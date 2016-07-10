@@ -14,9 +14,9 @@ namespace TaoShui
 
             ServicePointManager.ServerCertificateValidationCallback = ValidateServerCertificate;
 
-            WebSite maxBet1 = new MaxBet(browser, "pyh667h00a", "A123456a", 60);
-            WebSite maxBet2 = new MaxBet(browser, "sfb1337952", "Aaaa2234", 30);
-            WebSite pinnacle1 = new Pinnacle(browser, "hc2at84671", "aaaa2222", 30);
+            WebSite maxBet1 = new MaxBet("pyh667h00a", "A123456a", 4, 100);
+            //WebSite maxBet2 = new MaxBet("sfb1337952", "Aaaa2234", 4, 30);
+            //WebSite pinnacle1 = new Pinnacle("hc2at84671", "aaaa2222", 4, 30);
 
             var webBrowserThread = new Thread(maxBet1.Run)
             {

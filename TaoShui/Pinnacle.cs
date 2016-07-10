@@ -10,8 +10,8 @@ namespace TaoShui
 {
     public class Pinnacle : WebSite
     {
-        public Pinnacle(WebBrowser browser, string loginName, string loginPassword, int loginTimeOut = 10)
-            : base(browser, loginName, loginPassword, loginTimeOut)
+        public Pinnacle(string loginName, string loginPassword, int captchaLength, int loginTimeOut = 10)
+            : base(loginName, loginPassword, captchaLength, loginTimeOut)
         {
         }
 
@@ -84,41 +84,17 @@ namespace TaoShui
             }
         }
 
-        public override void ValidateCaptcha()
+        public override bool IsCaptchaInputPageLoaded()
         {
-            if (browser != null && browser.Document != null)
-            {
-                var refreshCaptchaCode = browser.Document.GetElementById("validateCode_href");
-                if (refreshCaptchaCode != null)
-                {
-                    refreshCaptchaCode.InvokeMember("Click");
-                }
-                var captchaCodeImage = browser.Document.GetElementById("validateCode");
-                var captchaCodeInput = browser.Document.GetElementById("txtCode");
-                var aElements = browser.Document.GetElementsByTagName("a");
-                var submit = aElements.Cast<HtmlElement>().FirstOrDefault(item => item.InnerHtml == "递交");
-                var divElements = browser.Document.GetElementsByTagName("div");
-                var captchaCodeDiv =
-                    divElements.Cast<HtmlElement>()
-                        .FirstOrDefault(item => item.GetAttribute("className") == "validationCode");
+            return true;
+        }
 
-                if (browser.Document.Window != null && browser.Document.Window.Parent != null &&
-                    captchaCodeImage != null && captchaCodeInput != null && submit != null && captchaCodeDiv != null)
-                {
-                    captchaCodeDiv.Style = "position: static; top: 0; left: 0; margin: 0;";
-                    captchaCodeImage.Style = "position: absolute; z-index: 99999999; top: -2px; left: -2px";
-                    var bitmap = new Bitmap(captchaCodeImage.ClientRectangle.Width - 4,
-                        captchaCodeImage.ClientRectangle.Height - 4);
-                    var rectangle = new Rectangle(0, 0,
-                        captchaCodeImage.OffsetRectangle.Width - 4, captchaCodeImage.OffsetRectangle.Height - 4);
-                    browser.DrawToBitmap(bitmap, rectangle);
+        public override void RefreshCaptcha()
+        {
+        }
 
-                    var code = Recogniser.RecognizeFromImage(bitmap, 4, 3,
-                        new HashSet<EnumCaptchaType> {EnumCaptchaType.Number});
-                    captchaCodeInput.SetAttribute("value", code);
-                    submit.InvokeMember("Click");
-                }
-            }
+        public override void CaptchaValidate()
+        {
         }
 
         public override void StartGrabData()

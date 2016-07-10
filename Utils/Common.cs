@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 
 namespace Utils
@@ -32,6 +33,11 @@ namespace Utils
                 return attributes[0].Description;
             }
             return propertyInfo.Name;
+        }
+
+        public static string GetNumericFromString(string str)
+        {
+            return str.Where(c => c >= 48 && c <= 58).Aggregate(string.Empty, (current, c) => current + c);
         }
     }
 }

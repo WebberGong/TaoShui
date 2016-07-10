@@ -156,6 +156,10 @@
       <Project>{a49647c1-a474-4368-80a7-a59c7e1e5750}</Project>
       <Name>CaptchaRecogniser</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Utils\Utils.csproj">
+      <Project>{B2A5C53D-D008-4AD1-89DB-7FFB0710AA74}</Project>
+      <Name>Utils</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -4,6 +4,7 @@
     {
         NotLogin,
         Logging,
+        CaptchaValidating,
         LoginSuccessful,
         LoginFailed
     }
