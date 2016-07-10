@@ -3,4 +3,5 @@
   &lt;Assembly Path="D:\TaoShui\packages\Tesseract.3.0.2.0\lib\net45\Tesseract.dll" /&gt;&#xD;
   &lt;Assembly Path="D:\TaoShui\packages\Atalasoft.dotImage.Ocr.Tesseract.x86.10.6.1.85353\lib\net40\x86\Atalasoft.dotImage.Ocr.Tesseract.dll" /&gt;&#xD;
   &lt;Assembly Path="D:\TaoShui\packages\Atalasoft.dotImage.Ocr.x86.10.6.1.85353\lib\net40\x86\Atalasoft.dotImage.Ocr.dll" /&gt;&#xD;
+  &lt;Assembly Path="D:\TaoShui\packages\log4net.2.0.5\lib\net45-full\log4net.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String></wpf:ResourceDictionary>

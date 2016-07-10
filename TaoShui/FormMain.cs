@@ -1,4 +1,7 @@
-﻿using System;
+﻿using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace TaoShui
@@ -9,13 +12,24 @@ namespace TaoShui
         {
             InitializeComponent();
 
-            MyRequest.DoRequest();
+            ServicePointManager.ServerCertificateValidationCallback = ValidateServerCertificate;
 
-            WebSite maxBet1 = new MaxBet(null, "pyh667h00a", "A123456a", new Uri("http://www.maxbet.com/Default.aspx"),
-                new Uri("http://www.maxbet.com/login_code.aspx?1"), "Default.aspx", "ProcessLogin.aspx", "main.aspx", 15);
-            //WebSite maxBet2 = new MaxBet(null, "sfb1337950", "Aaaa2234", new Uri("http://www.maxbet.com/Default.aspx"),
-            //    new Uri("http://www.maxbet.com/login_code.aspx?1"), "Default.aspx", "ProcessLogin.aspx", "main.aspx", 15);
-            maxBet1.Run();
+            WebSite maxBet1 = new MaxBet(null, "pyh667h00a", "A123456a", 30);
+            WebSite maxBet2 = new MaxBet(null, "sfb1337952", "Aaaa2234", 30);
+            WebSite pinnacle1 = new Pinnacle(browser, "hc2at84671", "aaaa2222", 30);
+
+            var webBrowserThread = new Thread(pinnacle1.Run)
+            {
+                Priority = ThreadPriority.AboveNormal,
+                IsBackground = true
+            };
+            webBrowserThread.Start();
+        }
+
+        private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain,
+            SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
         }
     }
 }

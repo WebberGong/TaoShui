@@ -56,18 +56,12 @@ namespace CaptchaRecogniser
             }
         }
 
-        public static string RecognizeFromImage(Uri imageUrl, string cookie, int maxLength = DefaultMaxLength,
+        public static string RecognizeFromImage(Uri imageUrl, int maxLength = DefaultMaxLength,
             int binarizeCount = DefaultBinarizeCount, HashSet<EnumCaptchaType> captchaTypeSet = null)
         {
             var request = WebRequest.Create(imageUrl) as HttpWebRequest;
             if (request != null)
             {
-                request.Accept = "image/webp,image/*,*/*;q=0.8";
-                request.UserAgent =
-                    "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36";
-                request.Headers.Add("Accept-Encoding", "gzip, deflate, sdch");
-                request.Headers.Add("Accept-Language", "en-US,en;q=0.8,zh;q=0.6");
-                request.Headers.Add("Cookie", cookie);
                 var response = (request.GetResponse()) as HttpWebResponse;
                 if (response != null)
                 {

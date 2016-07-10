@@ -1,44 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using mshtml;
 using Timer = System.Timers.Timer;
 
 namespace TaoShui
 {
     public abstract class WebSite
     {
-        private readonly string _loginPage;
         private readonly Timer _loginTimer;
-        private readonly string _mainPage;
-        private readonly string _processLoginPage;
         private EnumLoginStatus _loginStatus = EnumLoginStatus.NotLogin;
-        protected Uri baseUrl;
         protected WebBrowser browser;
-        protected Uri captchaCodeImgUrl;
         protected string loginName;
         protected string loginPassword;
         protected int loginTimeOut;
 
-        protected WebSite(WebBrowser browser, string loginName, string loginPassword, Uri baseUrl,
-            Uri captchaCodeImgUrl,
-            string loginPage, string processLoginPage, string mainPage, int loginTimeOut)
+        protected WebSite(WebBrowser browser, string loginName, string loginPassword, int loginTimeOut)
         {
             this.browser = browser ?? new WebBrowser();
             this.loginName = loginName;
             this.loginPassword = loginPassword;
-            this.baseUrl = baseUrl;
-            this.captchaCodeImgUrl = captchaCodeImgUrl;
             this.loginTimeOut = loginTimeOut;
 
-            this.browser.ScriptErrorsSuppressed = false;
+            this.browser.ObjectForScripting = new MaxBetMessageHandler(this);
+            this.browser.ScriptErrorsSuppressed = true;
             this.browser.Navigated += WebSiteNavigated;
             this.browser.DocumentCompleted += LoginPageLoaded;
             this.browser.DocumentCompleted += ProcessLoginPageLoaded;
             this.browser.DocumentCompleted += MainPageLoaded;
-
-            _loginPage = loginPage;
-            _processLoginPage = processLoginPage;
-            _mainPage = mainPage;
 
             var timeOut = new TimeSpan(0, 0, loginTimeOut);
             var startTime = DateTime.Now;
@@ -49,6 +38,10 @@ namespace TaoShui
                 {
                     _loginTimer.Stop();
                     LoginStatus = EnumLoginStatus.LoginFailed;
+                    if (browser != null)
+                    {
+                        browser.Stop();
+                    }
                 }
                 else
                 {
@@ -67,9 +60,14 @@ namespace TaoShui
             get { return loginName; }
         }
 
-        public Uri BaseUrl
+        public string LoginPassword
         {
-            get { return baseUrl; }
+            get { return loginPassword; }
+        }
+
+        public int LoginTimeOut
+        {
+            get { return loginTimeOut; }
         }
 
         public EnumLoginStatus LoginStatus
@@ -102,30 +100,46 @@ namespace TaoShui
             }
         }
 
-        protected abstract Action<bool> EndLogin { get; }
-        protected abstract Action<IDictionary<string, IList<string>>> EndGrabData { get; }
-        protected abstract Action<EnumLoginStatus> LoginStatusChanged { get; }
-
         public void Run()
         {
-            browser.Navigate(baseUrl);
+            LoginStatus = EnumLoginStatus.NotLogin;
+            browser.Navigate(BaseUrl);
         }
 
         private void WebSiteNavigated(object sender, WebBrowserNavigatedEventArgs e)
         {
+            var webBrowser = sender as WebBrowser;
+            if (webBrowser != null && webBrowser.Document != null && webBrowser.Document.Window != null)
+            {
+                var win = (IHTMLWindow2)webBrowser.Document.Window.DomWindow;
+                var js = @"window.alert = function(msg) { window.external.AlertMessage(msg); return true; }; 
+                    window.onerror = function() { return true; }; 
+                    window.confirm = function() { return true; }; 
+                    window.open = function() { return true; }; 
+                    window.showModalDialog = function() { return true; };";
+                win.execScript(js, "javascript");
+            }
+
             var pageName = e.Url.ToString();
 
-            if (pageName.Contains(_loginPage))
+            if (!string.IsNullOrEmpty(LoginPage) && pageName.Contains(LoginPage))
             {
-                LoginStatus = EnumLoginStatus.NotLogin;
+                if (string.IsNullOrEmpty(ProcessLoginPage) && LoginStatus == EnumLoginStatus.NotLogin)
+                {
+                    LoginStatus = EnumLoginStatus.Logging;
+                    _loginTimer.Enabled = true;
+                    _loginTimer.Start();
+                }
             }
-            else if (pageName.Contains(_processLoginPage))
+            else if (!string.IsNullOrEmpty(ProcessLoginPage) && LoginStatus == EnumLoginStatus.NotLogin &&
+                     pageName.Contains(ProcessLoginPage))
             {
                 LoginStatus = EnumLoginStatus.Logging;
                 _loginTimer.Enabled = true;
                 _loginTimer.Start();
             }
-            else if (pageName.Contains(_mainPage))
+            else if (!string.IsNullOrEmpty(MainPage) && LoginStatus == EnumLoginStatus.Logging &&
+                     pageName.Contains(MainPage))
             {
                 LoginStatus = EnumLoginStatus.LoginSuccessful;
             }
@@ -135,7 +149,7 @@ namespace TaoShui
         {
             var pageName = e.Url.ToString();
 
-            if (pageName.Contains(_loginPage))
+            if (!string.IsNullOrEmpty(LoginPage) && pageName.Contains(LoginPage))
             {
                 StartLogin();
             }
@@ -145,7 +159,7 @@ namespace TaoShui
         {
             var pageName = e.Url.ToString();
 
-            if (pageName.Contains(_processLoginPage))
+            if (!string.IsNullOrEmpty(ProcessLoginPage) && pageName.Contains(ProcessLoginPage))
             {
                 ProcessLogin();
             }
@@ -155,14 +169,21 @@ namespace TaoShui
         {
             var pageName = e.Url.ToString();
 
-            if (pageName.Contains(_mainPage))
+            if (!string.IsNullOrEmpty(MainPage) && pageName.Contains(MainPage))
             {
                 StartGrabData();
             }
         }
 
-        protected abstract void StartLogin();
-        protected abstract void ProcessLogin();
-        protected abstract void StartGrabData();
+        protected abstract Uri BaseUrl { get; }
+        protected abstract string LoginPage { get; }
+        protected abstract string ProcessLoginPage { get; }
+        protected abstract string MainPage { get; }
+        protected abstract Action<bool> EndLogin { get; }
+        protected abstract Action<IDictionary<string, IList<string>>> EndGrabData { get; }
+        protected abstract Action<EnumLoginStatus> LoginStatusChanged { get; }
+        public abstract void StartLogin();
+        public abstract void ProcessLogin();
+        public abstract void StartGrabData();
     }
 }
