@@ -8,6 +8,7 @@ namespace TaoShui
     public class MaxBetMessageHandler
     {
         private readonly WebSite _webSite;
+        private int _captchaValidateCount = 3;
 
         public MaxBetMessageHandler(WebSite webSite)
         {
@@ -18,7 +19,11 @@ namespace TaoShui
         {
             if (msg == "验证码错误!")
             {
-                _webSite.ProcessLogin();
+                _captchaValidateCount++;
+                if (_captchaValidateCount < 3)
+                {
+                    _webSite.ValidateCaptcha();
+                }
             }
         }
     }

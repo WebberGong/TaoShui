@@ -25,7 +25,7 @@ namespace TaoShui
             get { return "https://www.pinnacle.com/zh-cn/"; }
         }
 
-        protected override string ProcessLoginPage
+        protected override string CaptchaInputPage
         {
             get { return ""; }
         }
@@ -84,10 +84,15 @@ namespace TaoShui
             }
         }
 
-        public override void ProcessLogin()
+        public override void ValidateCaptcha()
         {
             if (browser != null && browser.Document != null)
             {
+                var refreshCaptchaCode = browser.Document.GetElementById("validateCode_href");
+                if (refreshCaptchaCode != null)
+                {
+                    refreshCaptchaCode.InvokeMember("Click");
+                }
                 var captchaCodeImage = browser.Document.GetElementById("validateCode");
                 var captchaCodeInput = browser.Document.GetElementById("txtCode");
                 var aElements = browser.Document.GetElementsByTagName("a");

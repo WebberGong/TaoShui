@@ -9,7 +9,7 @@ namespace TaoShui
     public abstract class WebSite
     {
         private readonly Timer _loginTimer;
-        private EnumLoginStatus _loginStatus = EnumLoginStatus.NotLogin;
+        private EnumLoginStatus _loginStatus;
         protected WebBrowser browser;
         protected string loginName;
         protected string loginPassword;
@@ -26,7 +26,7 @@ namespace TaoShui
             this.browser.ScriptErrorsSuppressed = true;
             this.browser.Navigated += WebSiteNavigated;
             this.browser.DocumentCompleted += LoginPageLoaded;
-            this.browser.DocumentCompleted += ProcessLoginPageLoaded;
+            this.browser.DocumentCompleted += CaptchaInputPageLoaded;
             this.browser.DocumentCompleted += MainPageLoaded;
 
             var timeOut = new TimeSpan(0, 0, loginTimeOut);
@@ -122,24 +122,13 @@ namespace TaoShui
 
             var pageName = e.Url.ToString();
 
-            if (!string.IsNullOrEmpty(LoginPage) && pageName.Contains(LoginPage))
-            {
-                if (string.IsNullOrEmpty(ProcessLoginPage) && LoginStatus == EnumLoginStatus.NotLogin)
-                {
-                    LoginStatus = EnumLoginStatus.Logging;
-                    _loginTimer.Enabled = true;
-                    _loginTimer.Start();
-                }
-            }
-            else if (!string.IsNullOrEmpty(ProcessLoginPage) && LoginStatus == EnumLoginStatus.NotLogin &&
-                     pageName.Contains(ProcessLoginPage))
+            if (LoginStatus == EnumLoginStatus.NotLogin && !string.IsNullOrEmpty(LoginPage) && pageName.Contains(LoginPage))
             {
                 LoginStatus = EnumLoginStatus.Logging;
                 _loginTimer.Enabled = true;
                 _loginTimer.Start();
             }
-            else if (!string.IsNullOrEmpty(MainPage) && LoginStatus == EnumLoginStatus.Logging &&
-                     pageName.Contains(MainPage))
+            else if (LoginStatus == EnumLoginStatus.Logging && !string.IsNullOrEmpty(MainPage) && pageName.Contains(MainPage))
             {
                 LoginStatus = EnumLoginStatus.LoginSuccessful;
             }
@@ -149,19 +138,19 @@ namespace TaoShui
         {
             var pageName = e.Url.ToString();
 
-            if (!string.IsNullOrEmpty(LoginPage) && pageName.Contains(LoginPage))
+            if (LoginStatus == EnumLoginStatus.NotLogin && !string.IsNullOrEmpty(LoginPage) && pageName.Contains(LoginPage))
             {
                 StartLogin();
             }
         }
 
-        private void ProcessLoginPageLoaded(object sender, WebBrowserDocumentCompletedEventArgs e)
+        private void CaptchaInputPageLoaded(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
             var pageName = e.Url.ToString();
 
-            if (!string.IsNullOrEmpty(ProcessLoginPage) && pageName.Contains(ProcessLoginPage))
+            if (LoginStatus == EnumLoginStatus.Logging && !string.IsNullOrEmpty(CaptchaInputPage) && pageName.Contains(CaptchaInputPage))
             {
-                ProcessLogin();
+                ValidateCaptcha();
             }
         }
 
@@ -169,7 +158,7 @@ namespace TaoShui
         {
             var pageName = e.Url.ToString();
 
-            if (!string.IsNullOrEmpty(MainPage) && pageName.Contains(MainPage))
+            if (LoginStatus == EnumLoginStatus.LoginSuccessful && !string.IsNullOrEmpty(MainPage) && pageName.Contains(MainPage))
             {
                 StartGrabData();
             }
@@ -177,13 +166,13 @@ namespace TaoShui
 
         protected abstract Uri BaseUrl { get; }
         protected abstract string LoginPage { get; }
-        protected abstract string ProcessLoginPage { get; }
+        protected abstract string CaptchaInputPage { get; }
         protected abstract string MainPage { get; }
         protected abstract Action<bool> EndLogin { get; }
         protected abstract Action<IDictionary<string, IList<string>>> EndGrabData { get; }
         protected abstract Action<EnumLoginStatus> LoginStatusChanged { get; }
         public abstract void StartLogin();
-        public abstract void ProcessLogin();
+        public abstract void ValidateCaptcha();
         public abstract void StartGrabData();
     }
 }

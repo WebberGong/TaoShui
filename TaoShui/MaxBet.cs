@@ -25,7 +25,7 @@ namespace TaoShui
             get { return "Default.aspx"; }
         }
 
-        protected override string ProcessLoginPage
+        protected override string CaptchaInputPage
         {
             get { return "ProcessLogin.aspx"; }
         }
@@ -72,7 +72,7 @@ namespace TaoShui
             }
         }
 
-        public override void ProcessLogin()
+        public override void ValidateCaptcha()
         {
             if (browser != null && browser.Document != null)
             {
