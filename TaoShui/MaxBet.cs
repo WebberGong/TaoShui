@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using CaptchaRecogniser;
 using Newtonsoft.Json;
@@ -11,8 +12,8 @@ namespace TaoShui
 {
     public class MaxBet : WebSite
     {
-        public MaxBet(string loginName, string loginPassword, int captchaLength, int loginTimeOut = 10)
-            : base(loginName, loginPassword, captchaLength, loginTimeOut)
+        public MaxBet(WebBrowser browser, string loginName, string loginPassword, int captchaLength, int loginTimeOut = 10)
+            : base(browser, loginName, loginPassword, captchaLength, loginTimeOut)
         {
         }
 
@@ -83,15 +84,49 @@ namespace TaoShui
             return captchaImage != null;
         }
 
+        private void RefreshCaptcha(HtmlElement captchaRefresh, HtmlElement captchaImage)
+        {
+            if (captchaRefresh != null && captchaImage != null)
+            {
+                var src = captchaImage.GetAttribute("src");
+
+                var bitmap = new Bitmap(captchaImage.ClientRectangle.Width - 4,
+                        captchaImage.ClientRectangle.Height - 4);
+                var rectangle = new Rectangle(0, 0,
+                    captchaImage.OffsetRectangle.Width - 4, captchaImage.OffsetRectangle.Height - 4);
+                browser.DrawToBitmap(bitmap, rectangle);
+
+                var code = Recogniser.RecognizeFromImage(bitmap, captchaLength, 3,
+                    new HashSet<EnumCaptchaType> { EnumCaptchaType.Number });
+
+                captchaRefresh.InvokeMember("Click");
+                var timeOut = new TimeSpan(0, 0, 3);
+                DateTime startTime = DateTime.Now;
+                while (DateTime.Now < startTime.Add(timeOut) && src == captchaImage.GetAttribute("src"))
+                {
+                    Application.DoEvents();
+                    Thread.Sleep(100);
+                }
+
+                bitmap = new Bitmap(captchaImage.ClientRectangle.Width - 4,
+                    captchaImage.ClientRectangle.Height - 4);
+                rectangle = new Rectangle(0, 0,
+                    captchaImage.OffsetRectangle.Width - 4, captchaImage.OffsetRectangle.Height - 4);
+                browser.DrawToBitmap(bitmap, rectangle);
+
+                code = Recogniser.RecognizeFromImage(bitmap, captchaLength, 3,
+                    new HashSet<EnumCaptchaType> { EnumCaptchaType.Number });
+            }
+        }
+
         public override void RefreshCaptcha()
         {
             if (browser.Document != null)
             {
                 var captchaRefresh = browser.Document.GetElementById("validateCode_href");
-                if (captchaRefresh != null)
-                {
-                    captchaRefresh.InvokeMember("Click");
-                }
+                var captchaImage = browser.Document.GetElementById("validateCode");
+
+                RefreshCaptcha(captchaRefresh, captchaImage);
             }
         }
 
@@ -100,16 +135,15 @@ namespace TaoShui
             if (browser != null && browser.Document != null)
             {
                 var captchaImage = browser.Document.GetElementById("validateCode");
+                var captchaRefresh = browser.Document.GetElementById("validateCode_href");
                 var captchaInput = browser.Document.GetElementById("txtCode");
                 var aElements = browser.Document.GetElementsByTagName("a");
                 var submit = aElements.Cast<HtmlElement>().FirstOrDefault(item => item.InnerHtml == "递交");
                 var divElements = browser.Document.GetElementsByTagName("div");
-                var captchaDiv =
-                    divElements.Cast<HtmlElement>()
-                        .FirstOrDefault(item => item.GetAttribute("className") == "validationCode");
+                var captchaDiv = divElements.Cast<HtmlElement>().FirstOrDefault(item => item.GetAttribute("className") == "validationCode");
 
                 if (browser.Document.Window != null && browser.Document.Window.Parent != null &&
-                    captchaImage != null && captchaInput != null && submit != null && captchaDiv != null)
+                    captchaImage != null && captchaRefresh != null && captchaInput != null && submit != null && captchaDiv != null)
                 {
                     captchaDiv.Style = "position: static; top: 0; left: 0; margin: 0;";
                     captchaImage.Style = "position: absolute; z-index: 99999999; top: -2px; left: -2px";
@@ -124,10 +158,11 @@ namespace TaoShui
                     code = Common.GetNumericFromString(code);
                     if (code.Length != captchaLength)
                     {
-                        RefreshCaptcha();
+                        Console.WriteLine(code);
+                        RefreshCaptcha(captchaRefresh, captchaImage);
                         return;
                     }
-                    code = "1";
+                    Console.WriteLine(code);
                     captchaInput.SetAttribute("value", code);
                     submit.InvokeMember("Click");
                 }

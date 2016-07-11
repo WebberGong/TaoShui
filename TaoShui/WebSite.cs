@@ -8,7 +8,7 @@ namespace TaoShui
 {
     public abstract class WebSite
     {
-        private Timer _loginTimer;
+        private readonly Timer _loginTimer;
         private EnumLoginStatus _loginStatus;
         private DateTime _startTime;
         private int _captchaValidateCount;
@@ -19,14 +19,51 @@ namespace TaoShui
         protected int captchaLength;
         protected int loginTimeOut;
 
-        protected WebSite(string loginName, string loginPassword, int captchaLength, int loginTimeOut)
+        protected WebSite(WebBrowser browser, string loginName, string loginPassword, int captchaLength, int loginTimeOut)
         {
+            this.browser = browser;
             this.loginName = loginName;
             this.loginPassword = loginPassword;
             this.captchaLength = captchaLength;
             this.loginTimeOut = loginTimeOut;
 
-            Init();
+            _loginStatus = EnumLoginStatus.NotLogin;
+            _captchaValidateCount = 0;
+
+            if (this.browser == null)
+            {
+                this.browser = new WebBrowser();
+            }
+
+            this.browser.ObjectForScripting = new MaxBetMessageHandler(this);
+            this.browser.ScriptErrorsSuppressed = true;
+            this.browser.Navigated += WebSiteNavigated;
+            this.browser.DocumentCompleted += LoginPageLoaded;
+            this.browser.DocumentCompleted += CaptchaInputPageLoaded;
+            this.browser.DocumentCompleted += MainPageLoaded;
+
+            var timeOut = new TimeSpan(0, 0, loginTimeOut);
+            _startTime = DateTime.Now;
+            _loginTimer = new Timer(500);
+            _loginTimer.Elapsed += (sender, ev) =>
+            {
+                if (DateTime.Now > _startTime.Add(timeOut))
+                {
+                    _loginTimer.Enabled = false;
+                    _loginTimer.Stop();
+                    LoginStatus = EnumLoginStatus.LoginFailed;
+                }
+                else
+                {
+                    if (LoginStatus == EnumLoginStatus.LoginSuccessful)
+                    {
+                        _loginTimer.Enabled = false;
+                        _loginTimer.Stop();
+                    }
+                }
+            };
+            _loginTimer.AutoReset = true;
+            _loginTimer.Enabled = false;
         }
 
         public string LoginName
@@ -84,46 +121,6 @@ namespace TaoShui
             browser.Navigate(BaseUrl);
         }
 
-        private void Init()
-        {
-            _loginStatus = EnumLoginStatus.NotLogin;
-            _captchaValidateCount = 0;
-
-            browser = new WebBrowser
-            {
-                ObjectForScripting = new MaxBetMessageHandler(this),
-                ScriptErrorsSuppressed = true
-            };
-
-            browser.Navigated += WebSiteNavigated;
-            browser.DocumentCompleted += LoginPageLoaded;
-            browser.DocumentCompleted += CaptchaInputPageLoaded;
-            browser.DocumentCompleted += MainPageLoaded;
-
-            var timeOut = new TimeSpan(0, 0, loginTimeOut);
-            _startTime = DateTime.Now;
-            _loginTimer = new Timer(500);
-            _loginTimer.Elapsed += (sender, ev) =>
-            {
-                if (DateTime.Now > _startTime.Add(timeOut))
-                {
-                    _loginTimer.Enabled = false;
-                    _loginTimer.Stop();
-                    LoginStatus = EnumLoginStatus.LoginFailed;
-                }
-                else
-                {
-                    if (LoginStatus == EnumLoginStatus.LoginSuccessful)
-                    {
-                        _loginTimer.Enabled = false;
-                        _loginTimer.Stop();
-                    }
-                }
-            };
-            _loginTimer.AutoReset = true;
-            _loginTimer.Enabled = false;
-        }
-
         private void WebSiteNavigated(object sender, WebBrowserNavigatedEventArgs e)
         {
             var webBrowser = sender as WebBrowser;
@@ -139,22 +136,6 @@ namespace TaoShui
             }
 
             var pageName = e.Url.ToString();
-
-            if (!string.IsNullOrEmpty(LoginPage) && pageName.Contains(LoginPage))
-            {
-                LoginStatus = EnumLoginStatus.Logging;
-                _startTime = DateTime.Now;
-                _loginTimer.Enabled = true;
-                _loginTimer.Start();
-            }
-            else if (!string.IsNullOrEmpty(CaptchaInputPage) && pageName.Contains(CaptchaInputPage))
-            {
-                LoginStatus = EnumLoginStatus.CaptchaValidating;
-            }
-            else if (!string.IsNullOrEmpty(MainPage) && pageName.Contains(MainPage))
-            {
-                LoginStatus = EnumLoginStatus.LoginSuccessful;
-            }
         }
 
         private void LoginPageLoaded(object sender, WebBrowserDocumentCompletedEventArgs e)
@@ -182,8 +163,8 @@ namespace TaoShui
                 {
                     LoginStatus = EnumLoginStatus.CaptchaValidating;
 
-                    CaptchaValidate();
                     _captchaValidateCount++;
+                    CaptchaValidate();
                 }
             }
         }

@@ -10,8 +10,8 @@ namespace TaoShui
 {
     public class Pinnacle : WebSite
     {
-        public Pinnacle(string loginName, string loginPassword, int captchaLength, int loginTimeOut = 10)
-            : base(loginName, loginPassword, captchaLength, loginTimeOut)
+        public Pinnacle(WebBrowser browser, string loginName, string loginPassword, int captchaLength, int loginTimeOut = 10)
+            : base(browser, loginName, loginPassword, captchaLength, loginTimeOut)
         {
         }
 
