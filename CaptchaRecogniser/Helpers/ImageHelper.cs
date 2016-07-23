@@ -181,9 +181,9 @@ namespace CaptchaRecogniser.Helpers
                 new Rectangle(0, 0, tempBitmap.Width, tempBitmap.Height), GraphicsUnit.Pixel);
             newGraphics.Dispose();
             int[] apetureMinX = {-(coreSize/2), 0, -(coreSize/2), 0};
-            int[] apetureMaxX = {0, (coreSize/2), 0, (coreSize/2)};
+            int[] apetureMaxX = {0, coreSize/2, 0, coreSize/2};
             int[] apetureMinY = {-(coreSize/2), -(coreSize/2), 0, 0};
-            int[] apetureMaxY = {0, 0, (coreSize/2), (coreSize/2)};
+            int[] apetureMaxY = {0, 0, coreSize/2, coreSize/2};
             for (var x = 0; x < newBitmap.Width; ++x)
             {
                 for (var y = 0; y < newBitmap.Height; ++y)
@@ -250,7 +250,7 @@ namespace CaptchaRecogniser.Helpers
                     var minDifference = 10000;
                     for (var i = 0; i < 4; ++i)
                     {
-                        var currentDifference = (maxRValue[i] - minRValue[i]) + (maxGValue[i] - minGValue[i]) +
+                        var currentDifference = maxRValue[i] - minRValue[i] + (maxGValue[i] - minGValue[i]) +
                                                 (maxBValue[i] - minBValue[i]);
                         if (currentDifference < minDifference && numPixels[i] > 0)
                         {

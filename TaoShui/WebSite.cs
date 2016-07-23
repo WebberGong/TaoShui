@@ -8,18 +8,20 @@ namespace TaoShui
 {
     public abstract class WebSite
     {
+        private readonly int _captchaValidateMaxCount = 3;
         private readonly Timer _loginTimer;
+        private int _captchaValidateCount;
         private EnumLoginStatus _loginStatus;
         private DateTime _startTime;
-        private int _captchaValidateCount;
-        private readonly int _captchaValidateMaxCount = 3;
+
         protected WebBrowser browser;
+        protected int captchaLength;
         protected string loginName;
         protected string loginPassword;
-        protected int captchaLength;
         protected int loginTimeOut;
 
-        protected WebSite(WebBrowser browser, string loginName, string loginPassword, int captchaLength, int loginTimeOut)
+        protected WebSite(WebBrowser browser, string loginName, string loginPassword, int captchaLength,
+            int loginTimeOut)
         {
             this.browser = browser;
             this.loginName = loginName;
@@ -116,6 +118,14 @@ namespace TaoShui
             }
         }
 
+        protected abstract Uri BaseUrl { get; }
+        protected abstract string LoginPage { get; }
+        protected abstract string CaptchaInputPage { get; }
+        protected abstract string MainPage { get; }
+        protected abstract Action<bool> EndLogin { get; }
+        protected abstract Action<IDictionary<string, IList<string>>> EndGrabData { get; }
+        protected abstract Action<EnumLoginStatus> LoginStatusChanged { get; }
+
         public void Run()
         {
             browser.Navigate(BaseUrl);
@@ -126,7 +136,7 @@ namespace TaoShui
             var webBrowser = sender as WebBrowser;
             if (webBrowser != null && webBrowser.Document != null && webBrowser.Document.Window != null)
             {
-                var win = (IHTMLWindow2)webBrowser.Document.Window.DomWindow;
+                var win = (IHTMLWindow2) webBrowser.Document.Window.DomWindow;
                 var js = @"window.alert = function(msg) { window.external.AlertMessage(msg); return true; }; 
                     window.onerror = function() { return true; }; 
                     window.confirm = function() { return true; }; 
@@ -136,6 +146,7 @@ namespace TaoShui
             }
 
             var pageName = e.Url.ToString();
+            LogHelper.LogInfo(GetType(), "页面跳转:" + pageName);
         }
 
         private void LoginPageLoaded(object sender, WebBrowserDocumentCompletedEventArgs e)
@@ -157,7 +168,8 @@ namespace TaoShui
         {
             var pageName = e.Url.ToString();
 
-            if (IsCaptchaInputPageLoaded() && !string.IsNullOrEmpty(CaptchaInputPage) && pageName.Contains(CaptchaInputPage))
+            if (IsCaptchaInputPageLoaded() && !string.IsNullOrEmpty(CaptchaInputPage) &&
+                pageName.Contains(CaptchaInputPage))
             {
                 if (_captchaValidateCount < _captchaValidateMaxCount)
                 {
@@ -181,13 +193,6 @@ namespace TaoShui
             }
         }
 
-        protected abstract Uri BaseUrl { get; }
-        protected abstract string LoginPage { get; }
-        protected abstract string CaptchaInputPage { get; }
-        protected abstract string MainPage { get; }
-        protected abstract Action<bool> EndLogin { get; }
-        protected abstract Action<IDictionary<string, IList<string>>> EndGrabData { get; }
-        protected abstract Action<EnumLoginStatus> LoginStatusChanged { get; }
         public abstract void StartLogin();
         public abstract bool IsCaptchaInputPageLoaded();
         public abstract void RefreshCaptcha();

@@ -14,7 +14,7 @@ namespace Utils
             var fieldInfo = enumType.GetField(enumName);
 
             var attributes = fieldInfo.GetCustomAttributes(
-                typeof (DescriptionAttribute), false) as DescriptionAttribute[];
+                typeof(DescriptionAttribute), false) as DescriptionAttribute[];
 
             if (attributes != null && attributes.Length > 0)
             {
@@ -26,7 +26,7 @@ namespace Utils
         public static string GetDescriptionAttribute(PropertyInfo propertyInfo)
         {
             var attributes = propertyInfo.GetCustomAttributes(
-                typeof (DescriptionAttribute), false) as DescriptionAttribute[];
+                typeof(DescriptionAttribute), false) as DescriptionAttribute[];
 
             if (attributes != null && attributes.Length > 0)
             {

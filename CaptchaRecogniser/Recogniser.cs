@@ -24,7 +24,7 @@ namespace CaptchaRecogniser
             Ocr = OcrApi.Create();
             Ocr.Init(Languages.English, Application.StartupPath, OcrEngineMode.OEM_TESSERACT_ONLY);
 
-            var allCaptchaType = Enum.GetValues(typeof (EnumCaptchaType));
+            var allCaptchaType = Enum.GetValues(typeof(EnumCaptchaType));
             DefaultCaptchaTypeSet = new HashSet<EnumCaptchaType>();
             foreach (var captchaType in allCaptchaType)
             {
@@ -62,7 +62,7 @@ namespace CaptchaRecogniser
             var request = WebRequest.Create(imageUrl) as HttpWebRequest;
             if (request != null)
             {
-                var response = (request.GetResponse()) as HttpWebResponse;
+                var response = request.GetResponse() as HttpWebResponse;
                 if (response != null)
                 {
                     var stream = response.GetResponseStream();

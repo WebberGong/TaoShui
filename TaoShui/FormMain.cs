@@ -14,16 +14,20 @@ namespace TaoShui
 
             ServicePointManager.ServerCertificateValidationCallback = ValidateServerCertificate;
 
-            WebSite maxBet1 = new MaxBet(null, "pyh667h00a", "A123456a", 4, 60);
-            //WebSite maxBet2 = new MaxBet(null, "sfb1337952", "Aaaa2234", 4, 30);
-            //WebSite pinnacle1 = new Pinnacle(null, "hc2at84671", "aaaa2222", 4, 30);
-
-            var webBrowserThread = new Thread(maxBet1.Run)
+            for (var i = 0; i < 1; i++)
             {
-                Priority = ThreadPriority.AboveNormal,
-                IsBackground = true
-            };
-            webBrowserThread.Start();
+                WebSite test = new MaxBet(null, "pyh667h00a", "A123456a", 4, 30);
+                //WebSite maxBet1 = new MaxBet(null, "pyh667h00a", "A123456a", 4, 30);
+                //WebSite maxBet2 = new MaxBet(null, "sfb1337952", "Aaaa2234", 4, 30);
+                //WebSite pinnacle1 = new Pinnacle(null, "hc2at84671", "aaaa2222", 4, 30);
+
+                var webBrowserThread = new Thread(test.Run)
+                {
+                    Priority = ThreadPriority.AboveNormal,
+                    IsBackground = true
+                };
+                webBrowserThread.Start();
+            }
         }
 
         private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain,
