@@ -3,6 +3,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Windows.Forms;
+using WebSite;
 
 namespace TaoShui
 {
@@ -16,14 +17,14 @@ namespace TaoShui
 
             for (var i = 0; i < 1; i++)
             {
-                WebSite test = new MaxBet(null, "pyh667h00a", "A123456a", 4, 30);
+                WebSite.WebSite test = new MaxBet(browser, "pyh667h00a", "A123456a", 4, 30);
                 //WebSite maxBet1 = new MaxBet(null, "pyh667h00a", "A123456a", 4, 30);
                 //WebSite maxBet2 = new MaxBet(null, "sfb1337952", "Aaaa2234", 4, 30);
                 //WebSite pinnacle1 = new Pinnacle(null, "hc2at84671", "aaaa2222", 4, 30);
 
                 var webBrowserThread = new Thread(test.Run)
                 {
-                    Priority = ThreadPriority.AboveNormal,
+                    Priority = ThreadPriority.Normal,
                     IsBackground = true
                 };
                 webBrowserThread.Start();
