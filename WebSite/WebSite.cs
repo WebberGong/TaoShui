@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 using mshtml;
 using Utils;
+using WatiN.Core;
+using WatiN.Core.Native.Chrome;
+using WatiN.Core.Native.Mozilla;
 using Timer = System.Timers.Timer;
 
 namespace WebSite
@@ -30,23 +34,6 @@ namespace WebSite
             this.loginPassword = loginPassword;
             this.captchaLength = captchaLength;
             this.loginTimeOut = loginTimeOut;
-
-            if (this.browser == null)
-            {
-                this.browser = new WebBrowser();
-            }
-            this.browser.ObjectForScripting = new MaxBetMessageHandler(this);
-            this.browser.ScriptErrorsSuppressed = true;
-            this.browser.Navigated -= WebSiteNavigated;
-            this.browser.DocumentCompleted -= LoginPageLoaded;
-            this.browser.DocumentCompleted -= CaptchaInputPageLoaded;
-            this.browser.DocumentCompleted -= MainPageLoaded;
-            this.browser.Navigated += WebSiteNavigated;
-            this.browser.DocumentCompleted += LoginPageLoaded;
-            this.browser.DocumentCompleted += CaptchaInputPageLoaded;
-            this.browser.DocumentCompleted += MainPageLoaded;
-
-            Initialize();
         }
 
         public string LoginName
@@ -109,6 +96,21 @@ namespace WebSite
 
         private void Initialize()
         {
+            if (browser == null)
+            {
+                browser = new WebBrowser();
+            }
+            browser.ObjectForScripting = new MaxBetMessageHandler(this);
+            browser.ScriptErrorsSuppressed = true;
+            browser.Navigated -= WebSiteNavigated;
+            browser.DocumentCompleted -= LoginPageLoaded;
+            browser.DocumentCompleted -= CaptchaInputPageLoaded;
+            browser.DocumentCompleted -= MainPageLoaded;
+            browser.Navigated += WebSiteNavigated;
+            browser.DocumentCompleted += LoginPageLoaded;
+            browser.DocumentCompleted += CaptchaInputPageLoaded;
+            browser.DocumentCompleted += MainPageLoaded;
+
             var timeOut = new TimeSpan(0, 0, loginTimeOut);
             _startTime = DateTime.Now;
             _loginTimer = new Timer(200);
