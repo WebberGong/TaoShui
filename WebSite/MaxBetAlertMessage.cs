@@ -18,7 +18,7 @@ namespace WebSite
         {
             if (msg == "验证码错误!")
             {
-                _webSite.RefreshCaptcha();
+                _webSite.DoRefreshCaptcha();
             }
         }
     }

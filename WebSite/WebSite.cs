@@ -111,9 +111,11 @@ namespace WebSite
         {
             var timeOut = new TimeSpan(0, 0, loginTimeOut);
             _startTime = DateTime.Now;
-            _loginTimer = new Timer(500);
+            _loginTimer = new Timer(200);
             _loginTimer.Elapsed += (sender, ev) =>
             {
+                Application.DoEvents();
+
                 if (DateTime.Now > _startTime.Add(timeOut))
                 {
                     _loginTimer.Enabled = false;
@@ -122,7 +124,8 @@ namespace WebSite
                 }
                 else
                 {
-                    if (LoginStatus == EnumLoginStatus.LoginSuccessful)
+                    if (LoginStatus == EnumLoginStatus.LoginSuccessful ||
+                        LoginStatus == EnumLoginStatus.LoginFailed)
                     {
                         _loginTimer.Enabled = false;
                         _loginTimer.Stop();
@@ -139,7 +142,7 @@ namespace WebSite
         protected abstract void StartLogin();
         protected abstract bool IsCaptchaInputPageLoaded();
         protected abstract void CaptchaValidate();
-        public abstract void RefreshCaptcha();
+        protected abstract void RefreshCaptcha();
         protected abstract void StartGrabData();
 
         public void Run()
@@ -155,6 +158,15 @@ namespace WebSite
                 CaptchaValidate();
                 _captchaValidateCount++;
             }
+            else
+            {
+                LoginStatus = EnumLoginStatus.LoginFailed;
+            }
+        }
+
+        public void DoRefreshCaptcha()
+        {
+            RefreshCaptcha();
         }
 
         private void WebSiteNavigated(object sender, WebBrowserNavigatedEventArgs e)
@@ -162,7 +174,7 @@ namespace WebSite
             var webBrowser = sender as WebBrowser;
             if (webBrowser != null && webBrowser.Document != null && webBrowser.Document.Window != null)
             {
-                var win = (IHTMLWindow2) webBrowser.Document.Window.DomWindow;
+                var win = (IHTMLWindow2)webBrowser.Document.Window.DomWindow;
                 var js = @"window.alert = function(msg) { window.external.AlertMessage(msg); return true; }; 
                     window.onerror = function() { return true; }; 
                     window.confirm = function() { return true; }; 

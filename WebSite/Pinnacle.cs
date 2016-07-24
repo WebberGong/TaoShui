@@ -94,7 +94,7 @@ namespace WebSite
         {
         }
 
-        public override void RefreshCaptcha()
+        protected override void RefreshCaptcha()
         {
         }
 

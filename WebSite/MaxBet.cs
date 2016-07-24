@@ -68,7 +68,7 @@ namespace WebSite
                     aElements.Cast<HtmlElement>().FirstOrDefault(item => item.GetAttribute("className") == "login_btn");
                 if (id != null && password != null && login != null)
                 {
-                    browser.Document.InvokeScript("changeLan", new object[] {"cs"});
+                    browser.Document.InvokeScript("changeLan", new object[] { "cs" });
                     id.SetAttribute("value", loginName);
                     password.SetAttribute("value", loginPassword);
                     login.InvokeMember("Click");
@@ -104,10 +104,10 @@ namespace WebSite
                     captchaImage != null && captchaRefresh != null && captchaInput != null && submit != null &&
                     captchaDiv != null)
                 {
-                    var doc = (HTMLDocument) browser.Document.DomDocument;
-                    var body = (HTMLBody) doc.body;
-                    var range = (IHTMLControlRange) body.createControlRange();
-                    var img = (IHTMLControlElement) captchaImage.DomElement;
+                    var doc = (HTMLDocument)browser.Document.DomDocument;
+                    var body = (HTMLBody)doc.body;
+                    var range = (IHTMLControlRange)body.createControlRange();
+                    var img = (IHTMLControlElement)captchaImage.DomElement;
                     range.add(img);
                     range.execCommand("Copy");
                     range.remove(0);
@@ -120,7 +120,7 @@ namespace WebSite
                     if (bitmap != null)
                     {
                         var code = Recogniser.RecognizeFromImage(bitmap, captchaLength, 3,
-                            new HashSet<EnumCaptchaType> {EnumCaptchaType.Number});
+                            new HashSet<EnumCaptchaType> { EnumCaptchaType.Number });
                         code = Common.GetNumericFromString(code);
                         LogHelper.LogInfo(GetType(), "验证码识别结果:" + code);
                         captchaInput.SetAttribute("value", code);
@@ -130,17 +130,11 @@ namespace WebSite
             }
         }
 
-        public override void RefreshCaptcha()
+        protected override void RefreshCaptcha()
         {
             if (browser.Document != null)
             {
-                var captchaRefresh = browser.Document.GetElementById("validateCode_href");
-                var captchaImage = browser.Document.GetElementById("validateCode");
-
-                if (captchaRefresh != null && captchaImage != null)
-                {
-                    captchaRefresh.InvokeMember("Click");
-                }
+                browser.Navigate(BaseUrl);
             }
         }
 
@@ -199,7 +193,7 @@ namespace WebSite
                                                 .Where(x => x.Name == "cvmy");
                                         var elementCollection = dataElementCollection as HtmlElement[] ??
                                                                 dataElementCollection.ToArray();
-                                        if (elementCollection.Count()%8 == 1)
+                                        if (elementCollection.Count() % 8 == 1)
                                         {
                                             LogHelper.LogWarn(GetType(), "比赛数据不完整！");
                                             continue;
