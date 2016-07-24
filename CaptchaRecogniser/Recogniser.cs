@@ -12,33 +12,54 @@ using Utils;
 
 namespace CaptchaRecogniser
 {
-    public static class Recogniser
+    public class Recogniser
     {
         private const int DefaultMaxLength = 50;
         private const int DefaultBinarizeCount = 3;
-        private static readonly OcrApi Ocr;
-        private static readonly HashSet<EnumCaptchaType> DefaultCaptchaTypeSet;
+        private readonly OcrApi _ocr;
+        private readonly HashSet<EnumCaptchaType> _defaultCaptchaTypeSet;
 
-        static Recogniser()
+        private static Recogniser _instance;
+        private static readonly object locker = new object();
+
+        private Recogniser()
         {
-            Ocr = OcrApi.Create();
-            Ocr.Init(Languages.English, Application.StartupPath, OcrEngineMode.OEM_TESSERACT_ONLY);
+            _ocr = OcrApi.Create();
+            _ocr.Init(Languages.English, Application.StartupPath, OcrEngineMode.OEM_TESSERACT_ONLY);
 
             var allCaptchaType = Enum.GetValues(typeof(EnumCaptchaType));
-            DefaultCaptchaTypeSet = new HashSet<EnumCaptchaType>();
+            _defaultCaptchaTypeSet = new HashSet<EnumCaptchaType>();
             foreach (var captchaType in allCaptchaType)
             {
-                DefaultCaptchaTypeSet.Add((EnumCaptchaType) captchaType);
+                _defaultCaptchaTypeSet.Add((EnumCaptchaType)captchaType);
             }
         }
 
-        public static string RecognizeFromImage(Bitmap bitMap, int maxLength = DefaultMaxLength,
+        public static Recogniser Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    lock (locker)
+                    {
+                        if (_instance == null)
+                        {
+                            _instance = new Recogniser();
+                        }
+                    }
+                }
+                return _instance;
+            }
+        }
+
+        public string RecognizeFromImage(Bitmap bitMap, int maxLength = DefaultMaxLength,
             int binarizeCount = DefaultBinarizeCount, HashSet<EnumCaptchaType> captchaTypeSet = null)
         {
             return Recognize(bitMap, maxLength, binarizeCount, captchaTypeSet);
         }
 
-        public static string RecognizeFromImage(string imagePath, int maxLength = DefaultMaxLength,
+        public string RecognizeFromImage(string imagePath, int maxLength = DefaultMaxLength,
             int binarizeCount = DefaultBinarizeCount, HashSet<EnumCaptchaType> captchaTypeSet = null)
         {
             using (var bitMap = Image.FromFile(imagePath) as Bitmap)
@@ -47,7 +68,7 @@ namespace CaptchaRecogniser
             }
         }
 
-        public static string RecognizeFromImage(Stream stream, int maxLength = DefaultMaxLength,
+        public string RecognizeFromImage(Stream stream, int maxLength = DefaultMaxLength,
             int binarizeCount = DefaultBinarizeCount, HashSet<EnumCaptchaType> captchaTypeSet = null)
         {
             using (var bitMap = Image.FromStream(stream) as Bitmap)
@@ -56,7 +77,7 @@ namespace CaptchaRecogniser
             }
         }
 
-        public static string RecognizeFromImage(Uri imageUrl, int maxLength = DefaultMaxLength,
+        public string RecognizeFromImage(Uri imageUrl, int maxLength = DefaultMaxLength,
             int binarizeCount = DefaultBinarizeCount, HashSet<EnumCaptchaType> captchaTypeSet = null)
         {
             var request = WebRequest.Create(imageUrl) as HttpWebRequest;
@@ -78,7 +99,7 @@ namespace CaptchaRecogniser
             return string.Empty;
         }
 
-        private static string Recognize(Bitmap bitMap, int maxLength = DefaultMaxLength,
+        private string Recognize(Bitmap bitMap, int maxLength = DefaultMaxLength,
             int binarizeCount = DefaultBinarizeCount, HashSet<EnumCaptchaType> captchaTypeSet = null)
         {
             var captha = new Captcha(bitMap);
@@ -92,7 +113,7 @@ namespace CaptchaRecogniser
 
             if (captchaTypeSet == null || captchaTypeSet.Count < 1)
             {
-                captchaTypeSet = DefaultCaptchaTypeSet;
+                captchaTypeSet = _defaultCaptchaTypeSet;
             }
             foreach (var captchaType in captchaTypeSet)
             {
@@ -100,10 +121,10 @@ namespace CaptchaRecogniser
             }
 
             string plainText;
-            lock (Ocr)
+            lock (_ocr)
             {
-                Ocr.SetVariable("tessedit_char_whitelist", validValueListBuilder.ToString());
-                plainText = Ocr.GetTextFromImage(image);
+                _ocr.SetVariable("tessedit_char_whitelist", validValueListBuilder.ToString());
+                plainText = _ocr.GetTextFromImage(image);
             }
 
             if (!captchaTypeSet.Contains(EnumCaptchaType.WhiteSpace))

@@ -119,7 +119,7 @@ namespace WebSite
 
                     if (bitmap != null)
                     {
-                        var code = Recogniser.RecognizeFromImage(bitmap, captchaLength, 3,
+                        var code = Recogniser.Instance.RecognizeFromImage(bitmap, captchaLength, 3,
                             new HashSet<EnumCaptchaType> { EnumCaptchaType.Number });
                         code = Common.GetNumericFromString(code);
                         LogHelper.LogInfo(GetType(), "验证码识别结果:" + code);
