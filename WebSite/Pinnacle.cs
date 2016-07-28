@@ -10,9 +10,9 @@ namespace WebSite
 {
     public class Pinnacle : WebSite
     {
-        public Pinnacle(WebBrowser browser, string loginName, string loginPassword, int captchaLength,
+        public Pinnacle(string loginName, string loginPassword, int captchaLength,
             int loginTimeOut = 10)
-            : base(browser, loginName, loginPassword, captchaLength, loginTimeOut)
+            : base(loginName, loginPassword, captchaLength, loginTimeOut)
         {
         }
 
@@ -52,6 +52,20 @@ namespace WebSite
         protected override Action<EnumLoginStatus> LoginStatusChanged
         {
             get { return loginStatus => { LogHelper.LogInfo(GetType(), "登录状态: " + loginStatus.ToString()); }; }
+        }
+
+        protected override Action<string> PopupMsgHandler
+        {
+            get
+            {
+                return msg =>
+                {
+                    if (msg == "验证码错误!")
+                    {
+                        DoRefreshCaptcha();
+                    }
+                };
+            }
         }
 
         protected override void StartLogin()
@@ -100,76 +114,6 @@ namespace WebSite
 
         protected override void StartGrabData()
         {
-            if (browser != null && browser.Document != null && browser.Document.Window != null &&
-                browser.Document.Window.Frames != null && browser.Document.Window.Frames.Count > 0)
-            {
-                var htmlWindow = browser.Document.Window.Frames["mainFrame"];
-                if (htmlWindow != null && htmlWindow.Document != null)
-                {
-                    var mainTables =
-                        htmlWindow.Document.GetElementsByTagName("table")
-                            .Cast<HtmlElement>()
-                            .Where(x => x.GetAttribute("className") == "oddsTable");
-                    IDictionary<string, IList<string>> dicData = new Dictionary<string, IList<string>>();
-                    foreach (var mainTable in mainTables)
-                    {
-                        if (mainTable.Document != null)
-                        {
-                            var mainTableRows = mainTable.Document.GetElementsByTagName("tr");
-                            var leagueName = string.Empty;
-                            foreach (HtmlElement item in mainTableRows)
-                            {
-                                var spanElements = item.GetElementsByTagName("span");
-                                var addToMyFavorite = spanElements.Cast<HtmlElement>()
-                                    .FirstOrDefault(x => x.GetAttribute("Title") == "加入我的最爱");
-                                if (addToMyFavorite != null && addToMyFavorite.Parent != null)
-                                {
-                                    leagueName = addToMyFavorite.Parent.InnerText;
-                                    if (!string.IsNullOrEmpty(leagueName))
-                                    {
-                                        if (!dicData.ContainsKey(leagueName))
-                                        {
-                                            dicData.Add(leagueName, new List<string>());
-                                        }
-                                        else
-                                        {
-                                            LogHelper.LogWarn(GetType(), "联赛名称重复！");
-                                        }
-                                        continue;
-                                    }
-                                }
-                                if (!string.IsNullOrEmpty(leagueName) &&
-                                    item.GetAttribute("className").Contains("displayOn"))
-                                {
-                                    if (!dicData.ContainsKey(leagueName))
-                                    {
-                                        LogHelper.LogWarn(GetType(), "未找到联赛名称！");
-                                    }
-                                    else
-                                    {
-                                        var dataElementCollection =
-                                            item.GetElementsByTagName("a")
-                                                .Cast<HtmlElement>()
-                                                .Where(x => x.Name == "cvmy");
-                                        var elementCollection = dataElementCollection as HtmlElement[] ??
-                                                                dataElementCollection.ToArray();
-                                        if (elementCollection.Count()%8 == 1)
-                                        {
-                                            LogHelper.LogWarn(GetType(), "比赛数据不完整！");
-                                            continue;
-                                        }
-                                        foreach (var dataElement in elementCollection)
-                                        {
-                                            dicData[leagueName].Add(dataElement.InnerHtml);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    EndGrabData(dicData);
-                }
-            }
         }
     }
 }

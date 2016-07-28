@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Net;
-using System.Net.Security;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using CaptchaRecogniser;
 using WebSite;
 
 namespace TaoShui
@@ -15,31 +10,27 @@ namespace TaoShui
         public FormMain()
         {
             InitializeComponent();
+        }
 
-            ServicePointManager.ServerCertificateValidationCallback = ValidateServerCertificate;
+        private void btnTest_Click(object sender, EventArgs e)
+        {
+            //WebSite maxBet1 = new MaxBet("pyh667h00a", "A123456a", 4, 30);
+            //WebSite maxBet2 = new MaxBet("sfb1337952", "Aaaa2234", 4, 30);
+            //WebSite pinnacle1 = new Pinnacle("hc2at84671", "aaaa2222", 4, 30);
 
-            ThreadPool.QueueUserWorkItem(s =>
+            //WebSite.WebSite maxBet1 = new MaxBet("pyh667h00a111", "A123456a111", 4, 30);
+            //maxBet1.Run();
+
+            WebSite.WebSite pinnacle1 = new Pinnacle("hc2at84671111", "aaaa2222111", 4, 30);
+            pinnacle1.Run();
+        }
+
+        private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (Recogniser.Instance != null)
             {
-                for (var i = 0; i < 10; i++)
-                {
-                    RunLogin();
-                    //WebSite maxBet1 = new MaxBet(null, "pyh667h00a", "A123456a", 4, 30);
-                    //WebSite maxBet2 = new MaxBet(null, "sfb1337952", "Aaaa2234", 4, 30);
-                    //WebSite pinnacle1 = new Pinnacle(null, "hc2at84671", "aaaa2222", 4, 30);
-                }
-            });
-        }
-
-        private void RunLogin()
-        {
-            WebSite.WebSite site = new MaxBet(null, "111", "111", 4, 30);
-            site.Run();
-        }
-
-        private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain,
-            SslPolicyErrors sslPolicyErrors)
-        {
-            return true;
+                Recogniser.Instance.Dispose();
+            }
         }
     }
 }

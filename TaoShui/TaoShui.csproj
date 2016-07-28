@@ -61,6 +61,9 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WatiN.Core">
+      <HintPath>..\packages\WatiN.2.1.0\lib\net40\WatiN.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FormMain.cs">
@@ -118,6 +121,14 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CaptchaRecogniser\CaptchaRecogniser.csproj">
+      <Project>{A49647C1-A474-4368-80A7-A59C7E1E5750}</Project>
+      <Name>CaptchaRecogniser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WebBrowserWaiter\WebBrowserWaiter.csproj">
+      <Project>{30430b8f-ff19-491f-8787-31a5db7ad132}</Project>
+      <Name>WebBrowserWaiter</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WebSite\WebSite.csproj">
       <Project>{165e7e15-b3a4-4530-9479-6dfe4e751c1c}</Project>
       <Name>WebSite</Name>

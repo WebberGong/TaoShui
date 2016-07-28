@@ -16,11 +16,11 @@ namespace CaptchaRecogniser
     {
         private const int DefaultMaxLength = 50;
         private const int DefaultBinarizeCount = 3;
-        private readonly OcrApi _ocr;
-        private readonly HashSet<EnumCaptchaType> _defaultCaptchaTypeSet;
 
         private static Recogniser _instance;
         private static readonly object locker = new object();
+        private readonly HashSet<EnumCaptchaType> _defaultCaptchaTypeSet;
+        private OcrApi _ocr;
 
         private Recogniser()
         {
@@ -31,7 +31,7 @@ namespace CaptchaRecogniser
             _defaultCaptchaTypeSet = new HashSet<EnumCaptchaType>();
             foreach (var captchaType in allCaptchaType)
             {
-                _defaultCaptchaTypeSet.Add((EnumCaptchaType)captchaType);
+                _defaultCaptchaTypeSet.Add((EnumCaptchaType) captchaType);
             }
         }
 
@@ -142,6 +142,15 @@ namespace CaptchaRecogniser
                 plainText = filteredBuilder.ToString();
             }
             return plainText;
+        }
+
+        public virtual void Dispose()
+        {
+            lock (_ocr)
+            {
+                _ocr.Dispose();
+                _ocr = null;
+            }
         }
     }
 }

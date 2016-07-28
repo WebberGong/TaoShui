@@ -13,9 +13,9 @@ namespace WebSite
 {
     public class MaxBet : WebSite
     {
-        public MaxBet(WebBrowser browser, string loginName, string loginPassword, int captchaLength,
+        public MaxBet(string loginName, string loginPassword, int captchaLength,
             int loginTimeOut = 10)
-            : base(browser, loginName, loginPassword, captchaLength, loginTimeOut)
+            : base(loginName, loginPassword, captchaLength, loginTimeOut)
         {
         }
 
@@ -57,6 +57,20 @@ namespace WebSite
             get { return loginStatus => { LogHelper.LogInfo(GetType(), "登录状态: " + loginStatus.ToString()); }; }
         }
 
+        protected override Action<string> PopupMsgHandler
+        {
+            get
+            {
+                return msg =>
+                {
+                    if (msg == "验证码错误!")
+                    {
+                        DoRefreshCaptcha();
+                    }
+                };
+            }
+        }
+
         protected override void StartLogin()
         {
             if (browser != null && browser.Document != null)
@@ -68,7 +82,7 @@ namespace WebSite
                     aElements.Cast<HtmlElement>().FirstOrDefault(item => item.GetAttribute("className") == "login_btn");
                 if (id != null && password != null && login != null)
                 {
-                    browser.Document.InvokeScript("changeLan", new object[] { "cs" });
+                    browser.Document.InvokeScript("changeLan", new object[] {"cs"});
                     id.SetAttribute("value", loginName);
                     password.SetAttribute("value", loginPassword);
                     login.InvokeMember("Click");
@@ -104,10 +118,10 @@ namespace WebSite
                     captchaImage != null && captchaRefresh != null && captchaInput != null && submit != null &&
                     captchaDiv != null)
                 {
-                    var doc = (HTMLDocument)browser.Document.DomDocument;
-                    var body = (HTMLBody)doc.body;
-                    var range = (IHTMLControlRange)body.createControlRange();
-                    var img = (IHTMLControlElement)captchaImage.DomElement;
+                    var doc = (HTMLDocument) browser.Document.DomDocument;
+                    var body = (HTMLBody) doc.body;
+                    var range = (IHTMLControlRange) body.createControlRange();
+                    var img = (IHTMLControlElement) captchaImage.DomElement;
                     range.add(img);
                     range.execCommand("Copy");
                     range.remove(0);
@@ -120,7 +134,7 @@ namespace WebSite
                     if (bitmap != null)
                     {
                         var code = Recogniser.Instance.RecognizeFromImage(bitmap, captchaLength, 3,
-                            new HashSet<EnumCaptchaType> { EnumCaptchaType.Number });
+                            new HashSet<EnumCaptchaType> {EnumCaptchaType.Number});
                         code = Common.GetNumericFromString(code);
                         LogHelper.LogInfo(GetType(), "验证码识别结果:" + code);
                         captchaInput.SetAttribute("value", code);
@@ -193,7 +207,7 @@ namespace WebSite
                                                 .Where(x => x.Name == "cvmy");
                                         var elementCollection = dataElementCollection as HtmlElement[] ??
                                                                 dataElementCollection.ToArray();
-                                        if (elementCollection.Count() % 8 == 1)
+                                        if (elementCollection.Count()%8 == 1)
                                         {
                                             LogHelper.LogWarn(GetType(), "比赛数据不完整！");
                                             continue;

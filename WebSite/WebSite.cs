@@ -5,9 +5,6 @@ using System.Threading;
 using System.Windows.Forms;
 using mshtml;
 using Utils;
-using WatiN.Core;
-using WatiN.Core.Native.Chrome;
-using WatiN.Core.Native.Mozilla;
 using Timer = System.Timers.Timer;
 
 namespace WebSite
@@ -26,14 +23,24 @@ namespace WebSite
         protected string loginPassword;
         protected int loginTimeOut;
 
-        protected WebSite(WebBrowser browser, string loginName, string loginPassword, int captchaLength,
-            int loginTimeOut)
+        protected WebSite(string loginName, string loginPassword, int captchaLength, int loginTimeOut)
         {
-            this.browser = browser;
             this.loginName = loginName;
             this.loginPassword = loginPassword;
             this.captchaLength = captchaLength;
             this.loginTimeOut = loginTimeOut;
+
+            using (var waiter = new WebBrowserWaiter.WebBrowserWaiter(null))
+            {
+
+                waiter.Await(
+                    wb => wb.Navigate(BaseUrl)
+                    );
+
+                var text = waiter.Await(
+                        wb => wb.DocumentText
+                    );
+            }
         }
 
         public string LoginName
@@ -93,24 +100,10 @@ namespace WebSite
         protected abstract Action<bool> EndLogin { get; }
         protected abstract Action<IDictionary<string, IList<string>>> EndGrabData { get; }
         protected abstract Action<EnumLoginStatus> LoginStatusChanged { get; }
+        protected abstract Action<string> PopupMsgHandler { get; }
 
         private void Initialize()
         {
-            if (browser == null)
-            {
-                browser = new WebBrowser();
-            }
-            browser.ObjectForScripting = new MaxBetMessageHandler(this);
-            browser.ScriptErrorsSuppressed = true;
-            browser.Navigated -= WebSiteNavigated;
-            browser.DocumentCompleted -= LoginPageLoaded;
-            browser.DocumentCompleted -= CaptchaInputPageLoaded;
-            browser.DocumentCompleted -= MainPageLoaded;
-            browser.Navigated += WebSiteNavigated;
-            browser.DocumentCompleted += LoginPageLoaded;
-            browser.DocumentCompleted += CaptchaInputPageLoaded;
-            browser.DocumentCompleted += MainPageLoaded;
-
             var timeOut = new TimeSpan(0, 0, loginTimeOut);
             _startTime = DateTime.Now;
             _loginTimer = new Timer(200);
@@ -150,7 +143,34 @@ namespace WebSite
         public void Run()
         {
             Initialize();
-            browser.Navigate(BaseUrl);
+
+            var thread = new Thread(() =>
+            {
+                using (var waiter = new WebBrowserWaiter.WebBrowserWaiter(PopupMsgHandler))
+                {
+                    browser = waiter.Browser;
+
+                    browser.Navigated -= WebSiteNavigated;
+                    browser.DocumentCompleted -= LoginPageLoaded;
+                    browser.DocumentCompleted -= CaptchaInputPageLoaded;
+                    browser.DocumentCompleted -= MainPageLoaded;
+                    browser.Navigated += WebSiteNavigated;
+                    browser.DocumentCompleted += LoginPageLoaded;
+                    browser.DocumentCompleted += CaptchaInputPageLoaded;
+                    browser.DocumentCompleted += MainPageLoaded;
+
+                    waiter.Await(
+                        wb => wb.Navigate(BaseUrl)
+                        );
+                }
+            })
+            {
+                Priority = ThreadPriority.Normal,
+                IsBackground = true,
+                Name = "WebBrowserThread"
+            };
+            thread.SetApartmentState(ApartmentState.MTA);
+            thread.Start();
         }
 
         public void DoCaptchaValidate()
@@ -176,9 +196,10 @@ namespace WebSite
             var webBrowser = sender as WebBrowser;
             if (webBrowser != null && webBrowser.Document != null && webBrowser.Document.Window != null)
             {
-                var win = (IHTMLWindow2)webBrowser.Document.Window.DomWindow;
-                var js = @"window.alert = function(msg) { window.external.AlertMessage(msg); return true; }; 
-                    window.onerror = function() { return true; }; 
+                var win = (IHTMLWindow2) webBrowser.Document.Window.DomWindow;
+                const string js =
+                    @"window.alert = function(msg) { window.external.PopupMsgHandler(msg); return true; }; 
+                    window.onerror = function() { return true; };
                     window.confirm = function() { return true; }; 
                     window.open = function() { return true; }; 
                     window.showModalDialog = function() { return true; };";
@@ -222,7 +243,6 @@ namespace WebSite
             if (MainPage != null && MainPage.IsMatch(pageName))
             {
                 LoginStatus = EnumLoginStatus.LoginSuccessful;
-
                 StartGrabData();
             }
         }
