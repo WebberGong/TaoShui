@@ -18,11 +18,11 @@ namespace TaoShui
             //WebSite maxBet2 = new MaxBet("sfb1337952", "Aaaa2234", 4, 30);
             //WebSite pinnacle1 = new Pinnacle("hc2at84671", "aaaa2222", 4, 30);
 
-            //WebSite.WebSite maxBet1 = new MaxBet("pyh667h00a111", "A123456a111", 4, 30);
-            //maxBet1.Run();
+            WebSiteBase maxBet1 = new MaxBet("pyh667h00a111", "A123456a111", 4, 20, 20);
+            maxBet1.Run();
 
-            WebSite.WebSite pinnacle1 = new Pinnacle("hc2at84671111", "aaaa2222111", 4, 30);
-            pinnacle1.Run();
+            //WebSite.WebSite pinnacle1 = new Pinnacle("hc2at84671111", "aaaa2222111", 4, 30);
+            //pinnacle1.Run();
         }
 
         private void FormMain_FormClosed(object sender, FormClosedEventArgs e)

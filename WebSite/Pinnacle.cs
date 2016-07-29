@@ -8,11 +8,11 @@ using Utils;
 
 namespace WebSite
 {
-    public class Pinnacle : WebSite
+    public class Pinnacle : WebSiteBase
     {
         public Pinnacle(string loginName, string loginPassword, int captchaLength,
-            int loginTimeOut = 10)
-            : base(loginName, loginPassword, captchaLength, loginTimeOut)
+            int loginTimeOut = 10, int getGrabDataUrlTimeOut = 5)
+            : base(loginName, loginPassword, captchaLength, loginTimeOut, getGrabDataUrlTimeOut)
         {
         }
 
@@ -21,19 +21,28 @@ namespace WebSite
             get { return new Uri("https://www.pinnacle.com/zh-cn/"); }
         }
 
-        protected override Regex LoginPage
+        protected override Regex LoginPageRegex
         {
-            get { return new Regex("https://www.pinnacle.com/zh-cn/"); }
+            get { return new Regex("https://www\\.pinnacle\\.com/zh-cn/"); }
         }
 
-        protected override Regex CaptchaInputPage
+        protected override Regex CaptchaInputPageRegex
         {
             get { return null; }
         }
 
-        protected override Regex MainPage
+        protected override Regex MainPageRegex
         {
             get { return new Regex("#tab=Menu&sport="); }
+        }
+
+        protected override IDictionary<string, Regex> GrabDataUrlRegexDictionary
+        {
+            get
+            {
+                IDictionary<string, Regex> grabDataUrlRegexeDic = new Dictionary<string, Regex>();
+                return grabDataUrlRegexeDic;
+            }
         }
 
         protected override Action<bool> EndLogin
@@ -49,7 +58,7 @@ namespace WebSite
             }
         }
 
-        protected override Action<EnumLoginStatus> LoginStatusChanged
+        protected override Action<WebSiteState> LoginStatusChanged
         {
             get { return loginStatus => { LogHelper.LogInfo(GetType(), "登录状态: " + loginStatus.ToString()); }; }
         }
@@ -70,7 +79,7 @@ namespace WebSite
 
         protected override void StartLogin()
         {
-            if (browser != null && browser.Document != null)
+            if (IsBrowserOk() && browser.Document != null)
             {
                 var startLoginBtn = browser.Document.GetElementById("loginButton");
                 if (startLoginBtn != null)

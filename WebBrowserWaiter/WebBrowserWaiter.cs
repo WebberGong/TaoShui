@@ -116,7 +116,7 @@ namespace WebBrowserWaiter
         /// <summary>
         ///     The default wait.
         /// </summary>
-        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(0);
+        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(30);
 
         /// <summary>
         ///     The signal.
@@ -294,7 +294,7 @@ namespace WebBrowserWaiter
         {
             Await(
                 wait,
-                new[] { order }
+                new[] {order}
                 );
         }
 
@@ -380,7 +380,7 @@ namespace WebBrowserWaiter
             Await(
                 waits,
                 orders.Select(
-                    (p, q) => (Func<WebBrowser, object>)(r =>
+                    (p, q) => (Func<WebBrowser, object>) (r =>
                     {
                         p(r);
                         return null;
@@ -449,7 +449,7 @@ namespace WebBrowserWaiter
         {
             return Await(
                 wait,
-                new[] { order }
+                new[] {order}
                 ).First();
         }
 
@@ -599,8 +599,14 @@ namespace WebBrowserWaiter
         public virtual void Dispose()
         {
             _form.Execute(
-                () => _form.Close()
-                );
+                () =>
+                {
+                    _form.Close();
+                    _browser.Stop();
+                    _browser.Dispose();
+                    _browser = null;
+                    GC.Collect();
+                });
         }
 
         #endregion

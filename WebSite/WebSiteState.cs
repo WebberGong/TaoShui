@@ -1,11 +1,12 @@
 ﻿namespace WebSite
 {
-    public enum EnumLoginStatus
+    public enum WebSiteState
     {
-        NotLogin,
+        Start,
         Logging,
         CaptchaValidating,
         LoginSuccessful,
-        LoginFailed
+        LoginFailed,
+        End
     }
 }

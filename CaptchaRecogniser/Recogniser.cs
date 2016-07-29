@@ -150,6 +150,7 @@ namespace CaptchaRecogniser
             {
                 _ocr.Dispose();
                 _ocr = null;
+                GC.Collect();
             }
         }
     }

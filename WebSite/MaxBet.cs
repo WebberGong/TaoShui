@@ -5,17 +5,18 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using CaptchaRecogniser;
+using DataGrabber;
 using mshtml;
 using Newtonsoft.Json;
 using Utils;
 
 namespace WebSite
 {
-    public class MaxBet : WebSite
+    public class MaxBet : WebSiteBase
     {
         public MaxBet(string loginName, string loginPassword, int captchaLength,
-            int loginTimeOut = 10)
-            : base(loginName, loginPassword, captchaLength, loginTimeOut)
+            int loginTimeOut = 10, int getGrabDataUrlTimeOut = 10)
+            : base(loginName, loginPassword, captchaLength, loginTimeOut, getGrabDataUrlTimeOut)
         {
         }
 
@@ -24,19 +25,32 @@ namespace WebSite
             get { return new Uri("http://www.maxbet.com/Default.aspx"); }
         }
 
-        protected override Regex LoginPage
+        protected override Regex LoginPageRegex
         {
-            get { return new Regex("Default.aspx"); }
+            get { return new Regex("Default\\.aspx"); }
         }
 
-        protected override Regex CaptchaInputPage
+        protected override Regex CaptchaInputPageRegex
         {
-            get { return new Regex("ProcessLogin.aspx$"); }
+            get { return new Regex("ProcessLogin\\.aspx$"); }
         }
 
-        protected override Regex MainPage
+        protected override Regex MainPageRegex
         {
-            get { return new Regex("main.aspx"); }
+            get { return new Regex("main\\.aspx"); }
+        }
+
+        protected override IDictionary<string, Regex> GrabDataUrlRegexDictionary
+        {
+            get
+            {
+                IDictionary<string, Regex> grabDataUrlRegexeDic = new Dictionary<string, Regex>();
+                grabDataUrlRegexeDic.Add("1", new Regex("miniOdds_data\\.aspx"));
+                grabDataUrlRegexeDic.Add("2", new Regex("LiveStreamingData\\.aspx"));
+                grabDataUrlRegexeDic.Add("3", new Regex("UnderOver_data\\.aspx\\?Market=l"));
+                grabDataUrlRegexeDic.Add("4", new Regex("UnderOver_data.aspx?Market=t"));
+                return grabDataUrlRegexeDic;
+            }
         }
 
         protected override Action<bool> EndLogin
@@ -52,7 +66,7 @@ namespace WebSite
             }
         }
 
-        protected override Action<EnumLoginStatus> LoginStatusChanged
+        protected override Action<WebSiteState> LoginStatusChanged
         {
             get { return loginStatus => { LogHelper.LogInfo(GetType(), "登录状态: " + loginStatus.ToString()); }; }
         }
@@ -73,7 +87,7 @@ namespace WebSite
 
         protected override void StartLogin()
         {
-            if (browser != null && browser.Document != null)
+            if (IsBrowserOk() && browser.Document != null)
             {
                 var id = browser.Document.GetElementById("txtID");
                 var password = browser.Document.GetElementById("txtPW");
@@ -102,7 +116,7 @@ namespace WebSite
 
         protected override void CaptchaValidate()
         {
-            if (browser != null && browser.Document != null)
+            if (IsBrowserOk() && browser.Document != null)
             {
                 var captchaImage = browser.Document.GetElementById("validateCode");
                 var captchaRefresh = browser.Document.GetElementById("validateCode_href");
@@ -154,75 +168,11 @@ namespace WebSite
 
         protected override void StartGrabData()
         {
-            if (browser != null && browser.Document != null && browser.Document.Window != null &&
-                browser.Document.Window.Frames != null && browser.Document.Window.Frames.Count > 0)
+            var grabber = new Grabber();
+            if (grabDataUrlDictionary != null && grabDataUrlDictionary.Count > 0 && !string.IsNullOrEmpty(cookie))
             {
-                var htmlWindow = browser.Document.Window.Frames["mainFrame"];
-                if (htmlWindow != null && htmlWindow.Document != null)
-                {
-                    var mainTables =
-                        htmlWindow.Document.GetElementsByTagName("table")
-                            .Cast<HtmlElement>()
-                            .Where(x => x.GetAttribute("className") == "oddsTable");
-                    IDictionary<string, IList<string>> dicData = new Dictionary<string, IList<string>>();
-                    foreach (var mainTable in mainTables)
-                    {
-                        if (mainTable.Document != null)
-                        {
-                            var mainTableRows = mainTable.Document.GetElementsByTagName("tr");
-                            var leagueName = string.Empty;
-                            foreach (HtmlElement item in mainTableRows)
-                            {
-                                var spanElements = item.GetElementsByTagName("span");
-                                var addToMyFavorite = spanElements.Cast<HtmlElement>()
-                                    .FirstOrDefault(x => x.GetAttribute("Title") == "加入我的最爱");
-                                if (addToMyFavorite != null && addToMyFavorite.Parent != null)
-                                {
-                                    leagueName = addToMyFavorite.Parent.InnerText;
-                                    if (!string.IsNullOrEmpty(leagueName))
-                                    {
-                                        if (!dicData.ContainsKey(leagueName))
-                                        {
-                                            dicData.Add(leagueName, new List<string>());
-                                        }
-                                        else
-                                        {
-                                            LogHelper.LogWarn(GetType(), "联赛名称重复！");
-                                        }
-                                        continue;
-                                    }
-                                }
-                                if (!string.IsNullOrEmpty(leagueName) &&
-                                    item.GetAttribute("className").Contains("displayOn"))
-                                {
-                                    if (!dicData.ContainsKey(leagueName))
-                                    {
-                                        LogHelper.LogWarn(GetType(), "未找到联赛名称！");
-                                    }
-                                    else
-                                    {
-                                        var dataElementCollection =
-                                            item.GetElementsByTagName("a")
-                                                .Cast<HtmlElement>()
-                                                .Where(x => x.Name == "cvmy");
-                                        var elementCollection = dataElementCollection as HtmlElement[] ??
-                                                                dataElementCollection.ToArray();
-                                        if (elementCollection.Count()%8 == 1)
-                                        {
-                                            LogHelper.LogWarn(GetType(), "比赛数据不完整！");
-                                            continue;
-                                        }
-                                        foreach (var dataElement in elementCollection)
-                                        {
-                                            dicData[leagueName].Add(dataElement.InnerHtml);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    EndGrabData(dicData);
-                }
+                string grabedData = grabber.Run(grabDataUrlDictionary, cookie);
+                Console.WriteLine(grabedData);
             }
         }
     }
