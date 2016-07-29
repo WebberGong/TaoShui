@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 using Utils;
 
 namespace WebSite
@@ -45,20 +44,7 @@ namespace WebSite
             }
         }
 
-        protected override Action<bool> EndLogin
-        {
-            get { return isLoginSuccessful => { LogHelper.LogInfo(GetType(), "登录是否成功: " + isLoginSuccessful); }; }
-        }
-
-        protected override Action<IDictionary<string, IList<string>>> EndGrabData
-        {
-            get
-            {
-                return dicData => { LogHelper.LogInfo(GetType(), "抓取到的数据: " + JsonConvert.SerializeObject(dicData)); };
-            }
-        }
-
-        protected override Action<WebSiteState> LoginStatusChanged
+        protected override Action<WebSiteStatus> LoginStatusChanged
         {
             get { return loginStatus => { LogHelper.LogInfo(GetType(), "登录状态: " + loginStatus.ToString()); }; }
         }
@@ -77,7 +63,7 @@ namespace WebSite
             }
         }
 
-        protected override void StartLogin()
+        protected override void Login()
         {
             if (IsBrowserOk() && browser.Document != null)
             {
@@ -121,7 +107,7 @@ namespace WebSite
         {
         }
 
-        protected override void StartGrabData()
+        protected override void GrabData()
         {
         }
     }

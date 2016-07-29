@@ -13,22 +13,24 @@ namespace WebSite
     {
         private readonly int _captchaValidateMaxCount = 3;
         private int _captchaValidateCount;
-        private WebSiteState _loginStatus;
-        private Timer _loginTimer;
-        private DateTime _startLoginTime;
         private Timer _getGrabDataUrlTimer;
+        private bool _isGetGrabDataUrlFinished;
+        private WebSiteStatus _loginStatus;
+        private Timer _loginTimer;
         private DateTime _startGetGrabDataUrlTime;
+        private DateTime _startLoginTime;
 
         protected WebBrowser browser;
         protected int captchaLength;
         protected string cookie;
+        protected int getGrabDataUrlTimeOut;
         protected IDictionary<string, string> grabDataUrlDictionary;
         protected string loginName;
         protected string loginPassword;
         protected int loginTimeOut;
-        protected int getGrabDataUrlTimeOut;
 
-        protected WebSiteBase(string loginName, string loginPassword, int captchaLength, int loginTimeOut, int getGrabDataUrlTimeOut)
+        protected WebSiteBase(string loginName, string loginPassword, int captchaLength, int loginTimeOut,
+            int getGrabDataUrlTimeOut)
         {
             this.loginName = loginName;
             this.loginPassword = loginPassword;
@@ -62,7 +64,7 @@ namespace WebSite
             get { return getGrabDataUrlTimeOut; }
         }
 
-        public WebSiteState LoginStatus
+        public WebSiteStatus LoginStatus
         {
             get { return _loginStatus; }
             private set
@@ -74,20 +76,6 @@ namespace WebSite
                     {
                         LoginStatusChanged(_loginStatus);
                     }
-                    if (_loginStatus == WebSiteState.LoginSuccessful)
-                    {
-                        if (EndLogin != null)
-                        {
-                            EndLogin(true);
-                        }
-                    }
-                    else if (_loginStatus == WebSiteState.LoginFailed)
-                    {
-                        if (EndLogin != null)
-                        {
-                            EndLogin(false);
-                        }
-                    }
                 }
             }
         }
@@ -97,20 +85,18 @@ namespace WebSite
         protected abstract Regex CaptchaInputPageRegex { get; }
         protected abstract Regex MainPageRegex { get; }
         protected abstract IDictionary<string, Regex> GrabDataUrlRegexDictionary { get; }
-        protected abstract Action<bool> EndLogin { get; }
-        protected abstract Action<IDictionary<string, IList<string>>> EndGrabData { get; }
-        protected abstract Action<WebSiteState> LoginStatusChanged { get; }
+        protected abstract Action<WebSiteStatus> LoginStatusChanged { get; }
         protected abstract Action<string> PopupMsgHandler { get; }
 
-        protected abstract void StartLogin();
+        protected abstract void Login();
         protected abstract bool IsCaptchaInputPageLoaded();
         protected abstract void CaptchaValidate();
         protected abstract void RefreshCaptcha();
-        protected abstract void StartGrabData();
+        protected abstract void GrabData();
 
         private void Initialize()
         {
-            TimeSpan tsLoginTimeOut = new TimeSpan(0, 0, loginTimeOut);
+            var tsLoginTimeOut = new TimeSpan(0, 0, loginTimeOut);
             _startLoginTime = DateTime.Now;
             _loginTimer = new Timer(200);
             _loginTimer.Elapsed += (sender, ev) =>
@@ -121,12 +107,12 @@ namespace WebSite
                 {
                     _loginTimer.Enabled = false;
                     _loginTimer.Stop();
-                    LoginStatus = WebSiteState.LoginFailed;
+                    LoginStatus = WebSiteStatus.LoginFailed;
                 }
                 else
                 {
-                    if (LoginStatus == WebSiteState.LoginSuccessful ||
-                        LoginStatus == WebSiteState.LoginFailed)
+                    if (LoginStatus == WebSiteStatus.LoginSuccessful ||
+                        LoginStatus == WebSiteStatus.LoginFailed)
                     {
                         _loginTimer.Enabled = false;
                         _loginTimer.Stop();
@@ -136,7 +122,7 @@ namespace WebSite
             _loginTimer.AutoReset = true;
             _loginTimer.Enabled = false;
 
-            TimeSpan tsGetGrabDataUrlTimeOut = new TimeSpan(0, 0, getGrabDataUrlTimeOut);
+            var tsGetGrabDataUrlTimeOut = new TimeSpan(0, 0, getGrabDataUrlTimeOut);
             _startGetGrabDataUrlTime = DateTime.Now;
             _getGrabDataUrlTimer = new Timer(200);
             _getGrabDataUrlTimer.Elapsed += (sender, ev) =>
@@ -147,27 +133,26 @@ namespace WebSite
                 {
                     _getGrabDataUrlTimer.Enabled = false;
                     _getGrabDataUrlTimer.Stop();
-                    LoginStatus = WebSiteState.End;
 
-                    StartGrabData();
+                    GrabData();
                 }
                 else
                 {
-                    if (LoginStatus == WebSiteState.End)
+                    if (_isGetGrabDataUrlFinished)
                     {
                         _getGrabDataUrlTimer.Enabled = false;
                         _getGrabDataUrlTimer.Stop();
 
-                        StartGrabData();
+                        GrabData();
                     }
                 }
             };
             _getGrabDataUrlTimer.AutoReset = true;
             _getGrabDataUrlTimer.Enabled = false;
 
-            _loginStatus = WebSiteState.Start;
+            _loginStatus = WebSiteStatus.NotLogin;
             _captchaValidateCount = 0;
-
+            _isGetGrabDataUrlFinished = false;
             grabDataUrlDictionary = new Dictionary<string, string>();
             cookie = string.Empty;
         }
@@ -219,7 +204,7 @@ namespace WebSite
             }
             else
             {
-                LoginStatus = WebSiteState.LoginFailed;
+                LoginStatus = WebSiteStatus.LoginFailed;
             }
         }
 
@@ -253,7 +238,7 @@ namespace WebSite
                         grabDataUrlDictionary.Add(item.Key, url);
                         if (grabDataUrlDictionary.Count == GrabDataUrlRegexDictionary.Count)
                         {
-                            LoginStatus = WebSiteState.End;
+                            _isGetGrabDataUrlFinished = true;
                         }
                     }
                 }
@@ -268,12 +253,12 @@ namespace WebSite
 
             if (LoginPageRegex != null && LoginPageRegex.IsMatch(url))
             {
-                LoginStatus = WebSiteState.Logging;
+                LoginStatus = WebSiteStatus.Logging;
                 _startLoginTime = DateTime.Now;
                 _loginTimer.Enabled = true;
                 _loginTimer.Start();
 
-                StartLogin();
+                Login();
             }
         }
 
@@ -283,7 +268,7 @@ namespace WebSite
 
             if (IsCaptchaInputPageLoaded() && CaptchaInputPageRegex != null && CaptchaInputPageRegex.IsMatch(url))
             {
-                LoginStatus = WebSiteState.CaptchaValidating;
+                LoginStatus = WebSiteStatus.CaptchaValidating;
                 DoCaptchaValidate();
             }
         }
@@ -300,7 +285,7 @@ namespace WebSite
                     cookie = webBrowser.Document.Cookie;
                 }
 
-                LoginStatus = WebSiteState.LoginSuccessful;
+                LoginStatus = WebSiteStatus.LoginSuccessful;
                 _startGetGrabDataUrlTime = DateTime.Now;
                 _getGrabDataUrlTimer.Enabled = true;
                 _getGrabDataUrlTimer.Start();
