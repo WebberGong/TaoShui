@@ -49,7 +49,7 @@ namespace WebSite
             get { return loginStatus => { LogHelper.LogInfo(GetType(), "登录状态: " + loginStatus.ToString()); }; }
         }
 
-        protected override Action<string> PopupMsgHandler
+        protected override Action<string> PopupMsg
         {
             get
             {
@@ -66,6 +66,17 @@ namespace WebSite
                         default:
                             break;
                     }
+                };
+            }
+        }
+
+        protected override Action<string> SendData
+        {
+            get
+            {
+                return data =>
+                {
+                    LogHelper.LogInfo(GetType(), data);
                 };
             }
         }

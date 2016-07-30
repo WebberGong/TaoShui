@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows.Forms;
 using mshtml;
 using Utils;
+using WebBrowserWaiter;
 using Timer = System.Timers.Timer;
 
 namespace WebSite
@@ -83,7 +84,8 @@ namespace WebSite
         protected abstract Regex MainPageRegex { get; }
         protected abstract IDictionary<string, string> GrabDataUrlDictionary { get; }
         protected abstract Action<WebSiteStatus> LoginStatusChanged { get; }
-        protected abstract Action<string> PopupMsgHandler { get; }
+        protected abstract Action<string> PopupMsg { get; }
+        protected abstract Action<string> SendData { get; }
 
         protected abstract void Login();
         protected abstract bool IsCaptchaInputPageLoaded();
@@ -143,19 +145,19 @@ namespace WebSite
 
             var thread = new Thread(() =>
             {
-                using (var waiter = new WebBrowserWaiter.WebBrowserWaiter(PopupMsgHandler))
+                using (var waiter = new WebBrowserWaiter.WebBrowserWaiter(new MessageHandler(PopupMsg, SendData), true))
                 {
                     browser = waiter.Browser;
 
+                    browser.Navigating -= WebSiteNavigating;
                     browser.Navigated -= WebSiteNavigated;
+                    browser.DocumentCompleted -= WebSiteDocumentCompleted;
                     browser.DocumentCompleted -= LoginPageLoaded;
                     browser.DocumentCompleted -= CaptchaInputPageLoaded;
                     browser.DocumentCompleted -= MainPageLoaded;
-                    browser.Navigating += (s, e) =>
-                    {
-                        LogHelper.LogInfo(GetType(), "Navigating:" + e.Url.ToString());
-                    };
+                    browser.Navigating += WebSiteNavigating;
                     browser.Navigated += WebSiteNavigated;
+                    browser.DocumentCompleted += WebSiteDocumentCompleted;
                     browser.DocumentCompleted += LoginPageLoaded;
                     browser.DocumentCompleted += CaptchaInputPageLoaded;
                     browser.DocumentCompleted += MainPageLoaded;
@@ -194,23 +196,35 @@ namespace WebSite
             RefreshCaptcha();
         }
 
+        private void WebSiteNavigating(object sender, WebBrowserNavigatingEventArgs e)
+        {
+            var url = e.Url.ToString();
+            LogHelper.LogInfo(GetType(), "正在跳转页面:" + url);
+        }
+
         private void WebSiteNavigated(object sender, WebBrowserNavigatedEventArgs e)
         {
+            var url = e.Url.ToString();
+            LogHelper.LogInfo(GetType(), "页面跳转成功:" + url);
+
             var webBrowser = sender as WebBrowser;
             if (webBrowser != null && webBrowser.Document != null && webBrowser.Document.Window != null)
             {
                 var win = (IHTMLWindow2)webBrowser.Document.Window.DomWindow;
                 const string js =
-                    @"window.alert = function(msg) { window.external.PopupMsgHandler(msg); return true; }; 
+                    @"window.alert = function(msg) { window.external.PopupMsg(msg); return true; }; 
                     window.onerror = function() { return true; };
                     window.confirm = function() { return true; }; 
                     window.open = function() { return true; }; 
                     window.showModalDialog = function() { return true; };";
                 win.execScript(js, "javascript");
             }
+        }
 
+        private void WebSiteDocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        {
             var url = e.Url.ToString();
-            LogHelper.LogInfo(GetType(), "页面跳转:" + url);
+            LogHelper.LogInfo(GetType(), "页面加载成功:" + url);
         }
 
         private void LoginPageLoaded(object sender, WebBrowserDocumentCompletedEventArgs e)

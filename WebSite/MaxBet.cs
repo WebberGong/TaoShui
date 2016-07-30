@@ -9,6 +9,7 @@ using CaptchaRecogniser;
 using DataGrabber;
 using mshtml;
 using Utils;
+using WebBrowserWaiter;
 
 namespace WebSite
 {
@@ -58,7 +59,7 @@ namespace WebSite
             get { return loginStatus => { LogHelper.LogInfo(GetType(), "登录状态: " + loginStatus.ToString()); }; }
         }
 
-        protected override Action<string> PopupMsgHandler
+        protected override Action<string> PopupMsg
         {
             get
             {
@@ -73,9 +74,19 @@ namespace WebSite
                             DoRefreshCaptcha();
                             break;
                         default:
-                            LogHelper.LogInfo(GetType(), msg);
                             break;
                     }
+                };
+            }
+        }
+
+        protected override Action<string> SendData
+        {
+            get
+            {
+                return data =>
+                {
+                    LogHelper.LogInfo(GetType(), data);
                 };
             }
         }
@@ -167,17 +178,8 @@ namespace WebSite
 
         protected override void GrabData()
         {
-            if (browser != null && browser.Document != null && browser.Document.Window != null &&
-                browser.Document.Window.Frames != null && browser.Document.Window.Frames.Count > 0)
+            if (browser != null && browser.Document != null && browser.Document.Window != null)
             {
-                var htmlWindow = browser.Document.Window.Frames["mainFrame"];
-                if (htmlWindow != null)
-                {
-                    if (htmlWindow.Frames != null)
-                    {
-                        var frame = htmlWindow.Frames["DataFrame_L"];
-                    }
-                }
                 var win = (IHTMLWindow2)browser.Document.Window.DomWindow;
                 const string js =
                     @"this.top.grabData = function() {
@@ -185,17 +187,18 @@ namespace WebSite
                             var data = JSON.stringify({
                                 D1: JSON.stringify(this.top.frames['mainFrame'].frames['DataFrame_L'].Nl),
                                 D2: JSON.stringify(this.top.frames['mainFrame'].frames['DataFrame_D'].Nt),
-                                D3: this.top.frames['mainFrame'].frames['DataFrame_L'].document.head.innerHTML,
-                                D4: this.top.frames['mainFrame'].frames['DataFrame_D'].document.head.innerHTML
                             });
-                            window.external.PopupMsgHandler(data);
-                            alert('data');
+                            if (data) {
+                                window.external.SendData(data);
+                            }
+                            this.top.frames['mainFrame'].refreshData_D();
+                            this.top.frames['mainFrame'].refreshData_L();
                         }
                         catch(ex){
-                            console.log(ex);
+                            window.external.PopupMsg(ex);
                         }
                     }
-                    setInterval(this.top.grabData, 6000);
+                    setInterval(this.top.grabData, 10000);
                     this.top.grabData();";
                 win.execScript(js, "javascript");
             }

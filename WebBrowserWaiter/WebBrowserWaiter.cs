@@ -116,7 +116,7 @@ namespace WebBrowserWaiter
         /// <summary>
         ///     The default wait.
         /// </summary>
-        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(2000);
+        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(10);
 
         /// <summary>
         ///     The signal.
@@ -138,6 +138,11 @@ namespace WebBrowserWaiter
         /// </summary>
         private DateTime? _lastCompleted;
 
+        /// <summary>
+        ///     If always keep wait, no timeout limit
+        /// </summary>
+        private readonly bool _isAlwaysKeepWait;
+
         #endregion
 
         #region Constructors and Destructors
@@ -153,19 +158,14 @@ namespace WebBrowserWaiter
             // constructor to avoid calling this constructor recursively.
         }
 
-        public WebBrowserWaiter(Action<string> popupMsgHandler)
-            // ReSharper disable once RedundantArgumentDefaultValue
-            : this(popupMsgHandler, false)
-        {
-            // NOTE: This constructor must provide at least one named argument to the other
-            // constructor to avoid calling this constructor recursively.
-        }
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="WebBrowserWaiter" /> class.
         /// </summary>
-        /// <param name="popupMsgHandler">
-        ///     The popup message handler
+        /// <param name="messageHandler">
+        ///     The js message handler
+        /// </param>
+        /// <param name="isAlwaysKeepWait">
+        ///     If always keep wait, no timeout limit
         /// </param>
         /// <param name="visibility">
         ///     The visibility.
@@ -185,19 +185,24 @@ namespace WebBrowserWaiter
         /// <param name="left">
         ///     The left.
         /// </param>
-        public WebBrowserWaiter(Action<string> popupMsgHandler = null, bool visibility = false,
+        public WebBrowserWaiter(MessageHandler messageHandler = null, bool isAlwaysKeepWait = false, bool visibility = false,
             FormStartPosition position = FormStartPosition.CenterScreen, int width = -1, int height = -1, int top = 0,
             int left = 0)
         {
             _signal = new ManualResetEvent(false);
+            _isAlwaysKeepWait = isAlwaysKeepWait;
+            if (messageHandler == null)
+            {
+                messageHandler = new MessageHandler(null, null);
+            }
 
             var thread = new Thread(() =>
             {
                 _browser = new WebBrowser
                 {
-                    Width = width < 0 ? Screen.PrimaryScreen.WorkingArea.Width*3/4 : width,
-                    Height = height < 0 ? Screen.PrimaryScreen.WorkingArea.Height*3/4 : height,
-                    ObjectForScripting = new MessageHandler(popupMsgHandler),
+                    Width = width < 0 ? Screen.PrimaryScreen.WorkingArea.Width * 3 / 4 : width,
+                    Height = height < 0 ? Screen.PrimaryScreen.WorkingArea.Height * 3 / 4 : height,
+                    ObjectForScripting = messageHandler,
                     ScriptErrorsSuppressed = true
                 };
 
@@ -580,22 +585,25 @@ namespace WebBrowserWaiter
 
                 while (true)
                 {
-                    Application.DoEvents();
-
-                    if (!_lastCompleted.HasValue)
+                    if ( !_lastCompleted.HasValue)
                     {
                         Thread.Sleep(50);
                         continue;
                     }
 
-                    var diff = _lastCompleted.Value.Add(waits[i]) - DateTime.UtcNow;
-
-                    if (diff.Ticks < 0)
+                    if (_isAlwaysKeepWait)
                     {
-                        break;
+                        Thread.Sleep(50);
                     }
-
-                    Thread.Sleep(diff);
+                    else
+                    {
+                        var diff = _lastCompleted.Value.Add(waits[i]) - DateTime.UtcNow;
+                        if (diff.Ticks < 0)
+                        {
+                            break;
+                        }
+                        Thread.Sleep(diff);
+                    }
                 }
             }
 

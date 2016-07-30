@@ -8,18 +8,28 @@ namespace WebBrowserWaiter
     [ComVisible(true)]
     public class MessageHandler
     {
-        private readonly Action<string> popupMsgHandler;
+        private readonly Action<string> _popupMsg;
+        private readonly Action<string> _sendData;
 
-        public MessageHandler(Action<string> popupMsg)
+        public MessageHandler(Action<string> popupMsg, Action<string> sendData)
         {
-            popupMsgHandler = popupMsg;
+            _popupMsg = popupMsg;
+            _sendData = sendData;
         }
 
-        public void PopupMsgHandler(string msg)
+        public void PopupMsg(string msg)
         {
-            if (popupMsgHandler != null)
+            if (_popupMsg != null)
             {
-                popupMsgHandler(msg);
+                _popupMsg(msg);
+            }
+        }
+
+        public void SendData(string data)
+        {
+            if (_sendData != null)
+            {
+                _sendData(data);
             }
         }
     }
