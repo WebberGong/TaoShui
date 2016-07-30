@@ -10,8 +10,8 @@ namespace WebSite
     public class Pinnacle : WebSiteBase
     {
         public Pinnacle(string loginName, string loginPassword, int captchaLength,
-            int loginTimeOut = 10, int getGrabDataUrlTimeOut = 5)
-            : base(loginName, loginPassword, captchaLength, loginTimeOut, getGrabDataUrlTimeOut)
+            int loginTimeOut = 10, int grabDataTimeOut = 5)
+            : base(loginName, loginPassword, captchaLength, loginTimeOut, grabDataTimeOut)
         {
         }
 
@@ -35,12 +35,12 @@ namespace WebSite
             get { return new Regex("#tab=Menu&sport="); }
         }
 
-        protected override IDictionary<string, Regex> GrabDataUrlRegexDictionary
+        protected override IDictionary<string, string> GrabDataUrlDictionary
         {
             get
             {
-                IDictionary<string, Regex> grabDataUrlRegexeDic = new Dictionary<string, Regex>();
-                return grabDataUrlRegexeDic;
+                IDictionary<string, string> grabDataUrlDic = new Dictionary<string, string>();
+                return grabDataUrlDic;
             }
         }
 
@@ -55,9 +55,16 @@ namespace WebSite
             {
                 return msg =>
                 {
-                    if (msg == "验证码错误!")
+                    switch (msg)
                     {
-                        DoRefreshCaptcha();
+                        case "帐号/密码错误":
+                            LoginStatus = WebSiteStatus.LoginFailed;
+                            break;
+                        case "验证码错误":
+                            DoRefreshCaptcha();
+                            break;
+                        default:
+                            break;
                     }
                 };
             }

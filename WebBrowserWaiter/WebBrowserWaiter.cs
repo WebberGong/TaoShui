@@ -116,7 +116,7 @@ namespace WebBrowserWaiter
         /// <summary>
         ///     The default wait.
         /// </summary>
-        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(30);
+        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(2000);
 
         /// <summary>
         ///     The signal.
@@ -201,8 +201,14 @@ namespace WebBrowserWaiter
                     ScriptErrorsSuppressed = true
                 };
 
-                _browser.Navigating += (p, q) => _lastCompleted = null;
-                _browser.DocumentCompleted += (p, q) => _lastCompleted = DateTime.UtcNow;
+                _browser.Navigating += (p, q) =>
+                {
+                    _lastCompleted = null;
+                };
+                _browser.DocumentCompleted += (p, q) =>
+                {
+                    _lastCompleted = DateTime.UtcNow;
+                };
 
                 _form = new HeadlessForm
                 {
@@ -222,6 +228,7 @@ namespace WebBrowserWaiter
             }) {Name = "WebBrowserWaiterThread"};
 
             thread.SetApartmentState(ApartmentState.STA);
+            thread.Priority = ThreadPriority.Highest;
             thread.IsBackground = true;
             thread.Start();
 
@@ -573,6 +580,8 @@ namespace WebBrowserWaiter
 
                 while (true)
                 {
+                    Application.DoEvents();
+
                     if (!_lastCompleted.HasValue)
                     {
                         Thread.Sleep(50);
@@ -602,9 +611,6 @@ namespace WebBrowserWaiter
                 () =>
                 {
                     _form.Close();
-                    _browser.Stop();
-                    _browser.Dispose();
-                    _browser = null;
                     GC.Collect();
                 });
         }

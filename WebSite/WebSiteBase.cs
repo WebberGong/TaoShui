@@ -13,30 +13,27 @@ namespace WebSite
     {
         private readonly int _captchaValidateMaxCount = 3;
         private int _captchaValidateCount;
-        private Timer _getGrabDataUrlTimer;
-        private bool _isGetGrabDataUrlFinished;
         private WebSiteStatus _loginStatus;
         private Timer _loginTimer;
-        private DateTime _startGetGrabDataUrlTime;
         private DateTime _startLoginTime;
 
         protected WebBrowser browser;
         protected int captchaLength;
         protected string cookie;
-        protected int getGrabDataUrlTimeOut;
-        protected IDictionary<string, string> grabDataUrlDictionary;
+        protected string grabDataBaseUrl;
+        protected int grabDataTimeOut;
         protected string loginName;
         protected string loginPassword;
         protected int loginTimeOut;
 
         protected WebSiteBase(string loginName, string loginPassword, int captchaLength, int loginTimeOut,
-            int getGrabDataUrlTimeOut)
+            int grabDataTimeOut)
         {
             this.loginName = loginName;
             this.loginPassword = loginPassword;
             this.captchaLength = captchaLength;
             this.loginTimeOut = loginTimeOut;
-            this.getGrabDataUrlTimeOut = getGrabDataUrlTimeOut;
+            this.grabDataTimeOut = grabDataTimeOut;
         }
 
         public string LoginName
@@ -59,15 +56,15 @@ namespace WebSite
             get { return loginTimeOut; }
         }
 
-        public int GetGrabDataUrlTimeOut
+        public int GrabDataTimeOut
         {
-            get { return getGrabDataUrlTimeOut; }
+            get { return grabDataTimeOut; }
         }
 
         public WebSiteStatus LoginStatus
         {
             get { return _loginStatus; }
-            private set
+            set
             {
                 if (_loginStatus != value)
                 {
@@ -84,7 +81,7 @@ namespace WebSite
         protected abstract Regex LoginPageRegex { get; }
         protected abstract Regex CaptchaInputPageRegex { get; }
         protected abstract Regex MainPageRegex { get; }
-        protected abstract IDictionary<string, Regex> GrabDataUrlRegexDictionary { get; }
+        protected abstract IDictionary<string, string> GrabDataUrlDictionary { get; }
         protected abstract Action<WebSiteStatus> LoginStatusChanged { get; }
         protected abstract Action<string> PopupMsgHandler { get; }
 
@@ -108,6 +105,7 @@ namespace WebSite
                     _loginTimer.Enabled = false;
                     _loginTimer.Stop();
                     LoginStatus = WebSiteStatus.LoginFailed;
+                    Stop();
                 }
                 else
                 {
@@ -116,45 +114,22 @@ namespace WebSite
                     {
                         _loginTimer.Enabled = false;
                         _loginTimer.Stop();
+
+                        if (LoginStatus == WebSiteStatus.LoginFailed)
+                        {
+                            Stop();
+                        }
                     }
                 }
             };
             _loginTimer.AutoReset = true;
             _loginTimer.Enabled = false;
 
-            var tsGetGrabDataUrlTimeOut = new TimeSpan(0, 0, getGrabDataUrlTimeOut);
-            _startGetGrabDataUrlTime = DateTime.Now;
-            _getGrabDataUrlTimer = new Timer(200);
-            _getGrabDataUrlTimer.Elapsed += (sender, ev) =>
-            {
-                Application.DoEvents();
-
-                if (DateTime.Now > _startGetGrabDataUrlTime.Add(tsGetGrabDataUrlTimeOut))
-                {
-                    _getGrabDataUrlTimer.Enabled = false;
-                    _getGrabDataUrlTimer.Stop();
-
-                    GrabData();
-                }
-                else
-                {
-                    if (_isGetGrabDataUrlFinished)
-                    {
-                        _getGrabDataUrlTimer.Enabled = false;
-                        _getGrabDataUrlTimer.Stop();
-
-                        GrabData();
-                    }
-                }
-            };
-            _getGrabDataUrlTimer.AutoReset = true;
-            _getGrabDataUrlTimer.Enabled = false;
-
             _loginStatus = WebSiteStatus.NotLogin;
             _captchaValidateCount = 0;
-            _isGetGrabDataUrlFinished = false;
-            grabDataUrlDictionary = new Dictionary<string, string>();
+
             cookie = string.Empty;
+            grabDataBaseUrl = string.Empty;
         }
 
         protected bool IsBrowserOk()
@@ -175,11 +150,15 @@ namespace WebSite
                     browser.Navigated -= WebSiteNavigated;
                     browser.DocumentCompleted -= LoginPageLoaded;
                     browser.DocumentCompleted -= CaptchaInputPageLoaded;
-                    browser.Navigating -= MainPageNavigating;
+                    browser.DocumentCompleted -= MainPageLoaded;
+                    browser.Navigating += (s, e) =>
+                    {
+                        LogHelper.LogInfo(GetType(), "Navigating:" + e.Url.ToString());
+                    };
                     browser.Navigated += WebSiteNavigated;
                     browser.DocumentCompleted += LoginPageLoaded;
                     browser.DocumentCompleted += CaptchaInputPageLoaded;
-                    browser.Navigating += MainPageNavigating;
+                    browser.DocumentCompleted += MainPageLoaded;
 
                     waiter.Await(
                         wb => wb.Navigate(BaseUrl)
@@ -191,7 +170,9 @@ namespace WebSite
                 IsBackground = true,
                 Name = "WebBrowserThread"
             };
-            thread.SetApartmentState(ApartmentState.MTA);
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Priority = ThreadPriority.Highest;
+            thread.IsBackground = true;
             thread.Start();
         }
 
@@ -215,11 +196,10 @@ namespace WebSite
 
         private void WebSiteNavigated(object sender, WebBrowserNavigatedEventArgs e)
         {
-            var url = e.Url.ToString();
             var webBrowser = sender as WebBrowser;
             if (webBrowser != null && webBrowser.Document != null && webBrowser.Document.Window != null)
             {
-                var win = (IHTMLWindow2) webBrowser.Document.Window.DomWindow;
+                var win = (IHTMLWindow2)webBrowser.Document.Window.DomWindow;
                 const string js =
                     @"window.alert = function(msg) { window.external.PopupMsgHandler(msg); return true; }; 
                     window.onerror = function() { return true; };
@@ -229,21 +209,7 @@ namespace WebSite
                 win.execScript(js, "javascript");
             }
 
-            foreach (var item in GrabDataUrlRegexDictionary)
-            {
-                if (item.Value.IsMatch(url))
-                {
-                    if (!grabDataUrlDictionary.ContainsKey(item.Key))
-                    {
-                        grabDataUrlDictionary.Add(item.Key, url);
-                        if (grabDataUrlDictionary.Count == GrabDataUrlRegexDictionary.Count)
-                        {
-                            _isGetGrabDataUrlFinished = true;
-                        }
-                    }
-                }
-            }
-
+            var url = e.Url.ToString();
             LogHelper.LogInfo(GetType(), "页面跳转:" + url);
         }
 
@@ -273,23 +239,33 @@ namespace WebSite
             }
         }
 
-        private void MainPageNavigating(object sender, WebBrowserNavigatingEventArgs e)
+        private void MainPageLoaded(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
             var url = e.Url.ToString();
 
             if (MainPageRegex != null && MainPageRegex.IsMatch(url))
             {
+                int index = MainPageRegex.Match(url).Index;
+                grabDataBaseUrl = url.Substring(0, index);
+
                 var webBrowser = sender as WebBrowser;
                 if (webBrowser != null && webBrowser.Document != null)
                 {
                     cookie = webBrowser.Document.Cookie;
+                    LogHelper.LogInfo(GetType(), cookie);
                 }
 
                 LoginStatus = WebSiteStatus.LoginSuccessful;
-                _startGetGrabDataUrlTime = DateTime.Now;
-                _getGrabDataUrlTimer.Enabled = true;
-                _getGrabDataUrlTimer.Start();
+
+                GrabData();
             }
+        }
+
+        private void Stop()
+        {
+            browser.Stop();
+            browser.Dispose();
+            browser = null;
         }
     }
 }
