@@ -10,8 +10,8 @@ namespace WebSite
     public class Pinnacle : WebSiteBase
     {
         public Pinnacle(string loginName, string loginPassword, int captchaLength,
-            int loginTimeOut = 10, int grabDataTimeOut = 5)
-            : base(loginName, loginPassword, captchaLength, loginTimeOut, grabDataTimeOut)
+            int loginTimeOut = 10, int grabDataInterval = 5)
+            : base(loginName, loginPassword, captchaLength, loginTimeOut, grabDataInterval)
         {
         }
 
@@ -35,20 +35,6 @@ namespace WebSite
             get { return new Regex("#tab=Menu&sport="); }
         }
 
-        protected override IDictionary<string, string> GrabDataUrlDictionary
-        {
-            get
-            {
-                IDictionary<string, string> grabDataUrlDic = new Dictionary<string, string>();
-                return grabDataUrlDic;
-            }
-        }
-
-        protected override Action<WebSiteStatus> LoginStatusChanged
-        {
-            get { return loginStatus => { LogHelper.LogInfo(GetType(), "登录状态: " + loginStatus.ToString()); }; }
-        }
-
         protected override Action<string> PopupMsg
         {
             get
@@ -58,12 +44,10 @@ namespace WebSite
                     switch (msg)
                     {
                         case "帐号/密码错误":
-                            LoginStatus = WebSiteStatus.LoginFailed;
+                            WebSiteStatus = WebSiteStatus.LoginFailed;
                             break;
                         case "验证码错误":
                             DoRefreshCaptcha();
-                            break;
-                        default:
                             break;
                     }
                 };
@@ -72,13 +56,7 @@ namespace WebSite
 
         protected override Action<string> SendData
         {
-            get
-            {
-                return data =>
-                {
-                    LogHelper.LogInfo(GetType(), data);
-                };
-            }
+            get { return data => { LogHelper.LogInfo(GetType(), data); }; }
         }
 
         protected override void Login()
@@ -125,8 +103,9 @@ namespace WebSite
         {
         }
 
-        protected override void GrabData()
+        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebBrowser wb)
         {
+            return new Dictionary<string, IDictionary<string, IList<string>>>();
         }
     }
 }

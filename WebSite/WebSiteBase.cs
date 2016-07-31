@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using mshtml;
+using Newtonsoft.Json;
 using Utils;
 using WebBrowserWaiter;
 using Timer = System.Timers.Timer;
@@ -12,29 +15,30 @@ namespace WebSite
 {
     public abstract class WebSiteBase
     {
+        public delegate void GrabDataSuccessHandler(IDictionary<string, IDictionary<string, IList<string>>> grabbedData);
+        public delegate void WebSiteStatusChangedHandler(WebSiteStatus webSiteStatus);
+
         private readonly int _captchaValidateMaxCount = 3;
         private int _captchaValidateCount;
-        private WebSiteStatus _loginStatus;
         private Timer _loginTimer;
         private DateTime _startLoginTime;
+        private WebSiteStatus _webSiteStatus;
 
         protected WebBrowser browser;
         protected int captchaLength;
-        protected string cookie;
-        protected string grabDataBaseUrl;
-        protected int grabDataTimeOut;
+        protected int grabDataInterval;
         protected string loginName;
         protected string loginPassword;
         protected int loginTimeOut;
 
         protected WebSiteBase(string loginName, string loginPassword, int captchaLength, int loginTimeOut,
-            int grabDataTimeOut)
+            int grabDataInterval)
         {
             this.loginName = loginName;
             this.loginPassword = loginPassword;
             this.captchaLength = captchaLength;
             this.loginTimeOut = loginTimeOut;
-            this.grabDataTimeOut = grabDataTimeOut;
+            this.grabDataInterval = grabDataInterval;
         }
 
         public string LoginName
@@ -57,23 +61,20 @@ namespace WebSite
             get { return loginTimeOut; }
         }
 
-        public int GrabDataTimeOut
+        public int GrabDataInterval
         {
-            get { return grabDataTimeOut; }
+            get { return grabDataInterval; }
         }
 
-        public WebSiteStatus LoginStatus
+        public WebSiteStatus WebSiteStatus
         {
-            get { return _loginStatus; }
+            get { return _webSiteStatus; }
             set
             {
-                if (_loginStatus != value)
+                if (_webSiteStatus != value)
                 {
-                    _loginStatus = value;
-                    if (LoginStatusChanged != null)
-                    {
-                        LoginStatusChanged(_loginStatus);
-                    }
+                    _webSiteStatus = value;
+                    OnWebSiteStatusChanged(_webSiteStatus);
                 }
             }
         }
@@ -82,8 +83,6 @@ namespace WebSite
         protected abstract Regex LoginPageRegex { get; }
         protected abstract Regex CaptchaInputPageRegex { get; }
         protected abstract Regex MainPageRegex { get; }
-        protected abstract IDictionary<string, string> GrabDataUrlDictionary { get; }
-        protected abstract Action<WebSiteStatus> LoginStatusChanged { get; }
         protected abstract Action<string> PopupMsg { get; }
         protected abstract Action<string> SendData { get; }
 
@@ -91,7 +90,9 @@ namespace WebSite
         protected abstract bool IsCaptchaInputPageLoaded();
         protected abstract void CaptchaValidate();
         protected abstract void RefreshCaptcha();
-        protected abstract void GrabData();
+        protected abstract IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebBrowser browser);
+        public event WebSiteStatusChangedHandler WebSiteStatusChanged;
+        public event GrabDataSuccessHandler GrabDataSuccess;
 
         private void Initialize()
         {
@@ -100,24 +101,23 @@ namespace WebSite
             _loginTimer = new Timer(200);
             _loginTimer.Elapsed += (sender, ev) =>
             {
-                Application.DoEvents();
-
-                if (DateTime.Now > _startLoginTime.Add(tsLoginTimeOut))
+                if (DateTime.Now > _startLoginTime.Add(tsLoginTimeOut) &&
+                    WebSiteStatus != WebSiteStatus.LoginSuccessful)
                 {
                     _loginTimer.Enabled = false;
                     _loginTimer.Stop();
-                    LoginStatus = WebSiteStatus.LoginFailed;
+                    WebSiteStatus = WebSiteStatus.LoginFailed;
                     Stop();
                 }
                 else
                 {
-                    if (LoginStatus == WebSiteStatus.LoginSuccessful ||
-                        LoginStatus == WebSiteStatus.LoginFailed)
+                    if (WebSiteStatus == WebSiteStatus.LoginSuccessful ||
+                        WebSiteStatus == WebSiteStatus.LoginFailed)
                     {
                         _loginTimer.Enabled = false;
                         _loginTimer.Stop();
 
-                        if (LoginStatus == WebSiteStatus.LoginFailed)
+                        if (WebSiteStatus == WebSiteStatus.LoginFailed)
                         {
                             Stop();
                         }
@@ -127,11 +127,8 @@ namespace WebSite
             _loginTimer.AutoReset = true;
             _loginTimer.Enabled = false;
 
-            _loginStatus = WebSiteStatus.NotLogin;
+            _webSiteStatus = WebSiteStatus.NotLogin;
             _captchaValidateCount = 0;
-
-            cookie = string.Empty;
-            grabDataBaseUrl = string.Empty;
         }
 
         protected bool IsBrowserOk()
@@ -145,7 +142,7 @@ namespace WebSite
 
             var thread = new Thread(() =>
             {
-                using (var waiter = new WebBrowserWaiter.WebBrowserWaiter(new MessageHandler(PopupMsg, SendData), true))
+                using (var waiter = new WebBrowserWaiter.WebBrowserWaiter(new MessageHandler(PopupMsg, SendData), true, true))
                 {
                     browser = waiter.Browser;
 
@@ -163,18 +160,31 @@ namespace WebSite
                     browser.DocumentCompleted += MainPageLoaded;
 
                     waiter.Await(
-                        wb => wb.Navigate(BaseUrl)
+                            wb => wb.Navigate(BaseUrl)
                         );
+
+                    while (WebSiteStatus == WebSiteStatus.LoginSuccessful)
+                    {
+                        Stopwatch watch = new Stopwatch();
+                        watch.Start();
+                        var data = waiter.Await(
+                            wb => GrabData(wb)
+                            );
+                        watch.Stop();
+                        string elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
+                        LogHelper.LogInfo(GetType(), elapsedTimeMsg);
+                        Console.WriteLine(elapsedTimeMsg);
+                        OnGrabDataSuccess(data);
+                        Thread.Sleep(grabDataInterval * 1000);
+                    }
                 }
             })
             {
-                Priority = ThreadPriority.Normal,
+                Priority = ThreadPriority.AboveNormal,
                 IsBackground = true,
                 Name = "WebBrowserThread"
             };
             thread.SetApartmentState(ApartmentState.STA);
-            thread.Priority = ThreadPriority.Highest;
-            thread.IsBackground = true;
             thread.Start();
         }
 
@@ -187,7 +197,7 @@ namespace WebSite
             }
             else
             {
-                LoginStatus = WebSiteStatus.LoginFailed;
+                WebSiteStatus = WebSiteStatus.LoginFailed;
             }
         }
 
@@ -233,7 +243,7 @@ namespace WebSite
 
             if (LoginPageRegex != null && LoginPageRegex.IsMatch(url))
             {
-                LoginStatus = WebSiteStatus.Logging;
+                WebSiteStatus = WebSiteStatus.Logging;
                 _startLoginTime = DateTime.Now;
                 _loginTimer.Enabled = true;
                 _loginTimer.Start();
@@ -248,7 +258,7 @@ namespace WebSite
 
             if (IsCaptchaInputPageLoaded() && CaptchaInputPageRegex != null && CaptchaInputPageRegex.IsMatch(url))
             {
-                LoginStatus = WebSiteStatus.CaptchaValidating;
+                WebSiteStatus = WebSiteStatus.CaptchaValidating;
                 DoCaptchaValidate();
             }
         }
@@ -259,19 +269,7 @@ namespace WebSite
 
             if (MainPageRegex != null && MainPageRegex.IsMatch(url))
             {
-                int index = MainPageRegex.Match(url).Index;
-                grabDataBaseUrl = url.Substring(0, index);
-
-                var webBrowser = sender as WebBrowser;
-                if (webBrowser != null && webBrowser.Document != null)
-                {
-                    cookie = webBrowser.Document.Cookie;
-                    LogHelper.LogInfo(GetType(), cookie);
-                }
-
-                LoginStatus = WebSiteStatus.LoginSuccessful;
-
-                GrabData();
+                WebSiteStatus = WebSiteStatus.LoginSuccessful;
             }
         }
 
@@ -280,6 +278,34 @@ namespace WebSite
             browser.Stop();
             browser.Dispose();
             browser = null;
+        }
+
+        private void OnWebSiteStatusChanged(WebSiteStatus webSiteStatus)
+        {
+            LogHelper.LogInfo(GetType(), "网站状态: " + webSiteStatus);
+
+            var handler = WebSiteStatusChanged;
+            if (handler != null)
+            {
+                handler(webSiteStatus);
+            }
+        }
+
+        private void OnGrabDataSuccess(IDictionary<string, IDictionary<string, IList<string>>> grabbedData)
+        {
+            int matchCount = 0;
+            foreach (var item in grabbedData)
+            {
+                matchCount += item.Value.Count;
+            }
+            LogHelper.LogInfo(GetType(), string.Format("抓取数据成功, 联赛数: {0}, 比赛数: {1}", grabbedData.Count, matchCount));
+            Console.WriteLine(JsonConvert.SerializeObject(grabbedData));
+
+            var handler = GrabDataSuccess;
+            if (handler != null)
+            {
+                handler(grabbedData);
+            }
         }
     }
 }

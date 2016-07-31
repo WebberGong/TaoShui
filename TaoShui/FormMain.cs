@@ -18,7 +18,7 @@ namespace TaoShui
             //WebSite maxBet2 = new MaxBet("sfb1337952", "Aaaa2234", 4, 30);
             //WebSite pinnacle1 = new Pinnacle("hc2at84671", "aaaa2222", 4, 30);
 
-            WebSiteBase maxBet1 = new MaxBet("sfb1337952", "Aaaa2234", 4, 30, 10);
+            WebSiteBase maxBet1 = new MaxBet("sfb1337952", "Aaaa2234", 4, 600, 3);
             maxBet1.Run();
 
             //WebSite.WebSite pinnacle1 = new Pinnacle("hc2at84671111", "aaaa2222111", 4, 30);

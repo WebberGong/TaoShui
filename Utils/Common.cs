@@ -39,5 +39,10 @@ namespace Utils
         {
             return str.Where(c => c >= 48 && c <= 58).Aggregate(string.Empty, (current, c) => current + c);
         }
+
+        public static string InnerTextTrim(string innerText)
+        {
+            return innerText == null ? string.Empty : innerText.Trim('\r', '\n').Replace("\r\n", " | ").Trim();
+        }
     }
 }

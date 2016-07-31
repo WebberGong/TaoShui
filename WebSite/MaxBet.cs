@@ -2,22 +2,20 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Forms;
 using CaptchaRecogniser;
-using DataGrabber;
 using mshtml;
 using Utils;
-using WebBrowserWaiter;
 
 namespace WebSite
 {
     public class MaxBet : WebSiteBase
     {
         public MaxBet(string loginName, string loginPassword, int captchaLength,
-            int loginTimeOut = 10, int grabDataTimeOut = 10)
-            : base(loginName, loginPassword, captchaLength, loginTimeOut, grabDataTimeOut)
+            int loginTimeOut = 10, int grabDataInterval = 10)
+            : base(loginName, loginPassword, captchaLength, loginTimeOut, grabDataInterval)
         {
         }
 
@@ -41,24 +39,6 @@ namespace WebSite
             get { return new Regex("main\\.aspx"); }
         }
 
-        protected override IDictionary<string, string> GrabDataUrlDictionary
-        {
-            get
-            {
-                IDictionary<string, string> grabDataUrlDic = new Dictionary<string, string>();
-                grabDataUrlDic.Add("1", "miniOdds_data.aspx?OddsType=&_=" + DateTime.Now.Ticks);
-                grabDataUrlDic.Add("2", "LiveStreamingData.aspx?OddsType=&_=" + DateTime.Now.Ticks);
-                grabDataUrlDic.Add("3", "UnderOver_data.aspx?Market=l&Sport=1&DT=&RT=W&CT=&Game=0&OrderBy=0&OddsType=4&MainLeague=0&k1169006800=v1169006972&key=QV1BW15AWV9AR05AWE9fXwVaCQUaREcRSV4bOl44IjocWh4dQBhFDBUZCQAXRlJdCUoWABtbCg4G%0AGBFsQBBB&_=" + DateTime.Now.Ticks);
-                grabDataUrlDic.Add("4", "UnderOver_data.aspx?Market=t&Sport=1&DT=&RT=W&CT=&Game=0&OrderBy=0&OddsType=4&MainLeague=0&DispRang=0&k1169006800=v1169006972&key=XFleXlFWWUZYXFtLQVtVCAEXXARIARVdWAFsBWY9bR9FAR1GFkcCAxkSDRFaEQ4KTR0JEkVWQU5e%0AWlw%3DKPKE&_=" + DateTime.Now.Ticks);
-                return grabDataUrlDic;
-            }
-        }
-
-        protected override Action<WebSiteStatus> LoginStatusChanged
-        {
-            get { return loginStatus => { LogHelper.LogInfo(GetType(), "登录状态: " + loginStatus.ToString()); }; }
-        }
-
         protected override Action<string> PopupMsg
         {
             get
@@ -68,12 +48,10 @@ namespace WebSite
                     switch (msg)
                     {
                         case "帐号/密码错误":
-                            LoginStatus = WebSiteStatus.LoginFailed;
+                            WebSiteStatus = WebSiteStatus.LoginFailed;
                             break;
                         case "验证码错误":
                             DoRefreshCaptcha();
-                            break;
-                        default:
                             break;
                     }
                 };
@@ -82,13 +60,7 @@ namespace WebSite
 
         protected override Action<string> SendData
         {
-            get
-            {
-                return data =>
-                {
-                    LogHelper.LogInfo(GetType(), data);
-                };
-            }
+            get { return data => { LogHelper.LogInfo(GetType(), data); }; }
         }
 
         protected override void Login()
@@ -105,7 +77,7 @@ namespace WebSite
                         aElements.Cast<HtmlElement>().FirstOrDefault(item => item.GetAttribute("title") == "LOGIN");
                     if (id != null && password != null && login != null)
                     {
-                        browser.Document.InvokeScript("changeLan", new object[] {"cs"});
+                        browser.Document.InvokeScript("changeLan", new object[] { "cs" });
                         id.SetAttribute("value", loginName);
                         password.SetAttribute("value", loginPassword);
                         login.InvokeMember("Click");
@@ -136,16 +108,16 @@ namespace WebSite
                 var divElements = browser.Document.GetElementsByTagName("div");
                 var captchaDiv =
                     divElements.Cast<HtmlElement>()
-                        .FirstOrDefault(item => item.GetAttribute("className") == "validationCode");
+                        .FirstOrDefault(item => item.GetAttribute("className").Contains("validationCode"));
 
                 if (browser.Document.Window != null && browser.Document.Window.Parent != null &&
                     captchaImage != null && captchaRefresh != null && captchaInput != null && submit != null &&
                     captchaDiv != null)
                 {
-                    var doc = (HTMLDocument) browser.Document.DomDocument;
-                    var body = (HTMLBody) doc.body;
-                    var range = (IHTMLControlRange) body.createControlRange();
-                    var img = (IHTMLControlElement) captchaImage.DomElement;
+                    var doc = (HTMLDocument)browser.Document.DomDocument;
+                    var body = (HTMLBody)doc.body;
+                    var range = (IHTMLControlRange)body.createControlRange();
+                    var img = (IHTMLControlElement)captchaImage.DomElement;
                     range.add(img);
                     range.execCommand("Copy");
                     range.remove(0);
@@ -158,7 +130,7 @@ namespace WebSite
                     if (bitmap != null)
                     {
                         var code = Recogniser.Instance.RecognizeFromImage(bitmap, captchaLength, 3,
-                            new HashSet<EnumCaptchaType> {EnumCaptchaType.Number});
+                            new HashSet<EnumCaptchaType> { EnumCaptchaType.Number });
                         code = Common.GetNumericFromString(code);
                         LogHelper.LogInfo(GetType(), "验证码识别结果:" + code);
                         captchaInput.SetAttribute("value", code);
@@ -176,53 +148,199 @@ namespace WebSite
             }
         }
 
-        protected override void GrabData()
+        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebBrowser wb)
         {
-            if (browser != null && browser.Document != null && browser.Document.Window != null)
+            IDictionary<string, IDictionary<string, IList<string>>> grabbedData = new Dictionary<string, IDictionary<string, IList<string>>>();
+            if (wb != null && wb.Document != null && wb.Document.Window != null &&
+                wb.Document.Window.Frames != null && wb.Document.Window.Frames.Count > 0)
             {
-                var win = (IHTMLWindow2)browser.Document.Window.DomWindow;
-                const string js =
-                    @"this.top.grabData = function() {
-                        try {
-                            var data = JSON.stringify({
-                                D1: JSON.stringify(this.top.frames['mainFrame'].frames['DataFrame_L'].Nl),
-                                D2: JSON.stringify(this.top.frames['mainFrame'].frames['DataFrame_D'].Nt),
-                            });
-                            if (data) {
-                                window.external.SendData(data);
+                var mainFrame = wb.Document.Window.Frames["mainFrame"];
+                if (mainFrame != null && mainFrame.Document != null)
+                {
+                    var tableContainerL = mainFrame.Document.GetElementById("oTableContainer_L");
+                    if (tableContainerL != null)
+                    {
+                        var tablesL = tableContainerL.GetElementsByTagName("TABLE");
+                        foreach (HtmlElement table in tablesL)
+                        {
+                            var trs = table.GetElementsByTagName("TR");
+                            var leagueName = string.Empty;
+                            foreach (HtmlElement tr in trs)
+                            {
+                                if (tr.GetElementsByTagName("TD").Count == 3 &&
+                                    tr.Children[1].GetAttribute("className").Contains("tabtitle") &&
+                                    tr.Children[1].GetElementsByTagName("SPAN")
+                                        .Cast<HtmlElement>()
+                                        .FirstOrDefault(x => x.GetAttribute("Title") == "加入我的最爱") != null)
+                                {
+                                    var span = tr.Children[1].GetElementsByTagName("SPAN")
+                                        .Cast<HtmlElement>()
+                                        .FirstOrDefault(x => x.GetAttribute("Title") == "加入我的最爱");
+                                    if (span != null && span.Parent != null)
+                                    {
+                                        leagueName = span.Parent.InnerText;
+                                    }
+                                    if (!string.IsNullOrEmpty(leagueName))
+                                    {
+                                        if (!grabbedData.ContainsKey(leagueName))
+                                        {
+                                            grabbedData.Add(leagueName, new Dictionary<string, IList<string>>());
+                                        }
+                                        else
+                                        {
+                                            LogHelper.LogWarn(GetType(), "联赛名称重复！\r\n" + leagueName);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (!string.IsNullOrEmpty(leagueName) &&
+                                        tr.GetAttribute("className").Contains("displayOn"))
+                                    {
+                                        if (!grabbedData.ContainsKey(leagueName))
+                                        {
+                                            LogHelper.LogWarn(GetType(), "未找到联赛名称！");
+                                        }
+                                        else
+                                        {
+                                            StringBuilder matchName = new StringBuilder();
+                                            IList<string> matchData = new List<string>();
+                                            var tds = tr.GetElementsByTagName("TD");
+                                            foreach (HtmlElement td in tds)
+                                            {
+                                                if (td.Children.Count == 2 &&
+                                                    td.Children[0].TagName == "B" &&
+                                                    td.Children[1].TagName == "DIV" &&
+                                                    td.Children[1].GetElementsByTagName("SPAN")
+                                                        .Cast<HtmlElement>()
+                                                        .FirstOrDefault(
+                                                            x => x.GetAttribute("className").Contains("displayOn")) !=
+                                                    null)
+                                                {
+                                                    var b1 = td.Children[0];
+                                                    var div = td.Children[1];
+                                                    var span = div.GetElementsByTagName("SPAN")
+                                                        .Cast<HtmlElement>()
+                                                        .FirstOrDefault(
+                                                            x => x.GetAttribute("className").Contains("displayOn"));
+                                                    if (span != null)
+                                                    {
+                                                        var b2 = span.GetElementsByTagName("B")
+                                                            .Cast<HtmlElement>()
+                                                            .FirstOrDefault();
+                                                        if (b2 != null)
+                                                        {
+                                                            string str1 = Common.InnerTextTrim(b1.InnerText);
+                                                            string str2 = Common.InnerTextTrim(b2.InnerText);
+                                                            matchData.Add(str1);
+                                                            matchData.Add(str2);
+                                                            matchName.Append(str1);
+                                                            matchName.Append(" | " + str2);
+                                                        }
+                                                    }
+                                                }
+                                                else if (td.Children.Count == 3 &&
+                                                    td.Children[0].TagName == "DIV" &&
+                                                    td.Children[1].TagName == "DIV" &&
+                                                    td.Children[2].TagName == "DIV" &&
+                                                    td.Children[0].GetElementsByTagName("SPAN").Count > 0 &&
+                                                    td.Children[1].GetElementsByTagName("SPAN").Count > 0)
+                                                {
+                                                    string str1 = Common.InnerTextTrim(td.Children[0].Children[0].InnerText);
+                                                    string str2 = Common.InnerTextTrim(td.Children[1].Children[0].InnerText);
+                                                    string str3 = Common.InnerTextTrim(td.Children[2].InnerText);
+                                                    matchData.Add(str1);
+                                                    matchData.Add(str2);
+                                                    matchData.Add(str3);
+                                                    matchName.Append(" | " + str1);
+                                                    matchName.Append(" - " + str2);
+                                                    matchName.Append(" | " + str3);
+                                                }
+                                                else if (td.Children.Count == 2 &&
+                                                    td.Children[0].TagName == "DIV" &&
+                                                    td.Children[1].TagName == "DIV" &&
+                                                    td.Children[0].GetElementsByTagName("SPAN").Count > 0 &&
+                                                    td.Children[1].GetElementsByTagName("SPAN").Count > 0)
+                                                {
+                                                    string str1 = Common.InnerTextTrim(td.Children[0].Children[0].InnerText);
+                                                    string str2 = Common.InnerTextTrim(td.Children[1].Children[0].InnerText);
+                                                    matchData.Add(str1);
+                                                    matchData.Add(str2);
+                                                    matchName.Append(" | " + str1);
+                                                    matchName.Append(" - " + str2);
+                                                }
+                                                else if (td.Children.Count == 2 &&
+                                                         td.GetElementsByTagName("DIV")
+                                                             .Cast<HtmlElement>()
+                                                             .FirstOrDefault(
+                                                                 x => x.GetAttribute("className").Contains("line_divL")) !=
+                                                         null &&
+                                                         td.GetElementsByTagName("DIV")
+                                                             .Cast<HtmlElement>()
+                                                             .FirstOrDefault(
+                                                                 x => x.GetAttribute("className").Contains("line_divR")) !=
+                                                         null)
+                                                {
+                                                    var div1 = td.GetElementsByTagName("DIV")
+                                                        .Cast<HtmlElement>()
+                                                        .FirstOrDefault(
+                                                            x => x.GetAttribute("className").Contains("line_divL"));
+                                                    var div2 = td.GetElementsByTagName("DIV")
+                                                        .Cast<HtmlElement>()
+                                                        .FirstOrDefault(
+                                                            x => x.GetAttribute("className").Contains("line_divR"));
+                                                    if (div1 != null && div2 != null)
+                                                    {
+                                                        var aCollection = div2.GetElementsByTagName("A")
+                                                            .Cast<HtmlElement>()
+                                                            .Where(x => x.GetAttribute("Name") == "cvmy").ToList();
+                                                        if (aCollection.Count == 2)
+                                                        {
+                                                            matchData.Add(Common.InnerTextTrim(div1.InnerText));
+                                                            matchData.Add(Common.InnerTextTrim(aCollection[0].InnerText));
+                                                            matchData.Add(Common.InnerTextTrim(aCollection[1].InnerText));
+                                                        }
+                                                    }
+                                                }
+                                                else if (td.Children.Count == 1 &&
+                                                         td.GetElementsByTagName("DIV")
+                                                             .Cast<HtmlElement>()
+                                                             .FirstOrDefault(
+                                                                 x => x.GetAttribute("className").Contains("line_divL line_divR")) !=
+                                                         null)
+                                                {
+                                                    var div1 = td.GetElementsByTagName("DIV")
+                                                        .Cast<HtmlElement>()
+                                                        .FirstOrDefault(
+                                                            x =>
+                                                                x.GetAttribute("className")
+                                                                    .Contains("line_divL line_divR"));
+                                                    if (div1 != null && div1.GetElementsByTagName("A").Count == 3)
+                                                    {
+                                                        var aCollection = div1.GetElementsByTagName("A");
+                                                        matchData.Add(Common.InnerTextTrim(aCollection[0].InnerText));
+                                                        matchData.Add(Common.InnerTextTrim(aCollection[1].InnerText));
+                                                        matchData.Add(Common.InnerTextTrim(aCollection[2].InnerText));
+                                                    }
+                                                }
+                                            }
+                                            if (grabbedData[leagueName].ContainsKey(matchName.ToString()))
+                                            {
+                                                LogHelper.LogWarn(GetType(), "比赛名称重复！\r\n" + matchName);
+                                            }
+                                            else
+                                            {
+                                                grabbedData[leagueName].Add(matchName.ToString(), matchData);
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            this.top.frames['mainFrame'].refreshData_D();
-                            this.top.frames['mainFrame'].refreshData_L();
-                        }
-                        catch(ex){
-                            window.external.PopupMsg(ex);
                         }
                     }
-                    setInterval(this.top.grabData, 10000);
-                    this.top.grabData();";
-                win.execScript(js, "javascript");
+                }
             }
-
-            //if (GrabDataUrlDictionary != null && GrabDataUrlDictionary.Count > 0 &&
-            //    !string.IsNullOrEmpty(grabDataBaseUrl) && !string.IsNullOrEmpty(cookie))
-            //{
-            //    IDictionary<string, string> grabDataUrlDic = new Dictionary<string, string>();
-            //    foreach (var item in GrabDataUrlDictionary)
-            //    {
-            //        grabDataUrlDic.Add(item.Key, grabDataBaseUrl + item.Value);
-            //    }
-            //    string html = string.Empty;
-            //    for (int i = 0; i < 20; i++)
-            //    {
-            //        if (!string.IsNullOrEmpty(html) && html != browser.DocumentText)
-            //        {
-            //            html = browser.DocumentText;
-            //        }
-            //        Thread.Sleep(10000);
-            //    }
-            //    var grabedData = Grabber.Instance.Run(grabDataUrlDic, cookie, grabDataTimeOut);
-            //    Console.WriteLine(grabedData);
-            //}
+            return grabbedData;
         }
     }
 }

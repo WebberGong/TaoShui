@@ -66,10 +66,6 @@
       <Project>{a49647c1-a474-4368-80a7-a59c7e1e5750}</Project>
       <Name>CaptchaRecogniser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DataGrabber\DataGrabber.csproj">
-      <Project>{9b96ddb2-abea-448d-aa07-c584597a7d86}</Project>
-      <Name>DataGrabber</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Utils\Utils.csproj">
       <Project>{b2a5c53d-d008-4ad1-89db-7ffb0710aa74}</Project>
       <Name>Utils</Name>

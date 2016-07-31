@@ -116,7 +116,7 @@ namespace WebBrowserWaiter
         /// <summary>
         ///     The default wait.
         /// </summary>
-        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(10);
+        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(20);
 
         /// <summary>
         ///     The signal.
@@ -185,7 +185,8 @@ namespace WebBrowserWaiter
         /// <param name="left">
         ///     The left.
         /// </param>
-        public WebBrowserWaiter(MessageHandler messageHandler = null, bool isAlwaysKeepWait = false, bool visibility = false,
+        public WebBrowserWaiter(MessageHandler messageHandler = null, bool isAlwaysKeepWait = false,
+            bool visibility = false,
             FormStartPosition position = FormStartPosition.CenterScreen, int width = -1, int height = -1, int top = 0,
             int left = 0)
         {
@@ -206,14 +207,8 @@ namespace WebBrowserWaiter
                     ScriptErrorsSuppressed = true
                 };
 
-                _browser.Navigating += (p, q) =>
-                {
-                    _lastCompleted = null;
-                };
-                _browser.DocumentCompleted += (p, q) =>
-                {
-                    _lastCompleted = DateTime.UtcNow;
-                };
+                _browser.Navigating += (p, q) => { _lastCompleted = null; };
+                _browser.DocumentCompleted += (p, q) => { _lastCompleted = DateTime.UtcNow; };
 
                 _form = new HeadlessForm
                 {
@@ -230,11 +225,13 @@ namespace WebBrowserWaiter
                 _form.Visible = visibility;
 
                 Application.Run(_form);
-            }) {Name = "WebBrowserWaiterThread"};
-
+            })
+            {
+                Priority = ThreadPriority.AboveNormal,
+                IsBackground = true,
+                Name = "WebBrowserThread"
+            };
             thread.SetApartmentState(ApartmentState.STA);
-            thread.Priority = ThreadPriority.Highest;
-            thread.IsBackground = true;
             thread.Start();
 
             _signal.WaitOne();
@@ -253,7 +250,10 @@ namespace WebBrowserWaiter
             set { _defaultWait = value; }
         }
 
-        public WebBrowser Browser
+        /// <summary>
+        /// Gets the web browser
+        /// </summary>
+        public virtual WebBrowser Browser
         {
             get { return _browser; }
         }
@@ -306,7 +306,7 @@ namespace WebBrowserWaiter
         {
             Await(
                 wait,
-                new[] {order}
+                new[] { order }
                 );
         }
 
@@ -392,7 +392,7 @@ namespace WebBrowserWaiter
             Await(
                 waits,
                 orders.Select(
-                    (p, q) => (Func<WebBrowser, object>) (r =>
+                    (p, q) => (Func<WebBrowser, object>)(r =>
                     {
                         p(r);
                         return null;
@@ -461,7 +461,7 @@ namespace WebBrowserWaiter
         {
             return Await(
                 wait,
-                new[] {order}
+                new[] { order }
                 ).First();
         }
 
@@ -585,24 +585,19 @@ namespace WebBrowserWaiter
 
                 while (true)
                 {
-                    if ( !_lastCompleted.HasValue)
+                    lock (this)
                     {
-                        Thread.Sleep(50);
-                        continue;
-                    }
+                        if (!_lastCompleted.HasValue)
+                        {
+                            Thread.Sleep(50);
+                            continue;
+                        }
 
-                    if (_isAlwaysKeepWait)
-                    {
-                        Thread.Sleep(50);
-                    }
-                    else
-                    {
                         var diff = _lastCompleted.Value.Add(waits[i]) - DateTime.UtcNow;
                         if (diff.Ticks < 0)
                         {
                             break;
                         }
-                        Thread.Sleep(diff);
                     }
                 }
             }
