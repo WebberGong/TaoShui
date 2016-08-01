@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -142,7 +141,7 @@ namespace WebSite
 
             var thread = new Thread(() =>
             {
-                using (var waiter = new WebBrowserWaiter.WebBrowserWaiter(new MessageHandler(PopupMsg, SendData), true, true))
+                using (var waiter = new WebBrowserWaiter.WebBrowserWaiter(new MessageHandler(PopupMsg, SendData), true))
                 {
                     browser = waiter.Browser;
 
@@ -163,6 +162,12 @@ namespace WebSite
                             wb => wb.Navigate(BaseUrl)
                         );
 
+                    while (WebSiteStatus != WebSiteStatus.LoginSuccessful &&
+                           WebSiteStatus != WebSiteStatus.LoginFailed)
+                    {
+                        Thread.Sleep(50);
+                    }
+
                     while (WebSiteStatus == WebSiteStatus.LoginSuccessful)
                     {
                         Stopwatch watch = new Stopwatch();
@@ -180,7 +185,7 @@ namespace WebSite
                 }
             })
             {
-                Priority = ThreadPriority.AboveNormal,
+                Priority = ThreadPriority.Highest,
                 IsBackground = true,
                 Name = "WebBrowserThread"
             };

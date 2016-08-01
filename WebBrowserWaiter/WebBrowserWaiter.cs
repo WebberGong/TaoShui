@@ -116,7 +116,7 @@ namespace WebBrowserWaiter
         /// <summary>
         ///     The default wait.
         /// </summary>
-        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(20);
+        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(0);
 
         /// <summary>
         ///     The signal.
@@ -137,11 +137,6 @@ namespace WebBrowserWaiter
         ///     The last completed.
         /// </summary>
         private DateTime? _lastCompleted;
-
-        /// <summary>
-        ///     If always keep wait, no timeout limit
-        /// </summary>
-        private readonly bool _isAlwaysKeepWait;
 
         #endregion
 
@@ -164,9 +159,6 @@ namespace WebBrowserWaiter
         /// <param name="messageHandler">
         ///     The js message handler
         /// </param>
-        /// <param name="isAlwaysKeepWait">
-        ///     If always keep wait, no timeout limit
-        /// </param>
         /// <param name="visibility">
         ///     The visibility.
         /// </param>
@@ -185,13 +177,11 @@ namespace WebBrowserWaiter
         /// <param name="left">
         ///     The left.
         /// </param>
-        public WebBrowserWaiter(MessageHandler messageHandler = null, bool isAlwaysKeepWait = false,
-            bool visibility = false,
+        public WebBrowserWaiter(MessageHandler messageHandler = null, bool visibility = false,
             FormStartPosition position = FormStartPosition.CenterScreen, int width = -1, int height = -1, int top = 0,
             int left = 0)
         {
             _signal = new ManualResetEvent(false);
-            _isAlwaysKeepWait = isAlwaysKeepWait;
             if (messageHandler == null)
             {
                 messageHandler = new MessageHandler(null, null);
@@ -207,7 +197,7 @@ namespace WebBrowserWaiter
                     ScriptErrorsSuppressed = true
                 };
 
-                _browser.Navigating += (p, q) => { _lastCompleted = null; };
+                _browser.Navigated += (p, q) => { _lastCompleted = null; };
                 _browser.DocumentCompleted += (p, q) => { _lastCompleted = DateTime.UtcNow; };
 
                 _form = new HeadlessForm
@@ -585,20 +575,17 @@ namespace WebBrowserWaiter
 
                 while (true)
                 {
-                    lock (this)
+                    if (!_lastCompleted.HasValue)
                     {
-                        if (!_lastCompleted.HasValue)
-                        {
-                            Thread.Sleep(50);
-                            continue;
-                        }
-
-                        var diff = _lastCompleted.Value.Add(waits[i]) - DateTime.UtcNow;
-                        if (diff.Ticks < 0)
-                        {
-                            break;
-                        }
+                        Thread.Sleep(50);
+                        continue;
                     }
+                    var diff = _lastCompleted.Value.Add(waits[i]) - DateTime.UtcNow;
+                    if (diff.Ticks < 0)
+                    {
+                        break;
+                    }
+                    Thread.Sleep(diff);
                 }
             }
 
