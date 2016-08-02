@@ -102,7 +102,7 @@ namespace WebSite
                         }
                     })();";
                 var loginResult = browser.ExecuteJavascriptWithResult(loginJs);
-                LogHelper.LogInfo(GetType(), "登录:" + loginResult);
+                LogHelper.LogInfo(GetType(), "开始登录:" + loginResult);
             }
         }
 
@@ -124,7 +124,7 @@ namespace WebSite
                         }
                     })();";
                 var isCaptchaReadyResult = browser.ExecuteJavascriptWithResult(isCaptchaReadyJs);
-                LogHelper.LogInfo(GetType(), "当前页是否为验证码输入页:" + isCaptchaReadyResult);
+                LogHelper.LogInfo(GetType(), "当前页是否为验证码输入页:" + isCaptchaReadyResult.ToString());
                 return isCaptchaReadyResult.ToString() == True;
             }
             return false;
