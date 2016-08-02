@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("WebControlWaiter")]
 [assembly:
     AssemblyDescription(
-        "A headless wrapper of the .NET WebControl useful in automated browser testing, or as web crawler or screen scrapper and includes both HTML and JavaScript processing capabilities."
+        "A headless wrapper of the .NET WebView useful in automated browser testing, or as web crawler or screen scrapper and includes both HTML and JavaScript processing capabilities."
         )]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM

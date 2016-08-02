@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using Awesomium.Core;
 using Awesomium.Windows.Forms;
 using CaptchaRecogniser;
 using Utils;
@@ -51,7 +52,7 @@ namespace WebSite
             get { return new Regex("main\\.aspx"); }
         }
 
-        protected override Action<WebControl, string> ShowJavascriptDialog
+        protected override Action<WebView, string> ShowJavascriptDialog
         {
             get
             {
@@ -70,7 +71,7 @@ namespace WebSite
             }
         }
 
-        protected override void ChangeLanguage(WebControl browser)
+        protected override void ChangeLanguage(WebView browser)
         {
             if (IsBrowserOk(browser))
             {
@@ -88,7 +89,7 @@ namespace WebSite
             }
         }
 
-        protected override void Login(WebControl browser)
+        protected override void Login(WebView browser)
         {
             if (IsBrowserOk(browser))
             {
@@ -114,7 +115,7 @@ namespace WebSite
             }
         }
 
-        protected override bool IsCaptchaInputPageReady(WebControl browser)
+        protected override bool IsCaptchaInputPageReady(WebView browser)
         {
             if (IsBrowserOk(browser))
             {
@@ -138,7 +139,7 @@ namespace WebSite
             return false;
         }
 
-        protected override void CaptchaValidate(WebControl browser)
+        protected override void CaptchaValidate(WebView browser)
         {
             if (IsBrowserOk(browser))
             {
@@ -208,12 +209,12 @@ namespace WebSite
             }
         }
 
-        protected override void RefreshCaptcha(WebControl browser)
+        protected override void RefreshCaptcha(WebView browser)
         {
             browser.Source = BaseUrl;
         }
 
-        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebControl wb)
+        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebView wb)
         {
             IDictionary<string, IDictionary<string, IList<string>>> grabbedData =
                 new Dictionary<string, IDictionary<string, IList<string>>>();

@@ -14,6 +14,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Windows.Forms;
+using Awesomium.Core;
 using Awesomium.Windows.Forms;
 
 namespace WebControlWaiter
@@ -129,7 +130,7 @@ namespace WebControlWaiter
         /// <summary>
         ///     The browser.
         /// </summary>
-        private WebControl _browser;
+        private WebView _browser;
 
         /// <summary>
         ///     The form.
@@ -173,11 +174,10 @@ namespace WebControlWaiter
 
             var thread = new Thread(() =>
             {
-                _browser = new WebControl
-                {
-                    Width = width < 0 ? Screen.PrimaryScreen.WorkingArea.Width*3/4 : width,
-                    Height = height < 0 ? Screen.PrimaryScreen.WorkingArea.Height*3/4 : height
-                };
+                _browser = WebCore.CreateWebView(
+                    width < 0 ? Screen.PrimaryScreen.WorkingArea.Width*3/4 : width,
+                    height < 0 ? Screen.PrimaryScreen.WorkingArea.Height*3/4 : height
+                );
 
                 _browser.LoadingFrame += (sender, e) => { _lastCompleted = null; };
                 _browser.LoadingFrameComplete += (sender, e) =>
@@ -188,21 +188,7 @@ namespace WebControlWaiter
                     }
                 };
 
-                _form = new HeadlessForm
-                {
-                    Width = _browser.Width,
-                    Height = _browser.Height,
-                    StartPosition = position,
-                    Top = top,
-                    Left = left
-                };
-
-                _form.Controls.Add(_browser);
-                _form.HandleCreated += (p, q) => _signal.Set();
-                _form.InitialVisibility = visibility;
-                _form.Visible = visibility;
-
-                Application.Run(_form);
+                WebCore.Run();
             })
             {
                 Priority = ThreadPriority.AboveNormal,
@@ -231,7 +217,7 @@ namespace WebControlWaiter
         /// <summary>
         ///     Gets the web browser
         /// </summary>
-        public virtual WebControl Browser
+        public virtual WebView Browser
         {
             get { return _browser; }
         }
@@ -246,7 +232,7 @@ namespace WebControlWaiter
         /// <param name="order">
         ///     The order.
         /// </param>
-        public virtual void Await(Action<WebControl> order)
+        public virtual void Await(Action<WebView> order)
         {
             Await(
                 DefaultWait,
@@ -263,7 +249,7 @@ namespace WebControlWaiter
         /// <param name="order">
         ///     The order.
         /// </param>
-        public virtual void Await(int wait, Action<WebControl> order)
+        public virtual void Await(int wait, Action<WebView> order)
         {
             Await(
                 CreateWaitTimeSpan(wait),
@@ -280,7 +266,7 @@ namespace WebControlWaiter
         /// <param name="order">
         ///     The order.
         /// </param>
-        public virtual void Await(TimeSpan wait, Action<WebControl> order)
+        public virtual void Await(TimeSpan wait, Action<WebView> order)
         {
             Await(
                 wait,
@@ -294,7 +280,7 @@ namespace WebControlWaiter
         /// <param name="orders">
         ///     The orders.
         /// </param>
-        public virtual void Await(params Action<WebControl>[] orders)
+        public virtual void Await(params Action<WebView>[] orders)
         {
             Await(
                 DefaultWait,
@@ -311,7 +297,7 @@ namespace WebControlWaiter
         /// <param name="orders">
         ///     The orders.
         /// </param>
-        public virtual void Await(int wait, params Action<WebControl>[] orders)
+        public virtual void Await(int wait, params Action<WebView>[] orders)
         {
             Await(
                 CreateWaitTimeSpan(wait),
@@ -328,7 +314,7 @@ namespace WebControlWaiter
         /// <param name="orders">
         ///     The orders.
         /// </param>
-        public virtual void Await(int[] waits, params Action<WebControl>[] orders)
+        public virtual void Await(int[] waits, params Action<WebView>[] orders)
         {
             Await(
                 waits.Select(CreateWaitTimeSpan).ToArray(),
@@ -345,7 +331,7 @@ namespace WebControlWaiter
         /// <param name="orders">
         ///     The orders.
         /// </param>
-        public virtual void Await(TimeSpan wait, params Action<WebControl>[] orders)
+        public virtual void Await(TimeSpan wait, params Action<WebView>[] orders)
         {
             Await(
                 orders.Select(p => wait).ToArray(),
@@ -365,12 +351,12 @@ namespace WebControlWaiter
         /// <exception cref="ArgumentException">
         ///     Throws ArgumentException if waits and orders differ in length.
         /// </exception>
-        public virtual void Await(TimeSpan[] waits, params Action<WebControl>[] orders)
+        public virtual void Await(TimeSpan[] waits, params Action<WebView>[] orders)
         {
             Await(
                 waits,
                 orders.Select(
-                    (p, q) => (Func<WebControl, object>) (r =>
+                    (p, q) => (Func<WebView, object>) (r =>
                     {
                         p(r);
                         return null;
@@ -389,7 +375,7 @@ namespace WebControlWaiter
         /// <returns>
         ///     The <see cref="T" />.
         /// </returns>
-        public virtual T Await<T>(Func<WebControl, T> order)
+        public virtual T Await<T>(Func<WebView, T> order)
         {
             return Await(
                 DefaultWait,
@@ -412,7 +398,7 @@ namespace WebControlWaiter
         /// <returns>
         ///     The <see cref="T" />.
         /// </returns>
-        public virtual T Await<T>(int wait, Func<WebControl, T> order)
+        public virtual T Await<T>(int wait, Func<WebView, T> order)
         {
             return Await(
                 CreateWaitTimeSpan(wait),
@@ -435,7 +421,7 @@ namespace WebControlWaiter
         /// <returns>
         ///     The <see cref="T" />.
         /// </returns>
-        public virtual T Await<T>(TimeSpan wait, Func<WebControl, T> order)
+        public virtual T Await<T>(TimeSpan wait, Func<WebView, T> order)
         {
             return Await(
                 wait,
@@ -455,7 +441,7 @@ namespace WebControlWaiter
         /// <returns>
         ///     The an array of the return type.
         /// </returns>
-        public virtual T[] Await<T>(params Func<WebControl, T>[] orders)
+        public virtual T[] Await<T>(params Func<WebView, T>[] orders)
         {
             return Await(
                 DefaultWait,
@@ -478,7 +464,7 @@ namespace WebControlWaiter
         /// <returns>
         ///     The an array of the return type.
         /// </returns>
-        public virtual T[] Await<T>(int wait, params Func<WebControl, T>[] orders)
+        public virtual T[] Await<T>(int wait, params Func<WebView, T>[] orders)
         {
             return Await(
                 CreateWaitTimeSpan(wait),
@@ -501,7 +487,7 @@ namespace WebControlWaiter
         /// <returns>
         ///     The an array of the return type.
         /// </returns>
-        public virtual T[] Await<T>(int[] waits, params Func<WebControl, T>[] orders)
+        public virtual T[] Await<T>(int[] waits, params Func<WebView, T>[] orders)
         {
             return Await(
                 waits.Select(CreateWaitTimeSpan).ToArray(),
@@ -524,7 +510,7 @@ namespace WebControlWaiter
         /// <returns>
         ///     The an array of the return type.
         /// </returns>
-        public virtual T[] Await<T>(TimeSpan wait, params Func<WebControl, T>[] orders)
+        public virtual T[] Await<T>(TimeSpan wait, params Func<WebView, T>[] orders)
         {
             return Await(
                 orders.Select(p => wait).ToArray(),
@@ -547,7 +533,7 @@ namespace WebControlWaiter
         /// <returns>
         ///     The an array of the return type.
         /// </returns>
-        public virtual T[] Await<T>(TimeSpan[] waits, params Func<WebControl, T>[] orders)
+        public virtual T[] Await<T>(TimeSpan[] waits, params Func<WebView, T>[] orders)
         {
             if (waits.Length != orders.Length)
                 throw new ArgumentException("The waits and orders arguments must have the same length.");

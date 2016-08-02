@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Awesomium.Core;
 using Awesomium.Windows.Forms;
 using Utils;
 
@@ -43,33 +44,33 @@ namespace WebSite
             get { return new Regex("#tab=Menu&sport="); }
         }
 
-        protected override Action<WebControl, string> ShowJavascriptDialog
+        protected override Action<WebView, string> ShowJavascriptDialog
         {
             get { return (browser, msg) => { LogHelper.LogWarn(GetType(), msg); }; }
         }
 
-        protected override void ChangeLanguage(WebControl browser)
+        protected override void ChangeLanguage(WebView browser)
         {
         }
 
-        protected override void Login(WebControl browser)
+        protected override void Login(WebView browser)
         {
         }
 
-        protected override bool IsCaptchaInputPageReady(WebControl browser)
+        protected override bool IsCaptchaInputPageReady(WebView browser)
         {
             return true;
         }
 
-        protected override void CaptchaValidate(WebControl browser)
+        protected override void CaptchaValidate(WebView browser)
         {
         }
 
-        protected override void RefreshCaptcha(WebControl browser)
+        protected override void RefreshCaptcha(WebView browser)
         {
         }
 
-        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebControl wb)
+        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebView wb)
         {
             return new Dictionary<string, IDictionary<string, IList<string>>>();
         }

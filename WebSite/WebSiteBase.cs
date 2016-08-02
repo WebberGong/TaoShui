@@ -87,14 +87,14 @@ namespace WebSite
         protected abstract Regex LoginPageRegex { get; }
         protected abstract Regex CaptchaInputPageRegex { get; }
         protected abstract Regex MainPageRegex { get; }
-        protected abstract Action<WebControl, string> ShowJavascriptDialog { get; }
+        protected abstract Action<WebView, string> ShowJavascriptDialog { get; }
 
-        protected abstract void ChangeLanguage(WebControl browser);
-        protected abstract void Login(WebControl browser);
-        protected abstract bool IsCaptchaInputPageReady(WebControl browser);
-        protected abstract void CaptchaValidate(WebControl browser);
-        protected abstract void RefreshCaptcha(WebControl browser);
-        protected abstract IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebControl browser);
+        protected abstract void ChangeLanguage(WebView browser);
+        protected abstract void Login(WebView browser);
+        protected abstract bool IsCaptchaInputPageReady(WebView browser);
+        protected abstract void CaptchaValidate(WebView browser);
+        protected abstract void RefreshCaptcha(WebView browser);
+        protected abstract IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebView browser);
         public event WebSiteStatusChangedHandler WebSiteStatusChanged;
         public event GrabDataSuccessHandler GrabDataSuccess;
 
@@ -129,7 +129,7 @@ namespace WebSite
             _captchaValidateCount = 0;
         }
 
-        protected bool IsBrowserOk(WebControl browser)
+        protected bool IsBrowserOk(WebView browser)
         {
             return browser != null && browser.IsLive && !browser.IsCrashed && !browser.IsDisposed &&
                    browser.IsDocumentReady;
@@ -195,7 +195,7 @@ namespace WebSite
             thread.Start();
         }
 
-        public void DoCaptchaValidate(WebControl browser)
+        public void DoCaptchaValidate(WebView browser)
         {
             if (_captchaValidateCount < _captchaValidateMaxCount)
             {
@@ -208,7 +208,7 @@ namespace WebSite
             }
         }
 
-        public void DoRefreshCaptcha(WebControl browser)
+        public void DoRefreshCaptcha(WebView browser)
         {
             RefreshCaptcha(browser);
         }
@@ -221,7 +221,7 @@ namespace WebSite
 
         private void ShowJavascriptDialogHandler(object sender, JavascriptDialogEventArgs e)
         {
-            var browser = sender as WebControl;
+            var browser = sender as WebView;
             var msg = e.Message;
             LogHelper.LogWarn(GetType(), msg);
             ShowJavascriptDialog(browser, msg);
@@ -247,7 +247,7 @@ namespace WebSite
         {
             if (e.IsMainFrame)
             {
-                var browser = sender as WebControl;
+                var browser = sender as WebView;
                 var url = e.Url.ToString();
 
                 if (ChangeLanguageRegex != null && ChangeLanguageRegex.IsMatch(url))
@@ -261,7 +261,7 @@ namespace WebSite
         {
             if (e.IsMainFrame)
             {
-                var browser = sender as WebControl;
+                var browser = sender as WebView;
                 var url = e.Url.ToString();
 
                 if (LoginPageRegex != null && LoginPageRegex.IsMatch(url))
@@ -280,7 +280,7 @@ namespace WebSite
         {
             if (e.IsMainFrame)
             {
-                var browser = sender as WebControl;
+                var browser = sender as WebView;
                 var url = e.Url.ToString();
 
                 if (IsCaptchaInputPageReady(browser) && CaptchaInputPageRegex != null &&

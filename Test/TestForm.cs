@@ -25,7 +25,7 @@ namespace Test
 
         private void GrabDataByHtml(string html)
         {
-            int executeTimes = 50;
+            int executeTimes = 10;
 
             long resultTotalLength = 0L;
             long totalElapsedTime = 0L;
@@ -58,7 +58,7 @@ namespace Test
 
         private void GrabDataByJs(WebView view)
         {
-            int executeTimes = 50;
+            int executeTimes = 10;
 
             long resultTotalLength = 0L;
             long totalElapsedTime = 0L;
@@ -101,9 +101,9 @@ namespace Test
         {
             try
             {
-                for (int i = 0; i < 10; i++)
+                var thread = new Thread(() =>
                 {
-                    var thread = new Thread(() =>
+                    for (int i = 0; i < 10; i++)
                     {
                         using (var webView = WebCore.CreateWebView(100, 100, WebViewType.Offscreen))
                         {
@@ -111,41 +111,35 @@ namespace Test
                             {
                                 WebView view = sender as WebView;
                                 Console.WriteLine(@"页面地址:" + e.Url);
-                                if (view != null && e.IsMainFrame)
+                                if (view != null)
                                 {
                                     GrabDataByHtml(view.HTML);
                                 }
                             };
 
-                            webView.DocumentReady += (sender, e) =>
-                            {
-                                WebView view = sender as WebView;
-                                Console.WriteLine(@"页面地址:" + e.Url);
-                                if (view != null)
-                                {
-                                    GrabDataByJs(view);
-                                }
-                            };
+                            //webView.DocumentReady += (sender, e) =>
+                            //{
+                            //    WebView view = sender as WebView;
+                            //    Console.WriteLine(@"页面地址:" + e.Url);
+                            //    if (view != null)
+                            //    {
+                            //        GrabDataByJs(view);
+                            //    }
+                            //};
 
                             webView.Source = new Uri("http://www.163.com/");
+                            WebCore.Run();
 
-                            while (true)
-                            {
-                                Thread.Sleep(100);
-                            }
                         }
-                    })
-                    {
-                        Priority = ThreadPriority.AboveNormal,
-                        IsBackground = true,
-                        Name = "Test"
-                    };
-                    thread.SetApartmentState(ApartmentState.STA);
-                    thread.Start();
-                }
-
-
-                WebCore.Run();
+                    }
+                })
+                {
+                    Priority = ThreadPriority.AboveNormal,
+                    IsBackground = true,
+                    Name = "Test"
+                };
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
             }
             catch (Exception ex)
             {
