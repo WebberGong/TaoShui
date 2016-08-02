@@ -21,8 +21,6 @@ namespace Test
         public TestForm()
         {
             InitializeComponent();
-
-            GrabDataByAwesomium();
         }
 
         private void GrabDataByHtml(string html)
@@ -101,41 +99,63 @@ namespace Test
 
         private void GrabDataByAwesomium()
         {
-            var thread = new Thread(() =>
+            try
             {
-                using (var webView = WebCore.CreateWebView(100, 100, WebViewType.Window))
+                for (int i = 0; i < 10; i++)
                 {
-                    webView.LoadingFrameComplete += (sender, e) =>
+                    var thread = new Thread(() =>
                     {
-                        WebView view = sender as WebView;
-                        Console.WriteLine(@"页面地址:" + e.Url);
-                        if (view != null && e.IsMainFrame)
+                        using (var webView = WebCore.CreateWebView(100, 100, WebViewType.Offscreen))
                         {
-                            GrabDataByHtml(view.HTML);
-                        }
-                    };
+                            webView.LoadingFrameComplete += (sender, e) =>
+                            {
+                                WebView view = sender as WebView;
+                                Console.WriteLine(@"页面地址:" + e.Url);
+                                if (view != null && e.IsMainFrame)
+                                {
+                                    GrabDataByHtml(view.HTML);
+                                }
+                            };
 
-                    webView.DocumentReady += (sender, e) =>
+                            webView.DocumentReady += (sender, e) =>
+                            {
+                                WebView view = sender as WebView;
+                                Console.WriteLine(@"页面地址:" + e.Url);
+                                if (view != null)
+                                {
+                                    GrabDataByJs(view);
+                                }
+                            };
+
+                            webView.Source = new Uri("http://www.163.com/");
+
+                            while (true)
+                            {
+                                Thread.Sleep(100);
+                            }
+                        }
+                    })
                     {
-                        WebView view = sender as WebView;
-                        Console.WriteLine(@"页面地址:" + e.Url);
-                        if (view != null)
-                        {
-                            GrabDataByJs(view);
-                        }
+                        Priority = ThreadPriority.AboveNormal,
+                        IsBackground = true,
+                        Name = "Test"
                     };
-
-                    webView.Source = new Uri("http://www.163.com/");
-                    WebCore.Run();
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
                 }
-            })
+
+
+                WebCore.Run();
+            }
+            catch (Exception ex)
             {
-                Priority = ThreadPriority.AboveNormal,
-                IsBackground = true,
-                Name = "Test"
-            };
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void btnTest_Click(object sender, EventArgs e)
+        {
+            GrabDataByAwesomium();
         }
     }
 }

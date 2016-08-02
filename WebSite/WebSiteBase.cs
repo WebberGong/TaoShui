@@ -141,7 +141,7 @@ namespace WebSite
 
             var thread = new Thread(() =>
             {
-                using (var waiter = new WebControlWaiter.WebControlWaiter(true))
+                using (var waiter = new WebControlWaiter.WebControlWaiter())
                 {
                     waiter.Browser.LoadingFrame -= WebSiteLoading;
                     waiter.Browser.LoadingFrameComplete -= WebSiteLoadingComplete;
