@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows.Forms;
-using mshtml;
+using Awesomium.Core;
+using Awesomium.Windows.Forms;
 using Newtonsoft.Json;
 using Utils;
-using WebBrowserWaiter;
 using Timer = System.Timers.Timer;
 
 namespace WebSite
@@ -15,6 +14,7 @@ namespace WebSite
     public abstract class WebSiteBase
     {
         public delegate void GrabDataSuccessHandler(IDictionary<string, IDictionary<string, IList<string>>> grabbedData);
+
         public delegate void WebSiteStatusChangedHandler(WebSiteStatus webSiteStatus);
 
         private readonly int _captchaValidateMaxCount = 3;
@@ -23,12 +23,15 @@ namespace WebSite
         private DateTime _startLoginTime;
         private WebSiteStatus _webSiteStatus;
 
-        protected WebBrowser browser;
         protected int captchaLength;
         protected int grabDataInterval;
         protected string loginName;
         protected string loginPassword;
         protected int loginTimeOut;
+
+        protected const string Undefined = "undefined";
+        protected const string True = "true";
+        protected const string False = "false";
 
         protected WebSiteBase(string loginName, string loginPassword, int captchaLength, int loginTimeOut,
             int grabDataInterval)
@@ -79,17 +82,18 @@ namespace WebSite
         }
 
         protected abstract Uri BaseUrl { get; }
+        protected abstract Regex ChangeLanguageRegex { get; }
         protected abstract Regex LoginPageRegex { get; }
         protected abstract Regex CaptchaInputPageRegex { get; }
         protected abstract Regex MainPageRegex { get; }
-        protected abstract Action<string> PopupMsg { get; }
-        protected abstract Action<string> SendData { get; }
+        protected abstract Action<WebControl, string> ShowJavascriptDialog { get; }
 
-        protected abstract void Login();
-        protected abstract bool IsCaptchaInputPageLoaded();
-        protected abstract void CaptchaValidate();
-        protected abstract void RefreshCaptcha();
-        protected abstract IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebBrowser browser);
+        protected abstract void ChangeLanguage(WebControl browser);
+        protected abstract void Login(WebControl browser);
+        protected abstract bool IsCaptchaInputPageReady(WebControl browser);
+        protected abstract void CaptchaValidate(WebControl browser);
+        protected abstract void RefreshCaptcha(WebControl browser);
+        protected abstract IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebControl browser);
         public event WebSiteStatusChangedHandler WebSiteStatusChanged;
         public event GrabDataSuccessHandler GrabDataSuccess;
 
@@ -106,7 +110,6 @@ namespace WebSite
                     _loginTimer.Enabled = false;
                     _loginTimer.Stop();
                     WebSiteStatus = WebSiteStatus.LoginFailed;
-                    Stop();
                 }
                 else
                 {
@@ -115,11 +118,6 @@ namespace WebSite
                     {
                         _loginTimer.Enabled = false;
                         _loginTimer.Stop();
-
-                        if (WebSiteStatus == WebSiteStatus.LoginFailed)
-                        {
-                            Stop();
-                        }
                     }
                 }
             };
@@ -130,9 +128,9 @@ namespace WebSite
             _captchaValidateCount = 0;
         }
 
-        protected bool IsBrowserOk()
+        protected bool IsBrowserOk(WebControl browser)
         {
-            return browser != null && !browser.IsDisposed && browser.Document != null;
+            return browser != null && browser.IsLive && !browser.IsCrashed && !browser.IsDisposed && browser.IsDocumentReady;
         }
 
         public void Run()
@@ -141,25 +139,27 @@ namespace WebSite
 
             var thread = new Thread(() =>
             {
-                using (var waiter = new WebBrowserWaiter.WebBrowserWaiter(new MessageHandler(PopupMsg, SendData), true))
+                using (var waiter = new WebControlWaiter.WebControlWaiter(true))
                 {
-                    browser = waiter.Browser;
-
-                    browser.Navigating -= WebSiteNavigating;
-                    browser.Navigated -= WebSiteNavigated;
-                    browser.DocumentCompleted -= WebSiteDocumentCompleted;
-                    browser.DocumentCompleted -= LoginPageLoaded;
-                    browser.DocumentCompleted -= CaptchaInputPageLoaded;
-                    browser.DocumentCompleted -= MainPageLoaded;
-                    browser.Navigating += WebSiteNavigating;
-                    browser.Navigated += WebSiteNavigated;
-                    browser.DocumentCompleted += WebSiteDocumentCompleted;
-                    browser.DocumentCompleted += LoginPageLoaded;
-                    browser.DocumentCompleted += CaptchaInputPageLoaded;
-                    browser.DocumentCompleted += MainPageLoaded;
+                    waiter.Browser.LoadingFrame -= WebSiteLoading;
+                    waiter.Browser.LoadingFrameComplete -= WebSiteLoadingComplete;
+                    waiter.Browser.LoadingFrameComplete -= ChangeLanguagePageLoadingComplete;
+                    waiter.Browser.LoadingFrameComplete -= LoginPageLoadingComplete;
+                    waiter.Browser.LoadingFrameComplete -= CaptchaInputPageLoadingComplete;
+                    waiter.Browser.LoadingFrameComplete -= MainPageLoadingComplete;
+                    waiter.Browser.JavascriptMessage -= JavascriptMessageHandler;
+                    waiter.Browser.ShowJavascriptDialog -= ShowJavascriptDialogHandler;
+                    waiter.Browser.LoadingFrame += WebSiteLoading;
+                    waiter.Browser.LoadingFrameComplete += WebSiteLoadingComplete;
+                    waiter.Browser.LoadingFrameComplete += ChangeLanguagePageLoadingComplete;
+                    waiter.Browser.LoadingFrameComplete += LoginPageLoadingComplete;
+                    waiter.Browser.LoadingFrameComplete += CaptchaInputPageLoadingComplete;
+                    waiter.Browser.LoadingFrameComplete += MainPageLoadingComplete;
+                    waiter.Browser.JavascriptMessage += JavascriptMessageHandler;
+                    waiter.Browser.ShowJavascriptDialog += ShowJavascriptDialogHandler;
 
                     waiter.Await(
-                            wb => wb.Navigate(BaseUrl)
+                        wb => wb.Source = BaseUrl
                         );
 
                     while (WebSiteStatus != WebSiteStatus.LoginSuccessful &&
@@ -170,13 +170,13 @@ namespace WebSite
 
                     while (WebSiteStatus == WebSiteStatus.LoginSuccessful)
                     {
-                        Stopwatch watch = new Stopwatch();
+                        var watch = new Stopwatch();
                         watch.Start();
                         var data = waiter.Await(
                             wb => GrabData(wb)
                             );
                         watch.Stop();
-                        string elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
+                        var elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
                         LogHelper.LogInfo(GetType(), elapsedTimeMsg);
                         Console.WriteLine(elapsedTimeMsg);
                         OnGrabDataSuccess(data);
@@ -193,11 +193,11 @@ namespace WebSite
             thread.Start();
         }
 
-        public void DoCaptchaValidate()
+        public void DoCaptchaValidate(WebControl browser)
         {
             if (_captchaValidateCount < _captchaValidateMaxCount)
             {
-                CaptchaValidate();
+                CaptchaValidate(browser);
                 _captchaValidateCount++;
             }
             else
@@ -206,83 +206,101 @@ namespace WebSite
             }
         }
 
-        public void DoRefreshCaptcha()
+        public void DoRefreshCaptcha(WebControl browser)
         {
-            RefreshCaptcha();
+            RefreshCaptcha(browser);
         }
 
-        private void WebSiteNavigating(object sender, WebBrowserNavigatingEventArgs e)
+        private void JavascriptMessageHandler(object sender, JavascriptMessageEventArgs e)
         {
-            var url = e.Url.ToString();
-            LogHelper.LogInfo(GetType(), "正在跳转页面:" + url);
+            var msg = e.Message;
+            LogHelper.LogWarn(GetType(), msg);
         }
 
-        private void WebSiteNavigated(object sender, WebBrowserNavigatedEventArgs e)
+        private void ShowJavascriptDialogHandler(object sender, JavascriptDialogEventArgs e)
+        {
+            var browser = sender as WebControl;
+            var msg = e.Message;
+            LogHelper.LogWarn(GetType(), msg);
+            ShowJavascriptDialog(browser, msg);
+            e.Handled = true;
+        }
+
+        private void WebSiteLoading(object sender, LoadingFrameEventArgs e)
         {
             var url = e.Url.ToString();
-            LogHelper.LogInfo(GetType(), "页面跳转成功:" + url);
+            LogHelper.LogInfo(GetType(), "页面正在加载:" + url);
+        }
 
-            var webBrowser = sender as WebBrowser;
-            if (webBrowser != null && webBrowser.Document != null && webBrowser.Document.Window != null)
+        private void WebSiteLoadingComplete(object sender, FrameEventArgs e)
+        {
+            if (e.IsMainFrame)
             {
-                var win = (IHTMLWindow2)webBrowser.Document.Window.DomWindow;
-                const string js =
-                    @"window.alert = function(msg) { window.external.PopupMsg(msg); return true; }; 
-                    window.onerror = function() { return true; };
-                    window.confirm = function() { return true; }; 
-                    window.open = function() { return true; }; 
-                    window.showModalDialog = function() { return true; };";
-                win.execScript(js, "javascript");
+                var url = e.Url.ToString();
+                LogHelper.LogInfo(GetType(), "页面加载成功:" + url);
             }
         }
 
-        private void WebSiteDocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        private void ChangeLanguagePageLoadingComplete(object sender, FrameEventArgs e)
         {
-            var url = e.Url.ToString();
-            LogHelper.LogInfo(GetType(), "页面加载成功:" + url);
-        }
-
-        private void LoginPageLoaded(object sender, WebBrowserDocumentCompletedEventArgs e)
-        {
-            var url = e.Url.ToString();
-
-            if (LoginPageRegex != null && LoginPageRegex.IsMatch(url))
+            if (e.IsMainFrame)
             {
-                WebSiteStatus = WebSiteStatus.Logging;
-                _startLoginTime = DateTime.Now;
-                _loginTimer.Enabled = true;
-                _loginTimer.Start();
+                var browser = sender as WebControl;
+                var url = e.Url.ToString();
 
-                Login();
+                if (ChangeLanguageRegex != null && ChangeLanguageRegex.IsMatch(url))
+                {
+                    ChangeLanguage(browser);
+                }
             }
         }
 
-        private void CaptchaInputPageLoaded(object sender, WebBrowserDocumentCompletedEventArgs e)
+        private void LoginPageLoadingComplete(object sender, FrameEventArgs e)
         {
-            var url = e.Url.ToString();
-
-            if (IsCaptchaInputPageLoaded() && CaptchaInputPageRegex != null && CaptchaInputPageRegex.IsMatch(url))
+            if (e.IsMainFrame)
             {
-                WebSiteStatus = WebSiteStatus.CaptchaValidating;
-                DoCaptchaValidate();
+                var browser = sender as WebControl;
+                var url = e.Url.ToString();
+
+                if (LoginPageRegex != null && LoginPageRegex.IsMatch(url))
+                {
+                    WebSiteStatus = WebSiteStatus.Logging;
+                    _startLoginTime = DateTime.Now;
+                    _loginTimer.Enabled = true;
+                    _loginTimer.Start();
+
+                    Login(browser);
+                }
             }
         }
 
-        private void MainPageLoaded(object sender, WebBrowserDocumentCompletedEventArgs e)
+        private void CaptchaInputPageLoadingComplete(object sender, FrameEventArgs e)
         {
-            var url = e.Url.ToString();
-
-            if (MainPageRegex != null && MainPageRegex.IsMatch(url))
+            if (e.IsMainFrame)
             {
-                WebSiteStatus = WebSiteStatus.LoginSuccessful;
+                var browser = sender as WebControl;
+                var url = e.Url.ToString();
+
+                if (IsCaptchaInputPageReady(browser) && CaptchaInputPageRegex != null &&
+                    CaptchaInputPageRegex.IsMatch(url))
+                {
+                    WebSiteStatus = WebSiteStatus.CaptchaValidating;
+                    DoCaptchaValidate(browser);
+                }
             }
         }
 
-        private void Stop()
+        private void MainPageLoadingComplete(object sender, FrameEventArgs e)
         {
-            browser.Stop();
-            browser.Dispose();
-            browser = null;
+            if (e.IsMainFrame)
+            {
+                var url = e.Url.ToString();
+
+                if (MainPageRegex != null && MainPageRegex.IsMatch(url))
+                {
+                    WebSiteStatus = WebSiteStatus.LoginSuccessful;
+                }
+            }
         }
 
         private void OnWebSiteStatusChanged(WebSiteStatus webSiteStatus)
@@ -298,7 +316,7 @@ namespace WebSite
 
         private void OnGrabDataSuccess(IDictionary<string, IDictionary<string, IList<string>>> grabbedData)
         {
-            int matchCount = 0;
+            var matchCount = 0;
             foreach (var item in grabbedData)
             {
                 matchCount += item.Value.Count;

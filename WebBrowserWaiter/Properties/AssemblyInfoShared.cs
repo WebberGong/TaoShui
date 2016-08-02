@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AssemblyInfoShared.cs" company="WebBrowserWaiter">
-//   Copyright © 2014 WebBrowserWaiter. All rights reserved.
+// <copyright file="AssemblyInfoShared.cs" company="WebControlWaiter">
+//   Copyright © 2014 WebControlWaiter. All rights reserved.
 // </copyright>
 // <summary>
 //   AssemblyInfo.cs
@@ -14,10 +14,10 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyCompany("WebBrowserWaiter")]
-[assembly: AssemblyProduct("WebBrowserWaiter")]
-[assembly: AssemblyCopyright("Copyright © 2014 WebBrowserWaiter. All rights reserved.")]
-[assembly: AssemblyTrademark("WebBrowserWaiter™")]
+[assembly: AssemblyCompany("WebControlWaiter")]
+[assembly: AssemblyProduct("WebControlWaiter")]
+[assembly: AssemblyCopyright("Copyright © 2014 WebControlWaiter. All rights reserved.")]
+[assembly: AssemblyTrademark("WebControlWaiter™")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

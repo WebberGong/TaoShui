@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
+using Awesomium.Windows.Forms;
 using Utils;
 
 namespace WebSite
@@ -20,6 +19,11 @@ namespace WebSite
             get { return new Uri("https://www.pinnacle.com/zh-cn/"); }
         }
 
+        protected override Regex ChangeLanguageRegex
+        {
+            get { return null; }
+        }
+
         protected override Regex LoginPageRegex
         {
             get { return new Regex("https://www\\.pinnacle\\.com/zh-cn/"); }
@@ -35,75 +39,33 @@ namespace WebSite
             get { return new Regex("#tab=Menu&sport="); }
         }
 
-        protected override Action<string> PopupMsg
+        protected override Action<WebControl, string> ShowJavascriptDialog
         {
-            get
-            {
-                return msg =>
-                {
-                    switch (msg)
-                    {
-                        case "帐号/密码错误":
-                            WebSiteStatus = WebSiteStatus.LoginFailed;
-                            break;
-                        case "验证码错误":
-                            DoRefreshCaptcha();
-                            break;
-                    }
-                };
-            }
+            get { return (browser, msg) => { LogHelper.LogWarn(GetType(), msg); }; }
         }
 
-        protected override Action<string> SendData
+        protected override void ChangeLanguage(WebControl browser)
         {
-            get { return data => { LogHelper.LogInfo(GetType(), data); }; }
         }
 
-        protected override void Login()
+        protected override void Login(WebControl browser)
         {
-            if (IsBrowserOk() && browser.Document != null)
-            {
-                var startLoginBtn = browser.Document.GetElementById("loginButton");
-                if (startLoginBtn != null)
-                {
-                    startLoginBtn.InvokeMember("Click");
-                }
-                var loginForm = browser.Document.Forms["loginForm"];
-                if (loginForm != null && loginForm.Document != null)
-                {
-                    var inputs = loginForm.Document.GetElementsByTagName("input");
-                    var id =
-                        inputs.Cast<HtmlElement>()
-                            .FirstOrDefault(item => item.GetAttribute("className") == "customerId");
-                    var password =
-                        inputs.Cast<HtmlElement>().FirstOrDefault(item => item.GetAttribute("className") == "password");
-                    var login =
-                        inputs.Cast<HtmlElement>()
-                            .FirstOrDefault(item => item.GetAttribute("className") == "loginSubmit");
-                    if (id != null && password != null && login != null)
-                    {
-                        id.SetAttribute("value", loginName);
-                        password.SetAttribute("value", loginPassword);
-                        login.InvokeMember("Click");
-                    }
-                }
-            }
         }
 
-        protected override bool IsCaptchaInputPageLoaded()
+        protected override bool IsCaptchaInputPageReady(WebControl browser)
         {
             return true;
         }
 
-        protected override void CaptchaValidate()
+        protected override void CaptchaValidate(WebControl browser)
         {
         }
 
-        protected override void RefreshCaptcha()
+        protected override void RefreshCaptcha(WebControl browser)
         {
         }
 
-        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebBrowser wb)
+        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebControl wb)
         {
             return new Dictionary<string, IDictionary<string, IList<string>>>();
         }

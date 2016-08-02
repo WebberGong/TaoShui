@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WebBrowserWaiter.cs" company="WebBrowserWaiter">
-//   Copyright © 2014 WebBrowserWaiter. All rights reserved.
+// <copyright file="WebControlWaiter.cs" company="WebControlWaiter">
+//   Copyright © 2014 WebControlWaiter. All rights reserved.
 // </copyright>
 // <summary>
 //   The web browser waiter.
@@ -14,13 +14,14 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Windows.Forms;
+using Awesomium.Windows.Forms;
 
-namespace WebBrowserWaiter
+namespace WebControlWaiter
 {
     /// <summary>
     ///     The web browser waiter.
     /// </summary>
-    public class WebBrowserWaiter : IDisposable
+    public class WebControlWaiter : IDisposable
     {
         #region Methods
 
@@ -101,7 +102,9 @@ namespace WebBrowserWaiter
             protected override void SetVisibleCore(bool value)
             {
                 if (!IsHandleCreated)
+                {
                     CreateHandle();
+                }
 
                 base.SetVisibleCore(InitialVisibility);
             }
@@ -116,7 +119,7 @@ namespace WebBrowserWaiter
         /// <summary>
         ///     The default wait.
         /// </summary>
-        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(0);
+        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(60);
 
         /// <summary>
         ///     The signal.
@@ -126,7 +129,7 @@ namespace WebBrowserWaiter
         /// <summary>
         ///     The browser.
         /// </summary>
-        private WebBrowser _browser;
+        private WebControl _browser;
 
         /// <summary>
         ///     The form.
@@ -143,22 +146,15 @@ namespace WebBrowserWaiter
         #region Constructors and Destructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="WebBrowserWaiter" /> class.
+        ///     Initializes a new instance of the <see cref="WebControlWaiter" /> class.
         /// </summary>
-        public WebBrowserWaiter()
-            // ReSharper disable once RedundantArgumentDefaultValue
-            : this(null)
+        public WebControlWaiter()
         {
-            // NOTE: This constructor must provide at least one named argument to the other
-            // constructor to avoid calling this constructor recursively.
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="WebBrowserWaiter" /> class.
+        ///     Initializes a new instance of the <see cref="WebControlWaiter" /> class.
         /// </summary>
-        /// <param name="messageHandler">
-        ///     The js message handler
-        /// </param>
         /// <param name="visibility">
         ///     The visibility.
         /// </param>
@@ -177,28 +173,30 @@ namespace WebBrowserWaiter
         /// <param name="left">
         ///     The left.
         /// </param>
-        public WebBrowserWaiter(MessageHandler messageHandler = null, bool visibility = false,
-            FormStartPosition position = FormStartPosition.CenterScreen, int width = -1, int height = -1, int top = 0,
-            int left = 0)
+        public WebControlWaiter(bool visibility = false, FormStartPosition position = FormStartPosition.CenterScreen,
+            int width = -1, int height = -1, int top = 0, int left = 0)
         {
             _signal = new ManualResetEvent(false);
-            if (messageHandler == null)
-            {
-                messageHandler = new MessageHandler(null, null);
-            }
 
             var thread = new Thread(() =>
             {
-                _browser = new WebBrowser
+                _browser = new WebControl
                 {
-                    Width = width < 0 ? Screen.PrimaryScreen.WorkingArea.Width * 3 / 4 : width,
-                    Height = height < 0 ? Screen.PrimaryScreen.WorkingArea.Height * 3 / 4 : height,
-                    ObjectForScripting = messageHandler,
-                    ScriptErrorsSuppressed = true
+                    Width = width < 0 ? Screen.PrimaryScreen.WorkingArea.Width*3/4 : width,
+                    Height = height < 0 ? Screen.PrimaryScreen.WorkingArea.Height*3/4 : height
                 };
 
-                _browser.Navigated += (p, q) => { _lastCompleted = null; };
-                _browser.DocumentCompleted += (p, q) => { _lastCompleted = DateTime.UtcNow; };
+                _browser.LoadingFrame += (sender, e) =>
+                {
+                    _lastCompleted = null;
+                };
+                _browser.LoadingFrameComplete += (sender, e) =>
+                {
+                    if (e.IsMainFrame)
+                    {
+                        _lastCompleted = DateTime.UtcNow;
+                    }
+                };
 
                 _form = new HeadlessForm
                 {
@@ -241,9 +239,9 @@ namespace WebBrowserWaiter
         }
 
         /// <summary>
-        /// Gets the web browser
+        ///     Gets the web browser
         /// </summary>
-        public virtual WebBrowser Browser
+        public virtual WebControl Browser
         {
             get { return _browser; }
         }
@@ -258,7 +256,7 @@ namespace WebBrowserWaiter
         /// <param name="order">
         ///     The order.
         /// </param>
-        public virtual void Await(Action<WebBrowser> order)
+        public virtual void Await(Action<WebControl> order)
         {
             Await(
                 DefaultWait,
@@ -275,7 +273,7 @@ namespace WebBrowserWaiter
         /// <param name="order">
         ///     The order.
         /// </param>
-        public virtual void Await(int wait, Action<WebBrowser> order)
+        public virtual void Await(int wait, Action<WebControl> order)
         {
             Await(
                 CreateWaitTimeSpan(wait),
@@ -292,11 +290,11 @@ namespace WebBrowserWaiter
         /// <param name="order">
         ///     The order.
         /// </param>
-        public virtual void Await(TimeSpan wait, Action<WebBrowser> order)
+        public virtual void Await(TimeSpan wait, Action<WebControl> order)
         {
             Await(
                 wait,
-                new[] { order }
+                new[] {order}
                 );
         }
 
@@ -306,7 +304,7 @@ namespace WebBrowserWaiter
         /// <param name="orders">
         ///     The orders.
         /// </param>
-        public virtual void Await(params Action<WebBrowser>[] orders)
+        public virtual void Await(params Action<WebControl>[] orders)
         {
             Await(
                 DefaultWait,
@@ -323,7 +321,7 @@ namespace WebBrowserWaiter
         /// <param name="orders">
         ///     The orders.
         /// </param>
-        public virtual void Await(int wait, params Action<WebBrowser>[] orders)
+        public virtual void Await(int wait, params Action<WebControl>[] orders)
         {
             Await(
                 CreateWaitTimeSpan(wait),
@@ -340,7 +338,7 @@ namespace WebBrowserWaiter
         /// <param name="orders">
         ///     The orders.
         /// </param>
-        public virtual void Await(int[] waits, params Action<WebBrowser>[] orders)
+        public virtual void Await(int[] waits, params Action<WebControl>[] orders)
         {
             Await(
                 waits.Select(CreateWaitTimeSpan).ToArray(),
@@ -357,7 +355,7 @@ namespace WebBrowserWaiter
         /// <param name="orders">
         ///     The orders.
         /// </param>
-        public virtual void Await(TimeSpan wait, params Action<WebBrowser>[] orders)
+        public virtual void Await(TimeSpan wait, params Action<WebControl>[] orders)
         {
             Await(
                 orders.Select(p => wait).ToArray(),
@@ -377,12 +375,12 @@ namespace WebBrowserWaiter
         /// <exception cref="ArgumentException">
         ///     Throws ArgumentException if waits and orders differ in length.
         /// </exception>
-        public virtual void Await(TimeSpan[] waits, params Action<WebBrowser>[] orders)
+        public virtual void Await(TimeSpan[] waits, params Action<WebControl>[] orders)
         {
             Await(
                 waits,
                 orders.Select(
-                    (p, q) => (Func<WebBrowser, object>)(r =>
+                    (p, q) => (Func<WebControl, object>) (r =>
                     {
                         p(r);
                         return null;
@@ -401,7 +399,7 @@ namespace WebBrowserWaiter
         /// <returns>
         ///     The <see cref="T" />.
         /// </returns>
-        public virtual T Await<T>(Func<WebBrowser, T> order)
+        public virtual T Await<T>(Func<WebControl, T> order)
         {
             return Await(
                 DefaultWait,
@@ -424,7 +422,7 @@ namespace WebBrowserWaiter
         /// <returns>
         ///     The <see cref="T" />.
         /// </returns>
-        public virtual T Await<T>(int wait, Func<WebBrowser, T> order)
+        public virtual T Await<T>(int wait, Func<WebControl, T> order)
         {
             return Await(
                 CreateWaitTimeSpan(wait),
@@ -447,11 +445,11 @@ namespace WebBrowserWaiter
         /// <returns>
         ///     The <see cref="T" />.
         /// </returns>
-        public virtual T Await<T>(TimeSpan wait, Func<WebBrowser, T> order)
+        public virtual T Await<T>(TimeSpan wait, Func<WebControl, T> order)
         {
             return Await(
                 wait,
-                new[] { order }
+                new[] {order}
                 ).First();
         }
 
@@ -467,7 +465,7 @@ namespace WebBrowserWaiter
         /// <returns>
         ///     The an array of the return type.
         /// </returns>
-        public virtual T[] Await<T>(params Func<WebBrowser, T>[] orders)
+        public virtual T[] Await<T>(params Func<WebControl, T>[] orders)
         {
             return Await(
                 DefaultWait,
@@ -490,7 +488,7 @@ namespace WebBrowserWaiter
         /// <returns>
         ///     The an array of the return type.
         /// </returns>
-        public virtual T[] Await<T>(int wait, params Func<WebBrowser, T>[] orders)
+        public virtual T[] Await<T>(int wait, params Func<WebControl, T>[] orders)
         {
             return Await(
                 CreateWaitTimeSpan(wait),
@@ -513,7 +511,7 @@ namespace WebBrowserWaiter
         /// <returns>
         ///     The an array of the return type.
         /// </returns>
-        public virtual T[] Await<T>(int[] waits, params Func<WebBrowser, T>[] orders)
+        public virtual T[] Await<T>(int[] waits, params Func<WebControl, T>[] orders)
         {
             return Await(
                 waits.Select(CreateWaitTimeSpan).ToArray(),
@@ -536,7 +534,7 @@ namespace WebBrowserWaiter
         /// <returns>
         ///     The an array of the return type.
         /// </returns>
-        public virtual T[] Await<T>(TimeSpan wait, params Func<WebBrowser, T>[] orders)
+        public virtual T[] Await<T>(TimeSpan wait, params Func<WebControl, T>[] orders)
         {
             return Await(
                 orders.Select(p => wait).ToArray(),
@@ -559,7 +557,7 @@ namespace WebBrowserWaiter
         /// <returns>
         ///     The an array of the return type.
         /// </returns>
-        public virtual T[] Await<T>(TimeSpan[] waits, params Func<WebBrowser, T>[] orders)
+        public virtual T[] Await<T>(TimeSpan[] waits, params Func<WebControl, T>[] orders)
         {
             if (waits.Length != orders.Length)
                 throw new ArgumentException("The waits and orders arguments must have the same length.");

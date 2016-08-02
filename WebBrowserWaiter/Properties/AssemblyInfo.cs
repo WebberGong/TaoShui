@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AssemblyInfo.cs" company="WebBrowserWaiter">
-//   Copyright © 2014 WebBrowserWaiter. All rights reserved.
+// <copyright file="AssemblyInfo.cs" company="WebControlWaiter">
+//   Copyright © 2014 WebControlWaiter. All rights reserved.
 // </copyright>
 // <summary>
 //   AssemblyInfo.cs
@@ -14,10 +14,10 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("WebBrowserWaiter")]
+[assembly: AssemblyTitle("WebControlWaiter")]
 [assembly:
     AssemblyDescription(
-        "A headless wrapper of the .NET WebBrowser useful in automated browser testing, or as web crawler or screen scrapper and includes both HTML and JavaScript processing capabilities."
+        "A headless wrapper of the .NET WebControl useful in automated browser testing, or as web crawler or screen scrapper and includes both HTML and JavaScript processing capabilities."
         )]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM

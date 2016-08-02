@@ -14,14 +14,10 @@ namespace TaoShui
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            //WebSite maxBet1 = new MaxBet("pyh667h00a", "A123456a", 4, 30);
-            //WebSite maxBet2 = new MaxBet("sfb1337952", "Aaaa2234", 4, 30);
-            //WebSite pinnacle1 = new Pinnacle("hc2at84671", "aaaa2222", 4, 30);
-
-            WebSiteBase maxBet2 = new MaxBet("sfb1337952", "Aaaa2234", 4, 60, 1);
-            maxBet2.Run();
-            //WebSiteBase maxBet1 = new MaxBet("pyh667h00a", "A123456a", 4, 60, 1);
+            //WebSiteBase maxBet1 = new MaxBet("sfb1337952", "Aaaa2234", 4, 200, 1);
             //maxBet1.Run();
+            WebSiteBase maxBet2 = new MaxBet("pyh667h00a111", "A123456a111", 4, 60, 1);
+            maxBet2.Run();
             //WebSiteBase pinnacle1 = new Pinnacle("hc2at84671111", "aaaa2222111", 4, 60, 1);
             //pinnacle1.Run();
         }

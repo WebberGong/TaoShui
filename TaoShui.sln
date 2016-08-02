@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSite", "WebSite\WebSite.csproj", "{165E7E15-B3A4-4530-9479-6DFE4E751C1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBrowserWaiter", "WebBrowserWaiter\WebBrowserWaiter.csproj", "{30430B8F-FF19-491F-8787-31A5DB7AD132}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebControlWaiter", "WebBrowserWaiter\WebControlWaiter.csproj", "{30430B8F-FF19-491F-8787-31A5DB7AD132}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

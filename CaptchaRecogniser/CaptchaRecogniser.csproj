@@ -38,6 +38,12 @@
       <HintPath>..\packages\AForge.Imaging.2.2.5\lib\AForge.Imaging.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Awesomium.Core">
+      <HintPath>..\packages\Awesomium.Windows.Forms.Unofficial.1.7.5.0\lib\Awesomium.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Awesomium.Windows.Forms">
+      <HintPath>..\packages\Awesomium.Windows.Forms.Unofficial.1.7.5.0\lib\Awesomium.Windows.Forms.dll</HintPath>
+    </Reference>
     <Reference Include="Patagames.Ocr, Version=1.8.0.341, Culture=neutral, PublicKeyToken=c2dc709ce62c6191, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Tesseract.Net.SDK.1.9.1\lib\net45\Patagames.Ocr.dll</HintPath>
