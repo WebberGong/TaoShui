@@ -14,6 +14,10 @@ namespace WebSite
         {
         }
 
+        ~Pinnacle()
+        {
+        }
+
         protected override Uri BaseUrl
         {
             get { return new Uri("https://www.pinnacle.com/zh-cn/"); }

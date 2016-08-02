@@ -148,13 +148,6 @@ namespace WebControlWaiter
         /// <summary>
         ///     Initializes a new instance of the <see cref="WebControlWaiter" /> class.
         /// </summary>
-        public WebControlWaiter()
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="WebControlWaiter" /> class.
-        /// </summary>
         /// <param name="visibility">
         ///     The visibility.
         /// </param>
@@ -186,10 +179,7 @@ namespace WebControlWaiter
                     Height = height < 0 ? Screen.PrimaryScreen.WorkingArea.Height*3/4 : height
                 };
 
-                _browser.LoadingFrame += (sender, e) =>
-                {
-                    _lastCompleted = null;
-                };
+                _browser.LoadingFrame += (sender, e) => { _lastCompleted = null; };
                 _browser.LoadingFrameComplete += (sender, e) =>
                 {
                     if (e.IsMainFrame)

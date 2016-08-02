@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Awesomium.Core;
 using Awesomium.Windows.Forms;
+using CaptchaRecogniser;
 using Newtonsoft.Json;
 using Utils;
 using Timer = System.Timers.Timer;
@@ -17,6 +18,10 @@ namespace WebSite
 
         public delegate void WebSiteStatusChangedHandler(WebSiteStatus webSiteStatus);
 
+        protected const string Undefined = "undefined";
+        protected const string True = "true";
+        protected const string False = "false";
+
         private readonly int _captchaValidateMaxCount = 3;
         private int _captchaValidateCount;
         private Timer _loginTimer;
@@ -28,10 +33,6 @@ namespace WebSite
         protected string loginName;
         protected string loginPassword;
         protected int loginTimeOut;
-
-        protected const string Undefined = "undefined";
-        protected const string True = "true";
-        protected const string False = "false";
 
         protected WebSiteBase(string loginName, string loginPassword, int captchaLength, int loginTimeOut,
             int grabDataInterval)
@@ -130,7 +131,8 @@ namespace WebSite
 
         protected bool IsBrowserOk(WebControl browser)
         {
-            return browser != null && browser.IsLive && !browser.IsCrashed && !browser.IsDisposed && browser.IsDocumentReady;
+            return browser != null && browser.IsLive && !browser.IsCrashed && !browser.IsDisposed &&
+                   browser.IsDocumentReady;
         }
 
         public void Run()
@@ -180,12 +182,12 @@ namespace WebSite
                         LogHelper.LogInfo(GetType(), elapsedTimeMsg);
                         Console.WriteLine(elapsedTimeMsg);
                         OnGrabDataSuccess(data);
-                        Thread.Sleep(grabDataInterval * 1000);
+                        Thread.Sleep(grabDataInterval*1000);
                     }
                 }
             })
             {
-                Priority = ThreadPriority.Highest,
+                Priority = ThreadPriority.AboveNormal,
                 IsBackground = true,
                 Name = "WebBrowserThread"
             };

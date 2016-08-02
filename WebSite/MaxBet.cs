@@ -18,6 +18,14 @@ namespace WebSite
         {
         }
 
+        ~MaxBet()
+        {
+            if (Recogniser.Instance != null)
+            {
+                Recogniser.Instance.Dispose();
+            }
+        }
+
         protected override Uri BaseUrl
         {
             get { return new Uri("http://www.maxbet.com/Default.aspx"); }

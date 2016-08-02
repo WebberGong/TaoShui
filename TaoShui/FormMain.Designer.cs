@@ -44,7 +44,6 @@
             this.Controls.Add(this.btnTest);
             this.Name = "FormMain";
             this.Text = "FormMain";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormMain_FormClosed);
             this.ResumeLayout(false);
 
         }
