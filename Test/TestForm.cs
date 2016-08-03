@@ -109,7 +109,7 @@ namespace Test
                     {
                         WebView view = sender as WebView;
                         Console.WriteLine(@"页面地址:" + e.Url);
-                        if (view != null && e.IsMainFrame)
+                        if (view != null)
                         {
                             GrabDataByHtml(view.HTML);
                         }
