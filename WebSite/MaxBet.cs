@@ -4,10 +4,9 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
-using Awesomium.Core;
-using Awesomium.Windows.Forms;
 using CaptchaRecogniser;
 using Utils;
+using Entity;
 
 namespace WebSite
 {
@@ -17,14 +16,6 @@ namespace WebSite
             int loginTimeOut = 10, int grabDataInterval = 10)
             : base(loginName, loginPassword, captchaLength, loginTimeOut, grabDataInterval)
         {
-        }
-
-        ~MaxBet()
-        {
-            if (Recogniser.Instance != null)
-            {
-                Recogniser.Instance.Dispose();
-            }
         }
 
         protected override Uri BaseUrl
@@ -52,11 +43,11 @@ namespace WebSite
             get { return new Regex("main\\.aspx"); }
         }
 
-        protected override Action<WebView, string> ShowJavascriptDialog
+        protected override Action<string> ShowJavascriptDialog
         {
             get
             {
-                return (browser, msg) =>
+                return msg =>
                 {
                     switch (msg)
                     {
@@ -64,16 +55,24 @@ namespace WebSite
                             WebSiteStatus = WebSiteStatus.LoginFailed;
                             break;
                         case "验证码错误":
-                            DoRefreshCaptcha(browser);
+                            DoRefreshCaptcha();
                             break;
                     }
                 };
             }
         }
 
-        protected override void ChangeLanguage(WebView browser)
+        ~MaxBet()
         {
-            if (IsBrowserOk(browser))
+            if (Recogniser.Instance != null)
+            {
+                Recogniser.Instance.Dispose();
+            }
+        }
+
+        protected override void ChangeLanguage()
+        {
+            if (IsBrowserOk())
             {
                 var changeLanguageJs = @"
                     (function() {
@@ -89,9 +88,9 @@ namespace WebSite
             }
         }
 
-        protected override void Login(WebView browser)
+        protected override void Login()
         {
-            if (IsBrowserOk(browser))
+            if (IsBrowserOk())
             {
                 var loginJs = @"
                     (function() {
@@ -115,14 +114,14 @@ namespace WebSite
             }
         }
 
-        protected override bool IsCaptchaInputPageReady(WebView browser)
+        protected override bool IsCaptchaInputPageReady()
         {
-            if (IsBrowserOk(browser))
+            if (IsBrowserOk())
             {
                 var isCaptchaReadyJs = @"
                     (function() {
                         try {
-                            var img = $('#validateCode');
+                            var img = this.document.getElementById('validateCode');
                             if (img) {
                                 return true;
                             } else {
@@ -139,9 +138,9 @@ namespace WebSite
             return false;
         }
 
-        protected override void CaptchaValidate(WebView browser)
+        protected override void CaptchaValidate()
         {
-            if (IsBrowserOk(browser))
+            if (IsBrowserOk())
             {
                 var getPositionJs = @"
                     (function() {
@@ -209,12 +208,12 @@ namespace WebSite
             }
         }
 
-        protected override void RefreshCaptcha(WebView browser)
+        protected override void RefreshCaptcha()
         {
             browser.Source = BaseUrl;
         }
 
-        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebView wb)
+        public override IDictionary<string, IDictionary<string, IList<string>>> GrabData()
         {
             IDictionary<string, IDictionary<string, IList<string>>> grabbedData =
                 new Dictionary<string, IDictionary<string, IList<string>>>();

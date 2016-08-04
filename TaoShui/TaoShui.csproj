@@ -118,9 +118,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WebSite\WebSite.csproj">
-      <Project>{165e7e15-b3a4-4530-9479-6dfe4e751c1c}</Project>
-      <Name>WebSite</Name>
+    <ProjectReference Include="..\WebSiteProcess\WebSiteProcess.csproj">
+      <Project>{a050acc5-86be-4e27-b7b3-9de5d19b854f}</Project>
+      <Name>WebSiteProcess</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

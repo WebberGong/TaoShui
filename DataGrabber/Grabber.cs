@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using HtmlAgilityPack;
+﻿using System.Collections.Generic;
 
 namespace DataGrabber
 {

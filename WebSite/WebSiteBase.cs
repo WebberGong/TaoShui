@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
-using System.Threading;
+using System.Windows.Forms;
 using Awesomium.Core;
-using Awesomium.Windows.Forms;
-using CaptchaRecogniser;
-using Newtonsoft.Json;
+using Entity;
 using Utils;
 using Timer = System.Timers.Timer;
 
@@ -14,8 +11,6 @@ namespace WebSite
 {
     public abstract class WebSiteBase
     {
-        public delegate void GrabDataSuccessHandler(IDictionary<string, IDictionary<string, IList<string>>> grabbedData);
-
         public delegate void WebSiteStatusChangedHandler(WebSiteStatus webSiteStatus);
 
         protected const string Undefined = "undefined";
@@ -28,6 +23,7 @@ namespace WebSite
         private DateTime _startLoginTime;
         private WebSiteStatus _webSiteStatus;
 
+        protected WebView browser;
         protected int captchaLength;
         protected int grabDataInterval;
         protected string loginName;
@@ -87,19 +83,38 @@ namespace WebSite
         protected abstract Regex LoginPageRegex { get; }
         protected abstract Regex CaptchaInputPageRegex { get; }
         protected abstract Regex MainPageRegex { get; }
-        protected abstract Action<WebView, string> ShowJavascriptDialog { get; }
+        protected abstract Action<string> ShowJavascriptDialog { get; }
 
-        protected abstract void ChangeLanguage(WebView browser);
-        protected abstract void Login(WebView browser);
-        protected abstract bool IsCaptchaInputPageReady(WebView browser);
-        protected abstract void CaptchaValidate(WebView browser);
-        protected abstract void RefreshCaptcha(WebView browser);
-        protected abstract IDictionary<string, IDictionary<string, IList<string>>> GrabData(WebView browser);
+        protected abstract void ChangeLanguage();
+        protected abstract void Login();
+        protected abstract bool IsCaptchaInputPageReady();
+        protected abstract void CaptchaValidate();
+        protected abstract void RefreshCaptcha();
+        public abstract IDictionary<string, IDictionary<string, IList<string>>> GrabData();
         public event WebSiteStatusChangedHandler WebSiteStatusChanged;
-        public event GrabDataSuccessHandler GrabDataSuccess;
 
         private void Initialize()
         {
+            browser = WebCore.CreateWebView(Screen.PrimaryScreen.WorkingArea.Width,
+                Screen.PrimaryScreen.WorkingArea.Height, WebViewType.Offscreen);
+
+            browser.LoadingFrame -= WebSiteLoading;
+            browser.LoadingFrameComplete -= WebSiteLoadingComplete;
+            browser.LoadingFrameComplete -= ChangeLanguagePageLoadingComplete;
+            browser.LoadingFrameComplete -= LoginPageLoadingComplete;
+            browser.LoadingFrameComplete -= CaptchaInputPageLoadingComplete;
+            browser.LoadingFrameComplete -= MainPageLoadingComplete;
+            browser.JavascriptMessage -= JavascriptMessageHandler;
+            browser.ShowJavascriptDialog -= ShowJavascriptDialogHandler;
+            browser.LoadingFrame += WebSiteLoading;
+            browser.LoadingFrameComplete += WebSiteLoadingComplete;
+            browser.LoadingFrameComplete += ChangeLanguagePageLoadingComplete;
+            browser.LoadingFrameComplete += LoginPageLoadingComplete;
+            browser.LoadingFrameComplete += CaptchaInputPageLoadingComplete;
+            browser.LoadingFrameComplete += MainPageLoadingComplete;
+            browser.JavascriptMessage += JavascriptMessageHandler;
+            browser.ShowJavascriptDialog += ShowJavascriptDialogHandler;
+
             var tsLoginTimeOut = new TimeSpan(0, 0, loginTimeOut);
             _startLoginTime = DateTime.Now;
             _loginTimer = new Timer(200);
@@ -129,7 +144,7 @@ namespace WebSite
             _captchaValidateCount = 0;
         }
 
-        protected bool IsBrowserOk(WebView browser)
+        protected bool IsBrowserOk()
         {
             return browser != null && browser.IsLive && !browser.IsCrashed && !browser.IsDisposed &&
                    browser.IsDocumentReady;
@@ -139,67 +154,15 @@ namespace WebSite
         {
             Initialize();
 
-            var thread = new Thread(() =>
-            {
-                using (var waiter = new WebControlWaiter.WebControlWaiter())
-                {
-                    waiter.Browser.LoadingFrame -= WebSiteLoading;
-                    waiter.Browser.LoadingFrameComplete -= WebSiteLoadingComplete;
-                    waiter.Browser.LoadingFrameComplete -= ChangeLanguagePageLoadingComplete;
-                    waiter.Browser.LoadingFrameComplete -= LoginPageLoadingComplete;
-                    waiter.Browser.LoadingFrameComplete -= CaptchaInputPageLoadingComplete;
-                    waiter.Browser.LoadingFrameComplete -= MainPageLoadingComplete;
-                    waiter.Browser.JavascriptMessage -= JavascriptMessageHandler;
-                    waiter.Browser.ShowJavascriptDialog -= ShowJavascriptDialogHandler;
-                    waiter.Browser.LoadingFrame += WebSiteLoading;
-                    waiter.Browser.LoadingFrameComplete += WebSiteLoadingComplete;
-                    waiter.Browser.LoadingFrameComplete += ChangeLanguagePageLoadingComplete;
-                    waiter.Browser.LoadingFrameComplete += LoginPageLoadingComplete;
-                    waiter.Browser.LoadingFrameComplete += CaptchaInputPageLoadingComplete;
-                    waiter.Browser.LoadingFrameComplete += MainPageLoadingComplete;
-                    waiter.Browser.JavascriptMessage += JavascriptMessageHandler;
-                    waiter.Browser.ShowJavascriptDialog += ShowJavascriptDialogHandler;
-
-                    waiter.Await(
-                        wb => wb.Source = BaseUrl
-                        );
-
-                    while (WebSiteStatus != WebSiteStatus.LoginSuccessful &&
-                           WebSiteStatus != WebSiteStatus.LoginFailed)
-                    {
-                        Thread.Sleep(50);
-                    }
-
-                    while (WebSiteStatus == WebSiteStatus.LoginSuccessful)
-                    {
-                        var watch = new Stopwatch();
-                        watch.Start();
-                        var data = waiter.Await(
-                            wb => GrabData(wb)
-                            );
-                        watch.Stop();
-                        var elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
-                        LogHelper.LogInfo(GetType(), elapsedTimeMsg);
-                        Console.WriteLine(elapsedTimeMsg);
-                        OnGrabDataSuccess(data);
-                        Thread.Sleep(grabDataInterval*1000);
-                    }
-                }
-            })
-            {
-                Priority = ThreadPriority.AboveNormal,
-                IsBackground = true,
-                Name = "WebBrowserThread"
-            };
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            browser.Source = BaseUrl;
+            WebCore.Run();
         }
 
-        public void DoCaptchaValidate(WebView browser)
+        public void DoCaptchaValidate()
         {
             if (_captchaValidateCount < _captchaValidateMaxCount)
             {
-                CaptchaValidate(browser);
+                CaptchaValidate();
                 _captchaValidateCount++;
             }
             else
@@ -208,9 +171,9 @@ namespace WebSite
             }
         }
 
-        public void DoRefreshCaptcha(WebView browser)
+        public void DoRefreshCaptcha()
         {
-            RefreshCaptcha(browser);
+            RefreshCaptcha();
         }
 
         private void JavascriptMessageHandler(object sender, JavascriptMessageEventArgs e)
@@ -221,10 +184,9 @@ namespace WebSite
 
         private void ShowJavascriptDialogHandler(object sender, JavascriptDialogEventArgs e)
         {
-            var browser = sender as WebView;
             var msg = e.Message;
             LogHelper.LogWarn(GetType(), msg);
-            ShowJavascriptDialog(browser, msg);
+            ShowJavascriptDialog(msg);
             e.Handled = true;
         }
 
@@ -247,12 +209,11 @@ namespace WebSite
         {
             if (e.IsMainFrame)
             {
-                var browser = sender as WebView;
                 var url = e.Url.ToString();
 
                 if (ChangeLanguageRegex != null && ChangeLanguageRegex.IsMatch(url))
                 {
-                    ChangeLanguage(browser);
+                    ChangeLanguage();
                 }
             }
         }
@@ -261,7 +222,6 @@ namespace WebSite
         {
             if (e.IsMainFrame)
             {
-                var browser = sender as WebView;
                 var url = e.Url.ToString();
 
                 if (LoginPageRegex != null && LoginPageRegex.IsMatch(url))
@@ -271,7 +231,7 @@ namespace WebSite
                     _loginTimer.Enabled = true;
                     _loginTimer.Start();
 
-                    Login(browser);
+                    Login();
                 }
             }
         }
@@ -280,14 +240,13 @@ namespace WebSite
         {
             if (e.IsMainFrame)
             {
-                var browser = sender as WebView;
                 var url = e.Url.ToString();
 
-                if (IsCaptchaInputPageReady(browser) && CaptchaInputPageRegex != null &&
+                if (IsCaptchaInputPageReady() && CaptchaInputPageRegex != null &&
                     CaptchaInputPageRegex.IsMatch(url))
                 {
                     WebSiteStatus = WebSiteStatus.CaptchaValidating;
-                    DoCaptchaValidate(browser);
+                    DoCaptchaValidate();
                 }
             }
         }
@@ -313,23 +272,6 @@ namespace WebSite
             if (handler != null)
             {
                 handler(webSiteStatus);
-            }
-        }
-
-        private void OnGrabDataSuccess(IDictionary<string, IDictionary<string, IList<string>>> grabbedData)
-        {
-            var matchCount = 0;
-            foreach (var item in grabbedData)
-            {
-                matchCount += item.Value.Count;
-            }
-            LogHelper.LogInfo(GetType(), string.Format("抓取数据成功, 联赛数: {0}, 比赛数: {1}", grabbedData.Count, matchCount));
-            Console.WriteLine(JsonConvert.SerializeObject(grabbedData));
-
-            var handler = GrabDataSuccess;
-            if (handler != null)
-            {
-                handler(grabbedData);
             }
         }
     }
