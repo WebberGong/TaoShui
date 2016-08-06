@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Awesomium.Core;
-using Entity;
 using Utils;
 using Timer = System.Timers.Timer;
 
@@ -95,6 +94,7 @@ namespace WebSite
 
         private void Initialize()
         {
+            WebCore.Initialize(new WebConfig() { LogLevel = LogLevel.Verbose, LogPath = "log", AutoUpdatePeriod = 0});
             browser = WebCore.CreateWebView(Screen.PrimaryScreen.WorkingArea.Width,
                 Screen.PrimaryScreen.WorkingArea.Height, WebViewType.Offscreen);
 
@@ -114,6 +114,21 @@ namespace WebSite
             browser.LoadingFrameComplete += MainPageLoadingComplete;
             browser.JavascriptMessage += JavascriptMessageHandler;
             browser.ShowJavascriptDialog += ShowJavascriptDialogHandler;
+
+            browser.InitializeView += (s, e) =>
+            {
+                Console.WriteLine("InitializeView");
+            };
+
+            browser.NativeViewInitialized += (s, e) =>
+            {
+                Console.WriteLine("NativeViewInitialized");
+            };
+
+            browser.DocumentReady += (s, e) =>
+            {
+                Console.WriteLine("DocumentReady");
+            };
 
             var tsLoginTimeOut = new TimeSpan(0, 0, loginTimeOut);
             _startLoginTime = DateTime.Now;
@@ -153,9 +168,13 @@ namespace WebSite
         public void Run()
         {
             Initialize();
-
             browser.Source = BaseUrl;
             WebCore.Run();
+        }
+
+        public void Stop()
+        {
+            WebCore.Shutdown();
         }
 
         public void DoCaptchaValidate()
@@ -174,6 +193,29 @@ namespace WebSite
         public void DoRefreshCaptcha()
         {
             RefreshCaptcha();
+        }
+
+        protected string JsGetImgBase64String(string getElementQuery, bool leaveOnlyBase64Data = true)
+        {
+            string data = browser.ExecuteJavascriptWithResult(@"
+                function getImgBase64String(img)
+                {
+                    var cnv = document.createElement('CANVAS');
+                    var ctx = cnv.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    return cnv.toDataURL();
+                }" + string.Format("getImgBase64String({0});", getElementQuery));
+
+            if (data == "undefined")
+            {
+                return string.Empty;
+            }
+            if (leaveOnlyBase64Data && data.Contains(","))
+            {
+                data = data.Substring(data.IndexOf(",", StringComparison.Ordinal) + 1);
+            }
+
+            return data;
         }
 
         private void JavascriptMessageHandler(object sender, JavascriptMessageEventArgs e)
@@ -260,6 +302,8 @@ namespace WebSite
                 if (MainPageRegex != null && MainPageRegex.IsMatch(url))
                 {
                     WebSiteStatus = WebSiteStatus.LoginSuccessful;
+                    _loginTimer.Enabled = false;
+                    _loginTimer.Stop();
                 }
             }
         }

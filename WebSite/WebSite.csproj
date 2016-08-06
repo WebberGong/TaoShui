@@ -48,9 +48,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="SharedMemory">
-      <HintPath>..\packages\SharedMemory.2.0.15\lib\net40\SharedMemory.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -67,6 +64,7 @@
     <Compile Include="Pinnacle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebSiteBase.cs" />
+    <Compile Include="WebSiteStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CaptchaRecogniser\CaptchaRecogniser.csproj">
@@ -74,7 +72,7 @@
       <Name>CaptchaRecogniser</Name>
     </ProjectReference>
     <ProjectReference Include="..\Entity\Entity.csproj">
-      <Project>{9556bee1-8eb8-4088-b7a1-96963de4ceaa}</Project>
+      <Project>{9556BEE1-8EB8-4088-B7A1-96963DE4CEAA}</Project>
       <Name>Entity</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utils\Utils.csproj">

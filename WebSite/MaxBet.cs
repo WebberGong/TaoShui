@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows.Forms;
+using Awesomium.Core;
 using CaptchaRecogniser;
 using Utils;
-using Entity;
 
 namespace WebSite
 {
@@ -142,68 +142,39 @@ namespace WebSite
         {
             if (IsBrowserOk())
             {
-                var getPositionJs = @"
-                    (function() {
-                        try {
-                            var img = $('#validateCode');
-                            if (img) {
-                                return img.offset().left + '|' + img.offset().top;
-                            } else {
-                                return null;
-                            }
-                        } catch (ex) {
-                            return ex;
-                        }
-                    })();";
-                var getPositionResult = browser.ExecuteJavascriptWithResult(getPositionJs);
-                LogHelper.LogInfo(GetType(), "获取验证码坐标:" + getPositionResult);
-
-                if (getPositionResult != null && getPositionResult.ToString() != Undefined &&
-                    getPositionResult.ToString().Contains("|"))
+                var imgBase64 = JsGetImgBase64String("$('#validateCode')");
+                var imgBytes = Convert.FromBase64String(imgBase64);
+                var stream = new MemoryStream(imgBytes);
+                var bitmap = Image.FromStream(stream) as Bitmap;
+                if (bitmap != null)
                 {
-                    var arr = getPositionResult.ToString().Split('|');
-                    if (arr.Length == 2)
-                    {
-                        var x = int.Parse(arr[0]);
-                        var y = int.Parse(arr[1]);
-                        browser.CopyImageAt(x, y);
-                        Thread.Sleep(50);
-                        Bitmap bitmap = null;
-                        if (Clipboard.ContainsImage())
-                        {
-                            bitmap = Clipboard.GetImage() as Bitmap;
-                        }
-                        if (bitmap != null)
-                        {
-                            LogHelper.LogInfo(GetType(), "获取验证码图片成功");
-                            var code = Recogniser.Instance.RecognizeFromImage(bitmap, 4, 3,
-                                new HashSet<EnumCaptchaType> {EnumCaptchaType.Number});
-                            code = Common.GetNumericFromString(code);
-                            LogHelper.LogInfo(GetType(), "验证码识别结果:" + code);
+                    LogHelper.LogInfo(GetType(), "获取验证码图片成功");
+                    var code = Recogniser.Instance.RecognizeFromImage(bitmap, 4, 3,
+                        new HashSet<EnumCaptchaType> { EnumCaptchaType.Number });
+                    code = Common.GetNumericFromString(code);
+                    LogHelper.LogInfo(GetType(), "验证码识别结果:" + code);
 
-                            var submitJs = @"
-                                (function() {
-                                    try {
-                                        var captchaInput = $('#txtCode');
-                                        var submit = $('a:contains(" + "\"递交\"" + @")');
-                                        if (captchaInput && submit) {
-                                            captchaInput.val('" + code + @"');
-                                            submit.click();
-                                            return true;
-                                        }
-                                        return false;
-                                    } catch (ex) {
-                                        return ex;
-                                    }
-                                })();";
-                            var submitResult = browser.ExecuteJavascriptWithResult(submitJs);
-                            LogHelper.LogInfo(GetType(), "提交验证码:" + submitResult);
-                        }
-                        else
-                        {
-                            LogHelper.LogInfo(GetType(), "获取验证码图片失败");
-                        }
-                    }
+                    var submitJs = @"
+                        (function() {
+                            try {
+                                var captchaInput = $('#txtCode');
+                                var submit = $('a:contains(" + "\"递交\"" + @")');
+                                if (captchaInput && submit) {
+                                    captchaInput.val('" + code + @"');
+                                    submit.click();
+                                    return true;
+                                }
+                                return false;
+                            } catch (ex) {
+                                return ex;
+                            }
+                        })();";
+                    var submitResult = browser.ExecuteJavascriptWithResult(submitJs);
+                    LogHelper.LogInfo(GetType(), "提交验证码:" + submitResult);
+                }
+                else
+                {
+                    LogHelper.LogInfo(GetType(), "获取验证码图片失败");
                 }
             }
         }
@@ -215,9 +186,47 @@ namespace WebSite
 
         public override IDictionary<string, IDictionary<string, IList<string>>> GrabData()
         {
-            IDictionary<string, IDictionary<string, IList<string>>> grabbedData =
-                new Dictionary<string, IDictionary<string, IList<string>>>();
-            return grabbedData;
+            lock (browser)
+            {
+                IDictionary<string, IDictionary<string, IList<string>>> grabbedData =
+                    new Dictionary<string, IDictionary<string, IList<string>>>();
+                //if (browser.IsDocumentReady)
+                //{
+//                    var getMainFrameJs = @"
+//                        (function() {
+//                            try {
+//                                var mainFrame = this.top.frames['mainFrame'];
+//                                if (mainFrame) {
+//                                    var tableContainerL = mainFrame.document.getElementById('oTableContainer_L');
+//                                    if (tableContainerL) {
+//                                        var tables = tableContainerL.getElementsByTagName('table');
+//                                        if (tables.length > 0) {
+//                                            var trs = tables[0].getElementsByTagName('tr');
+//                                            return trs;
+//                                        }
+//                                    }
+//                                }
+//                                return null;
+//                            } catch (ex) {
+//                                return ex;
+//                            }
+//                        })();";
+//                    var data = browser.ExecuteJavascriptWithResult(getMainFrameJs);
+//                    Console.WriteLine(data.ToString());
+                //}
+
+                var getMainFrameJs = @"
+                        (function() {
+                            try {
+                                return this.document.cookie;
+                            } catch (ex) {
+                                return ex;
+                            }
+                        })();";
+                var data = browser.ExecuteJavascriptWithResult(getMainFrameJs);
+                Console.WriteLine(data.ToString());
+                return grabbedData;
+            }
         }
     }
 }

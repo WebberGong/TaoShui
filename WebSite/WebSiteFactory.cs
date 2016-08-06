@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-
-namespace WebSite
+﻿namespace WebSite
 {
     public class WebSiteFactory
     {
@@ -30,7 +27,8 @@ namespace WebSite
             }
         }
 
-        public static WebSiteBase CreateWebSite(string webSiteType, string loginName, string loginPassword, int captchaLength, int loginTimeOut,
+        public static WebSiteBase CreateWebSite(string webSiteType, string loginName, string loginPassword,
+            int captchaLength, int loginTimeOut,
             int grabDataInterval)
         {
             if (webSiteType == typeof(MaxBet).ToString())

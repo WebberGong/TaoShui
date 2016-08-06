@@ -38,6 +38,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="SharedMemory">
+      <HintPath>..\packages\SharedMemory.2.0.15\lib\net40\SharedMemory.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -54,6 +57,7 @@
     <Compile Include="CommonEqualityComparer.cs" />
     <Compile Include="LogHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SharedMemoryManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="log4net.config">

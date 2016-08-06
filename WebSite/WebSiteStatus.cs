@@ -1,4 +1,4 @@
-﻿namespace Entity
+﻿namespace WebSite
 {
     public enum WebSiteStatus
     {
