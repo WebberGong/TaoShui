@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Windows.Forms;
-using Awesomium.Core;
 using CaptchaRecogniser;
 using Utils;
 
@@ -21,7 +18,7 @@ namespace WebSite
 
         protected override Uri BaseUrl
         {
-            get { return new Uri("http://www.maxbet.com/Default.aspx"); }
+            get { return new Uri("http://www.maxbet.com/Default.aspx?hidSelLang=cs"); }
         }
 
         protected override Regex ChangeLanguageRegex
@@ -75,17 +72,17 @@ namespace WebSite
         {
             if (IsBrowserOk())
             {
-                var changeLanguageJs = @"
+                var js = @"
                     (function() {
                         try {
                             changeLan('cs');
                             return true;
                         } catch (ex) {
-                            return ex;
+                            return ex.message;
                         }
                     })();";
-                var changeLanguageResult = browser.ExecuteJavascriptWithResult(changeLanguageJs);
-                LogHelper.LogInfo(GetType(), "设置语言:" + changeLanguageResult);
+                var result = browser.ExecuteJavascriptWithResult(js);
+                LogHelper.LogInfo(GetType(), "设置语言:" + result);
             }
         }
 
@@ -93,7 +90,7 @@ namespace WebSite
         {
             if (IsBrowserOk())
             {
-                var loginJs = @"
+                var js = @"
                     (function() {
                         try {
                             var id = $('#txtID');
@@ -107,11 +104,11 @@ namespace WebSite
                             }
                             return false;
                         } catch (ex) {
-                            return ex;
+                            return ex.message;
                         }
                     })();";
-                var loginResult = browser.ExecuteJavascriptWithResult(loginJs);
-                LogHelper.LogInfo(GetType(), "开始登录:" + loginResult);
+                var result = browser.ExecuteJavascriptWithResult(js);
+                LogHelper.LogInfo(GetType(), "开始登录:" + result);
             }
         }
 
@@ -119,22 +116,22 @@ namespace WebSite
         {
             if (IsBrowserOk())
             {
-                var isCaptchaReadyJs = @"
+                var js = @"
                     (function() {
                         try {
-                            var img = this.document.getElementById('validateCode');
+                            var img = document.getElementById('validateCode');
                             if (img) {
                                 return true;
                             } else {
                                 return false;
                             }
                         } catch (ex) {
-                            return ex;
+                            return ex.message;
                         }
                     })();";
-                var isCaptchaReadyResult = browser.ExecuteJavascriptWithResult(isCaptchaReadyJs);
-                LogHelper.LogInfo(GetType(), "当前页是否为验证码输入页:" + isCaptchaReadyResult.ToString());
-                return isCaptchaReadyResult.ToString() == True;
+                var result = browser.ExecuteJavascriptWithResult(js);
+                LogHelper.LogInfo(GetType(), "当前页是否为验证码输入页:" + result.ToString());
+                return result.ToString() == True;
             }
             return false;
         }
@@ -143,7 +140,7 @@ namespace WebSite
         {
             if (IsBrowserOk())
             {
-                var imgBase64 = JsGetImgBase64String("$('#validateCode')");
+                var imgBase64 = JsGetImgBase64String("document.getElementById('validateCode')");
                 var imgBytes = Convert.FromBase64String(imgBase64);
                 var stream = new MemoryStream(imgBytes);
                 var bitmap = Image.FromStream(stream) as Bitmap;
@@ -151,11 +148,11 @@ namespace WebSite
                 {
                     LogHelper.LogInfo(GetType(), "获取验证码图片成功");
                     var code = Recogniser.Instance.RecognizeFromImage(bitmap, 4, 3,
-                        new HashSet<EnumCaptchaType> { EnumCaptchaType.Number });
+                        new HashSet<EnumCaptchaType> {EnumCaptchaType.Number});
                     code = Common.GetNumericFromString(code);
                     LogHelper.LogInfo(GetType(), "验证码识别结果:" + code);
 
-                    var submitJs = @"
+                    var js = @"
                         (function() {
                             try {
                                 var captchaInput = $('#txtCode');
@@ -167,11 +164,11 @@ namespace WebSite
                                 }
                                 return false;
                             } catch (ex) {
-                                return ex;
+                                return ex.message;
                             }
                         })();";
-                    var submitResult = browser.ExecuteJavascriptWithResult(submitJs);
-                    LogHelper.LogInfo(GetType(), "提交验证码:" + submitResult);
+                    var result = browser.ExecuteJavascriptWithResult(js);
+                    LogHelper.LogInfo(GetType(), "提交验证码:" + result);
                 }
                 else
                 {
@@ -192,38 +189,25 @@ namespace WebSite
                 IDictionary<string, IDictionary<string, IList<string>>> grabbedData =
                     new Dictionary<string, IDictionary<string, IList<string>>>();
 
-//                var getMainFrameJs = @"
-//                        (function() {
-//                            try {
-//                                var mainFrame = this.top.frames['mainFrame'];
-//                                if (mainFrame) {
-//                                    var tableContainerL = mainFrame.document.getElementById('oTableContainer_L');
-//                                    if (tableContainerL) {
-//                                        var tables = tableContainerL.getElementsByTagName('table');
-//                                        if (tables.length > 0) {
-//                                            var trs = tables[0].getElementsByTagName('tr');
-//                                            return trs;
-//                                        }
-//                                    }
-//                                }
-//                                return null;
-//                            } catch (ex) {
-//                                return ex;
-//                            }
-//                        })();";
-//                while (!browser.IsDocumentReady)
-//                {
-//                    Application.DoEvents();
-//                    Thread.Sleep(100);
-//                }
-//                var data = browser.ExecuteJavascriptWithResult(getMainFrameJs);
-                var data = browser.ExecuteJavascriptWithResult("this.document.getElementsByTagName('title')[0].innerHTML");
-                Console.WriteLine(data.ToString());
-                browser.SelectAll();
-                browser.CopyHTML();
-                browser.Paste();
-                string value = Clipboard.GetText();
-                Console.WriteLine(value);
+                var js = @"
+                        (function() {
+                            try {
+                                var mainFrame = this.top.frames['mainFrame'];
+                                if (mainFrame) {
+                                    var tableContainerL = mainFrame.document.getElementById('oTableContainer_L');
+                                    if (tableContainerL) {
+                                        var tables = tableContainerL.getElementsByTagName('table');
+                                        if (tables.length > 0) {
+                                            return tables[0].innerHTML;
+                                        }
+                                    }
+                                }
+                                return null;
+                            } catch (ex) {
+                                return ex.message;
+                            }
+                        })();";
+                var result = browser.ExecuteJavascriptWithResult(js);
                 return grabbedData;
             }
         }

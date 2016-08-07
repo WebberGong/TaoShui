@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.Remoting.Channels;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -20,14 +20,15 @@ namespace WebSite
         protected const string True = "true";
         protected const string False = "false";
 
+        private static readonly string jquery = File.ReadAllText(@"jquery-3.1.0.min.js");
         private readonly int _captchaValidateMaxCount = 3;
+        private readonly TimeSpan _loginInterval = new TimeSpan(0, 5, 0);
+        private readonly int _maxLoginAttemptCount = 3;
         private int _captchaValidateCount;
+        private int _loginFailedCount;
         private Timer _loginTimer;
         private DateTime _startLoginTime;
         private WebSiteStatus _webSiteStatus;
-        private static int _loginFailedCount;
-        private static readonly int maxLoginAttemptCount = 3;
-        private static readonly TimeSpan loginInterval = new TimeSpan(0, 5, 0);
 
         protected WebView browser;
         protected int captchaLength;
@@ -35,6 +36,8 @@ namespace WebSite
         protected string loginName;
         protected string loginPassword;
         protected int loginTimeOut;
+        protected string isDataReady;
+        protected string grabDataSymbol;
 
         protected WebSiteBase(string loginName, string loginPassword, int captchaLength, int loginTimeOut,
             int grabDataInterval)
@@ -44,6 +47,9 @@ namespace WebSite
             this.captchaLength = captchaLength;
             this.loginTimeOut = loginTimeOut;
             this.grabDataInterval = grabDataInterval;
+
+            isDataReady = GetType() + ":IsDataReady";
+            grabDataSymbol = GetType().ToString();
         }
 
         public string LoginName
@@ -84,6 +90,16 @@ namespace WebSite
             }
         }
 
+        public string IsDataReady
+        {
+            get { return isDataReady; }
+        }
+
+        public string GrabDataSymbol
+        {
+            get { return grabDataSymbol; }
+        }
+
         protected abstract Uri BaseUrl { get; }
         protected abstract Regex ChangeLanguageRegex { get; }
         protected abstract Regex LoginPageRegex { get; }
@@ -101,8 +117,8 @@ namespace WebSite
 
         private void Initialize()
         {
-            WebCore.Initialize(new WebConfig() { LogLevel = LogLevel.Verbose, LogPath = "log", AutoUpdatePeriod = 0 });
-            browser = WebCore.CreateSourceWebView(Screen.PrimaryScreen.WorkingArea.Width,
+            WebCore.Initialize(new WebConfig { LogLevel = LogLevel.Verbose, UserScript = jquery });
+            browser = WebCore.CreateWebView(Screen.PrimaryScreen.WorkingArea.Width,
                 Screen.PrimaryScreen.WorkingArea.Height, WebViewType.Offscreen);
 
             browser.LoadingFrame -= WebSiteLoading;
@@ -189,16 +205,20 @@ namespace WebSite
 
         protected string JsGetImgBase64String(string getElementQuery, bool leaveOnlyBase64Data = true)
         {
-            string data = browser.ExecuteJavascriptWithResult(@"
-                function getImgBase64String(img)
-                {
-                    var cnv = document.createElement('CANVAS');
-                    var ctx = cnv.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    return cnv.toDataURL();
-                }" + string.Format("getImgBase64String({0});", getElementQuery));
-
-            if (data == "undefined")
+            string js = @"
+                (function() {
+                    try {
+                        var img = " + getElementQuery + @";
+                        var cnv = document.createElement('CANVAS');
+                        var ctx = cnv.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        return cnv.toDataURL();
+                    } catch (ex) {
+                        return ex.message;
+                    }
+                })();";
+            string data = browser.ExecuteJavascriptWithResult(js);
+            if (data == Undefined)
             {
                 return string.Empty;
             }
@@ -297,7 +317,7 @@ namespace WebSite
                     _loginTimer.Enabled = false;
                     _loginTimer.Stop();
 
-                    browser.Invoke(new Action(DoGrabData));
+                    browser.BeginInvoke(new Action(DoGrabData));
                 }
             }
         }
@@ -306,57 +326,50 @@ namespace WebSite
         {
             while (true)
             {
-                switch (_webSiteStatus)
+                if (IsBrowserOk() && _webSiteStatus == WebSiteStatus.LoginSuccessful)
                 {
-                    case WebSiteStatus.LoginFailed:
-                        _loginFailedCount++;
-                        Stop();
-                        if (_loginFailedCount < maxLoginAttemptCount)
+                    _loginFailedCount = 0;
+
+                    var watch = new Stopwatch();
+                    watch.Start();
+                    var data = GrabData();
+                    watch.Stop();
+
+                    if (data != null)
+                    {
+                        var elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
+                        LogHelper.LogInfo(GetType(), elapsedTimeMsg);
+
+                        var matchCount = 0;
+                        foreach (var item in data)
                         {
-                            if (_loginFailedCount > 0)
-                            {
-                                Thread.Sleep((int)loginInterval.TotalSeconds);
-                            }
-                            Run();
+                            matchCount += item.Value.Count;
                         }
-                        break;
-                    case WebSiteStatus.LoginSuccessful:
-                        _loginFailedCount = 0;
+                        LogHelper.LogInfo(GetType(),
+                            string.Format("抓取数据成功, 联赛数: {0}, 比赛数: {1}", data.Count, matchCount));
 
-                        var watch = new Stopwatch();
-                        watch.Start();
-                        var data = GrabData();
-                        watch.Stop();
-
-                        if (data != null)
+                        var webSiteData = new WebSiteData
                         {
-                            var elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
-                            LogHelper.LogInfo(typeof(MaxBet), elapsedTimeMsg);
-
-                            var matchCount = 0;
-                            foreach (var item in data)
-                            {
-                                matchCount += item.Value.Count;
-                            }
-                            LogHelper.LogInfo(typeof(MaxBet),
-                                string.Format("抓取数据成功, 联赛数: {0}, 比赛数: {1}", data.Count, matchCount));
-
-                            var webSiteData = new WebSiteData
-                            {
-                                WebSiteStatus = _webSiteStatus.ToString(),
-                                GrabbedData = data
-                            };
-                            SharedMemoryManager.Instance.Write("isDataReady", "false");
-                            SharedMemoryManager.Instance.Write(GetType().ToString(), webSiteData);
-                            SharedMemoryManager.Instance.Write("isDataReady", "true");
-                        }
-                        Thread.Sleep(grabDataInterval * 1000);
-                        break;
-                    default:
-                        Thread.Sleep(50);
-                        break;
+                            WebSiteStatus = _webSiteStatus.ToString(),
+                            GrabbedData = data
+                        };
+                        SharedMemoryManager.Instance.Write(grabDataSymbol, webSiteData);
+                        SharedMemoryManager.Instance.Write(isDataReady, "true");
+                    }
+                    Thread.Sleep(grabDataInterval * 1000);
+                }
+                else
+                {
+                    _loginFailedCount++;
+                    Stop();
+                    if (_loginFailedCount < _maxLoginAttemptCount)
+                    {
+                        Thread.Sleep((int)_loginInterval.TotalSeconds);
+                        Run();
+                    }
                 }
             }
+            // ReSharper disable once FunctionNeverReturns
         }
 
         private void OnWebSiteStatusChanged(WebSiteBase sender, WebSiteStatus status)

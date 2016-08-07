@@ -1,9 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using Entity;
-using Utils;
+﻿using Utils;
 using WebSite;
 
 namespace WebSiteProcess
@@ -14,8 +9,7 @@ namespace WebSiteProcess
         {
             if (args.Length == 0)
             {
-                //args = new[] { "WebSite.MaxBet", "pyh667h00a111", "A123456a111", "4", "60", "1" };
-                args = new[] { "WebSite.MaxBet", "sfb1337952", "Aaaa2234", "4", "60", "1" };
+                args = new[] {"WebSite.MaxBet", "sfb1337952111", "Aaaa2234111", "4", "60", "1"};
             }
             if (args.Length != 6)
             {

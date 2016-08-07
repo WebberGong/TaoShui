@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 using Entity;
 using Newtonsoft.Json;
@@ -18,16 +17,17 @@ namespace TaoShui
         {
             InitializeComponent();
 
-            SharedMemoryManager.Instance.Write("isDataReady", "false");
+            SharedMemoryManager.Instance.Write("WebSite.MaxBet:IsDataReady", "false");
 
             _getGrabbedDataTimer = new Timer(1000);
             _getGrabbedDataTimer.Elapsed += (sender, ev) =>
             {
-                var isDataReady = SharedMemoryManager.Instance.Read("isDataReady");
+                var isDataReady = SharedMemoryManager.Instance.Read("WebSite.MaxBet:IsDataReady");
                 if (isDataReady == "true")
                 {
                     var data = SharedMemoryManager.Instance.Read<WebSiteData>("WebSite.MaxBet");
                     LogHelper.LogInfo(GetType(), @"获取到的数据：" + JsonConvert.SerializeObject(data));
+                    SharedMemoryManager.Instance.Write("WebSite.MaxBet:IsDataReady", "false");
                 }
             };
             _getGrabbedDataTimer.AutoReset = true;
@@ -37,7 +37,6 @@ namespace TaoShui
         private void btnTest_Click(object sender, EventArgs e)
         {
             StartProcess("WebSite.MaxBet", "sfb1337952", "Aaaa2234", 4, 60, 1);
-            //StartProcess("WebSite.Pinnacle", "hc2at84671", "aaaa2222", 4, 60, 1);
 
             _getGrabbedDataTimer.Enabled = true;
             _getGrabbedDataTimer.Start();
