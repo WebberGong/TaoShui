@@ -217,6 +217,7 @@ namespace WebSite
         {
             IDictionary<string, IDictionary<string, IList<string>>> grabbedData =
                 new Dictionary<string, IDictionary<string, IList<string>>>();
+            Console.WriteLine(wb.HTML);
             return grabbedData;
         }
     }

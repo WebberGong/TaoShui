@@ -164,8 +164,7 @@ namespace WebSite
                         wb => wb.Source = BaseUrl
                         );
 
-                    while (WebSiteStatus != WebSiteStatus.LoginSuccessful &&
-                           WebSiteStatus != WebSiteStatus.LoginFailed)
+                    while (WebSiteStatus != WebSiteStatus.LoginSuccessful)
                     {
                         Thread.Sleep(50);
                     }
@@ -174,15 +173,16 @@ namespace WebSite
                     {
                         var watch = new Stopwatch();
                         watch.Start();
-                        var data = waiter.Await(
-                            wb => GrabData(wb)
-                            );
+                        //var data = waiter.Await(
+                        //    wb => GrabData(wb)
+                        //    );
+                        var data = GrabData(waiter.Browser);
                         watch.Stop();
                         var elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
                         LogHelper.LogInfo(GetType(), elapsedTimeMsg);
                         Console.WriteLine(elapsedTimeMsg);
                         OnGrabDataSuccess(data);
-                        Thread.Sleep(grabDataInterval*1000);
+                        Thread.Sleep(grabDataInterval * 1000);
                     }
                 }
             })
@@ -296,6 +296,7 @@ namespace WebSite
         {
             if (e.IsMainFrame)
             {
+                var browser = sender as WebControl;
                 var url = e.Url.ToString();
 
                 if (MainPageRegex != null && MainPageRegex.IsMatch(url))

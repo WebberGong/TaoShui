@@ -119,7 +119,7 @@ namespace WebControlWaiter
         /// <summary>
         ///     The default wait.
         /// </summary>
-        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(60);
+        private static TimeSpan _defaultWait = TimeSpan.FromSeconds(10);
 
         /// <summary>
         ///     The signal.
