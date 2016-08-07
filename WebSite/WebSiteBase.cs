@@ -25,7 +25,6 @@ namespace WebSite
         private Timer _loginTimer;
         private DateTime _startLoginTime;
         private WebSiteStatus _webSiteStatus;
-        private Timer _grabDataTimer;
         private static int _loginFailedCount;
         private static readonly int maxLoginAttemptCount = 3;
         private static readonly TimeSpan loginInterval = new TimeSpan(0, 5, 0);
@@ -97,14 +96,13 @@ namespace WebSite
         protected abstract bool IsCaptchaInputPageReady();
         protected abstract void CaptchaValidate();
         protected abstract void RefreshCaptcha();
-        public delegate IDictionary<string, IDictionary<string, IList<string>>> GrabDataInvoke();
-        public abstract IDictionary<string, IDictionary<string, IList<string>>> GrabData();
+        protected abstract IDictionary<string, IDictionary<string, IList<string>>> GrabData();
         public event WebSiteStatusChangedHandler WebSiteStatusChanged;
 
         private void Initialize()
         {
             WebCore.Initialize(new WebConfig() { LogLevel = LogLevel.Verbose, LogPath = "log", AutoUpdatePeriod = 0 });
-            browser = WebCore.CreateWebView(Screen.PrimaryScreen.WorkingArea.Width,
+            browser = WebCore.CreateSourceWebView(Screen.PrimaryScreen.WorkingArea.Width,
                 Screen.PrimaryScreen.WorkingArea.Height, WebViewType.Offscreen);
 
             browser.LoadingFrame -= WebSiteLoading;
@@ -148,61 +146,6 @@ namespace WebSite
             };
             _loginTimer.AutoReset = true;
             _loginTimer.Enabled = false;
-
-            _grabDataTimer = new Timer(grabDataInterval * 1000);
-            _grabDataTimer.Elapsed += (sender, ev) =>
-            {
-                switch (_webSiteStatus)
-                {
-                    case WebSiteStatus.LoginFailed:
-                        _loginFailedCount++;
-                        Stop();
-                        if (_loginFailedCount < maxLoginAttemptCount)
-                        {
-                            if (_loginFailedCount > 0)
-                            {
-                                Thread.Sleep((int)loginInterval.TotalSeconds);
-                            }
-                            Run();
-                        }
-                        break;
-                    case WebSiteStatus.LoginSuccessful:
-                        _loginFailedCount = 0;
-
-                        var watch = new Stopwatch();
-                        watch.Start();
-                        var data = GrabData();
-                        watch.Stop();
-
-                        if (data != null)
-                        {
-                            var elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
-                            LogHelper.LogInfo(typeof(MaxBet), elapsedTimeMsg);
-
-                            var matchCount = 0;
-                            foreach (var item in data)
-                            {
-                                matchCount += item.Value.Count;
-                            }
-                            LogHelper.LogInfo(typeof(MaxBet),
-                                string.Format("抓取数据成功, 联赛数: {0}, 比赛数: {1}", data.Count, matchCount));
-
-                            var webSiteData = new WebSiteData
-                            {
-                                WebSiteStatus = _webSiteStatus.ToString(),
-                                GrabbedData = data
-                            };
-                            SharedMemoryManager.Instance.Write("isDataReady", "false");
-                            SharedMemoryManager.Instance.Write(GetType().ToString(), webSiteData);
-                            SharedMemoryManager.Instance.Write("isDataReady", "true");
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            };
-            _grabDataTimer.AutoReset = true;
-            _grabDataTimer.Enabled = false;
 
             _webSiteStatus = WebSiteStatus.NotLogin;
             _captchaValidateCount = 0;
@@ -354,9 +297,6 @@ namespace WebSite
                     _loginTimer.Enabled = false;
                     _loginTimer.Stop();
 
-                    //_grabDataTimer.Enabled = true;
-                    //_grabDataTimer.Start();
-
                     browser.Invoke(new Action(DoGrabData));
                 }
             }
@@ -366,32 +306,55 @@ namespace WebSite
         {
             while (true)
             {
-                var watch = new Stopwatch();
-                watch.Start();
-                var data = GrabData();
-                watch.Stop();
-
-                if (data != null)
+                switch (_webSiteStatus)
                 {
-                    var elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
-                    LogHelper.LogInfo(typeof(MaxBet), elapsedTimeMsg);
+                    case WebSiteStatus.LoginFailed:
+                        _loginFailedCount++;
+                        Stop();
+                        if (_loginFailedCount < maxLoginAttemptCount)
+                        {
+                            if (_loginFailedCount > 0)
+                            {
+                                Thread.Sleep((int)loginInterval.TotalSeconds);
+                            }
+                            Run();
+                        }
+                        break;
+                    case WebSiteStatus.LoginSuccessful:
+                        _loginFailedCount = 0;
 
-                    var matchCount = 0;
-                    foreach (var item in data)
-                    {
-                        matchCount += item.Value.Count;
-                    }
-                    LogHelper.LogInfo(typeof(MaxBet),
-                        string.Format("抓取数据成功, 联赛数: {0}, 比赛数: {1}", data.Count, matchCount));
+                        var watch = new Stopwatch();
+                        watch.Start();
+                        var data = GrabData();
+                        watch.Stop();
 
-                    var webSiteData = new WebSiteData
-                    {
-                        WebSiteStatus = _webSiteStatus.ToString(),
-                        GrabbedData = data
-                    };
-                    SharedMemoryManager.Instance.Write("isDataReady", "false");
-                    SharedMemoryManager.Instance.Write(GetType().ToString(), webSiteData);
-                    SharedMemoryManager.Instance.Write("isDataReady", "true");
+                        if (data != null)
+                        {
+                            var elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
+                            LogHelper.LogInfo(typeof(MaxBet), elapsedTimeMsg);
+
+                            var matchCount = 0;
+                            foreach (var item in data)
+                            {
+                                matchCount += item.Value.Count;
+                            }
+                            LogHelper.LogInfo(typeof(MaxBet),
+                                string.Format("抓取数据成功, 联赛数: {0}, 比赛数: {1}", data.Count, matchCount));
+
+                            var webSiteData = new WebSiteData
+                            {
+                                WebSiteStatus = _webSiteStatus.ToString(),
+                                GrabbedData = data
+                            };
+                            SharedMemoryManager.Instance.Write("isDataReady", "false");
+                            SharedMemoryManager.Instance.Write(GetType().ToString(), webSiteData);
+                            SharedMemoryManager.Instance.Write("isDataReady", "true");
+                        }
+                        Thread.Sleep(grabDataInterval * 1000);
+                        break;
+                    default:
+                        Thread.Sleep(50);
+                        break;
                 }
             }
         }

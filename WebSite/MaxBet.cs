@@ -185,42 +185,45 @@ namespace WebSite
             browser.Source = BaseUrl;
         }
 
-        public override IDictionary<string, IDictionary<string, IList<string>>> GrabData()
+        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData()
         {
             lock (browser)
             {
                 IDictionary<string, IDictionary<string, IList<string>>> grabbedData =
                     new Dictionary<string, IDictionary<string, IList<string>>>();
 
-                var getMainFrameJs = @"
-                        (function() {
-                            try {
-                                var mainFrame = this.top.frames['mainFrame'];
-                                if (mainFrame) {
-                                    var tableContainerL = mainFrame.document.getElementById('oTableContainer_L');
-                                    if (tableContainerL) {
-                                        var tables = tableContainerL.getElementsByTagName('table');
-                                        if (tables.length > 0) {
-                                            var trs = tables[0].getElementsByTagName('tr');
-                                            return trs;
-                                        }
-                                    }
-                                }
-                                return null;
-                            } catch (ex) {
-                                return ex;
-                            }
-                        })();";
-                if (browser.IsDocumentReady)
-                {
-                    var data = browser.ExecuteJavascriptWithResult(getMainFrameJs);
-                    Console.WriteLine(data.ToString());
-                }
+//                var getMainFrameJs = @"
+//                        (function() {
+//                            try {
+//                                var mainFrame = this.top.frames['mainFrame'];
+//                                if (mainFrame) {
+//                                    var tableContainerL = mainFrame.document.getElementById('oTableContainer_L');
+//                                    if (tableContainerL) {
+//                                        var tables = tableContainerL.getElementsByTagName('table');
+//                                        if (tables.length > 0) {
+//                                            var trs = tables[0].getElementsByTagName('tr');
+//                                            return trs;
+//                                        }
+//                                    }
+//                                }
+//                                return null;
+//                            } catch (ex) {
+//                                return ex;
+//                            }
+//                        })();";
+//                while (!browser.IsDocumentReady)
+//                {
+//                    Application.DoEvents();
+//                    Thread.Sleep(100);
+//                }
+//                var data = browser.ExecuteJavascriptWithResult(getMainFrameJs);
+                var data = browser.ExecuteJavascriptWithResult("this.document.getElementsByTagName('title')[0].innerHTML");
+                Console.WriteLine(data.ToString());
                 browser.SelectAll();
                 browser.CopyHTML();
-                var text = Clipboard.GetText();
-                Console.WriteLine(text);
-                Console.WriteLine(browser.HTML);
+                browser.Paste();
+                string value = Clipboard.GetText();
+                Console.WriteLine(value);
                 return grabbedData;
             }
         }
