@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows.Forms;
 using Awesomium.Core;
 using CaptchaRecogniser;
 using Utils;
@@ -190,41 +191,36 @@ namespace WebSite
             {
                 IDictionary<string, IDictionary<string, IList<string>>> grabbedData =
                     new Dictionary<string, IDictionary<string, IList<string>>>();
-                //if (browser.IsDocumentReady)
-                //{
-//                    var getMainFrameJs = @"
-//                        (function() {
-//                            try {
-//                                var mainFrame = this.top.frames['mainFrame'];
-//                                if (mainFrame) {
-//                                    var tableContainerL = mainFrame.document.getElementById('oTableContainer_L');
-//                                    if (tableContainerL) {
-//                                        var tables = tableContainerL.getElementsByTagName('table');
-//                                        if (tables.length > 0) {
-//                                            var trs = tables[0].getElementsByTagName('tr');
-//                                            return trs;
-//                                        }
-//                                    }
-//                                }
-//                                return null;
-//                            } catch (ex) {
-//                                return ex;
-//                            }
-//                        })();";
-//                    var data = browser.ExecuteJavascriptWithResult(getMainFrameJs);
-//                    Console.WriteLine(data.ToString());
-                //}
 
                 var getMainFrameJs = @"
                         (function() {
                             try {
-                                return this.document.cookie;
+                                var mainFrame = this.top.frames['mainFrame'];
+                                if (mainFrame) {
+                                    var tableContainerL = mainFrame.document.getElementById('oTableContainer_L');
+                                    if (tableContainerL) {
+                                        var tables = tableContainerL.getElementsByTagName('table');
+                                        if (tables.length > 0) {
+                                            var trs = tables[0].getElementsByTagName('tr');
+                                            return trs;
+                                        }
+                                    }
+                                }
+                                return null;
                             } catch (ex) {
                                 return ex;
                             }
                         })();";
-                var data = browser.ExecuteJavascriptWithResult(getMainFrameJs);
-                Console.WriteLine(data.ToString());
+                if (browser.IsDocumentReady)
+                {
+                    var data = browser.ExecuteJavascriptWithResult(getMainFrameJs);
+                    Console.WriteLine(data.ToString());
+                }
+                browser.SelectAll();
+                browser.CopyHTML();
+                var text = Clipboard.GetText();
+                Console.WriteLine(text);
+                Console.WriteLine(browser.HTML);
                 return grabbedData;
             }
         }
