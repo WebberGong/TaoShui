@@ -182,30 +182,26 @@ namespace WebSite
             browser.Source = BaseUrl;
         }
 
-        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData()
+        protected override IDictionary<string, IDictionary<string, string[][]>> GrabData()
         {
             lock (browser)
             {
-                IDictionary<string, IDictionary<string, IList<string>>> grabbedData =
-                    new Dictionary<string, IDictionary<string, IList<string>>>();
+                IDictionary<string, IDictionary<string, string[][]>> grabbedData =
+                    new Dictionary<string, IDictionary<string, string[][]>>();
 
                 var js = @"
                         (function() {
-                            try {
-                                var mainFrame = this.top.frames['mainFrame'];
-                                if (mainFrame) {
-                                    var tableContainerL = mainFrame.document.getElementById('oTableContainer_L');
-                                    if (tableContainerL) {
-                                        var tables = tableContainerL.getElementsByTagName('table');
-                                        if (tables.length > 0) {
-                                            return tables[0].innerHTML;
-                                        }
-                                    }
-                                }
-                                return null;
-                            } catch (ex) {
-                                return ex.message;
-                            }
+                           try {
+                               var trs = $(this.top.frames['mainFrame'].document).find('#oTableContainer_L tbody tr.displayOn');
+                               var result = [];
+                               trs.each(function() {
+                                   var tds = $(this).find('td');
+                                   result.push(tds.text());
+                               });
+                               return result;
+                           } catch (ex) {
+                               return ex.message;
+                           }
                         })();";
                 var result = browser.ExecuteJavascriptWithResult(js);
                 return grabbedData;

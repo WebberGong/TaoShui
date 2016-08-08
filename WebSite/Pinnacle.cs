@@ -64,9 +64,9 @@ namespace WebSite
         {
         }
 
-        protected override IDictionary<string, IDictionary<string, IList<string>>> GrabData()
+        protected override IDictionary<string, IDictionary<string, string[][]>> GrabData()
         {
-            return new Dictionary<string, IDictionary<string, IList<string>>>();
+            return new Dictionary<string, IDictionary<string, string[][]>>();
         }
     }
 }
