@@ -112,7 +112,7 @@ namespace WebSite
         protected abstract bool IsCaptchaInputPageReady();
         protected abstract void CaptchaValidate();
         protected abstract void RefreshCaptcha();
-        protected abstract IDictionary<string, IDictionary<string, string[][]>> GrabData();
+        protected abstract IDictionary<string, IDictionary<string, string[][][]>> GrabData();
         public event WebSiteStatusChangedHandler WebSiteStatusChanged;
 
         private void Initialize()
