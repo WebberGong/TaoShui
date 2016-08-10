@@ -48,6 +48,32 @@ namespace WebSite
 
         protected override void Login()
         {
+            if (IsBrowserOk())
+            {
+                var js = @"
+                    (function() {
+                        try {
+                            var openLogin = $('#loginButton');
+                            if (openLogin) {
+                                openLogin.click();
+                                var id = $('input.customerId:first');
+                                var pw = $('input.password:first');
+                                var login = $('input.loginSubmit:first');
+                                if (id && pw && login) {
+                                    id.val('" + loginName + @"');
+                                    pw.val('" + loginPassword + @"');
+                                    login.click();
+                                    return true;
+                                }
+                            }
+                            return false;
+                        } catch (ex) {
+                            return ex.message;
+                        }
+                    })();";
+                var result = browser.ExecuteJavascriptWithResult(js);
+                LogHelper.LogInfo(GetType(), "开始登录:" + result);
+            }
         }
 
         protected override bool IsCaptchaInputPageReady()

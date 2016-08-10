@@ -30,7 +30,8 @@ namespace TaoShui
                 Priority = ThreadPriority.AboveNormal
             };
             thread.Start();
-            StartProcess("WebSite.MaxBet", "sfb1337952", "Aaaa2235", 4, 60, 1);
+            StartProcess("WebSite.MaxBet", "sfb1337952mmm", "Aaaa2235", 4, 60, 1);
+            StartProcess("WebSite.Pinnacle", "hc2at84671", "aaaa2222", 4, 60, 1);
         }
 
         private void StartProcess(string webSiteType, string loginName, string loginPassword, int captchaLength,
@@ -39,8 +40,8 @@ namespace TaoShui
             var process = new Process();
             var start = new ProcessStartInfo("WebSiteProcess.exe")
             {
-                CreateNoWindow = true,
-                UseShellExecute = false,
+                CreateNoWindow = false,
+                UseShellExecute = true,
                 Arguments =
                     string.Format("{0} {1} {2} {3} {4} {5}", webSiteType, loginName, loginPassword, captchaLength,
                         loginTimeOut, grabDataInterval)

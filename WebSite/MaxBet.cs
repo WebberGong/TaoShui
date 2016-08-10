@@ -53,7 +53,7 @@ namespace WebSite
                         case "帐号/密码错误":
                             WebSiteStatus = WebSiteStatus.LoginFailed;
                             break;
-                        case "验证码错误":
+                        case "验证码错误!":
                             DoRefreshCaptcha();
                             break;
                     }
