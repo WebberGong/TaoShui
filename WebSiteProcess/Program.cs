@@ -9,11 +9,11 @@ namespace WebSiteProcess
         {
             if (args.Length == 0)
             {
-                args = new[] {"WebSite.MaxBet", "sfb1337952", "Aaaa2234", "4", "60", "1"};
+                args = new[] {"WebSite.MaxBet", "sfb1337952", "Aaaa2235", "4", "60", "1"};
             }
             if (args.Length != 6)
             {
-                LogHelper.LogInfo(typeof(Program), "运行出错，传递到该进程的参数不完整！");
+                LogHelper.LogInfo(typeof(Program), "运行出错,传递到该进程的参数不完整!");
                 return;
             }
             var webSiteType = args[0];

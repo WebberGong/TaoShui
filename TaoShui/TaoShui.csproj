@@ -57,6 +57,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -123,13 +124,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Entity\Entity.csproj">
-      <Project>{9556bee1-8eb8-4088-b7a1-96963de4ceaa}</Project>
-      <Name>Entity</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Utils\Utils.csproj">
       <Project>{b2a5c53d-d008-4ad1-89db-7ffb0710aa74}</Project>
       <Name>Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WcfService\WcfService.csproj">
+      <Project>{f1a19c39-0643-49e3-abfb-5c71208b761d}</Project>
+      <Name>WcfService</Name>
     </ProjectReference>
     <ProjectReference Include="..\WebSiteProcess\WebSiteProcess.csproj">
       <Project>{a050acc5-86be-4e27-b7b3-9de5d19b854f}</Project>

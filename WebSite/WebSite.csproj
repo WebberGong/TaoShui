@@ -55,6 +55,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -75,13 +76,13 @@
       <Project>{a49647c1-a474-4368-80a7-a59c7e1e5750}</Project>
       <Name>CaptchaRecogniser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Entity\Entity.csproj">
-      <Project>{9556BEE1-8EB8-4088-B7A1-96963DE4CEAA}</Project>
-      <Name>Entity</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Utils\Utils.csproj">
       <Project>{b2a5c53d-d008-4ad1-89db-7ffb0710aa74}</Project>
       <Name>Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WcfService\WcfService.csproj">
+      <Project>{f1a19c39-0643-49e3-abfb-5c71208b761d}</Project>
+      <Name>WcfService</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

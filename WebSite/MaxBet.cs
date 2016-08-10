@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 using CaptchaRecogniser;
 using Newtonsoft.Json;
@@ -184,88 +183,83 @@ namespace WebSite
             browser.Source = BaseUrl;
         }
 
-        protected override IDictionary<string, IDictionary<string, string[][][]>> GrabData()
+        protected override string[][] GrabData()
         {
             lock (browser)
             {
-                IDictionary<string, IDictionary<string, string[][][]>> grabbedData =
-                    new Dictionary<string, IDictionary<string, string[][][]>>();
-
                 var js = @"
                     (function() {
                         try {
-                            var trs = $(this.top.frames['mainFrame'].document).find('#tabbox tbody tr.displayOn');
-                            var result = [];
+                            var trs = $(this.top.frames['mainFrame'].document).find('#tabbox tbody tr');
+                            var matches = [];
+                            var leagueName = '';
                             trs.each(function() {
                                 var tds = $(this).children('td');
-                                var tr = [];
-                                var index = -1;
-                                tds.each (function () {
-                                    index++;
-                                    var td = [];
-                                    if (index === 0) {
-                                        var a1 = $(this).children('b');
-                                        var a2 = $(this).find('div span b:last');
-                                        if (a1 && a2) {
-                                            td.push(a1.text().trim());
-                                            td.push(a2.text().trim());
-                                        }
-                                    }
-                                    else if (index === 1) {
-                                        var b1 = $(this).find('div span');
-                                        if (b1.length === 2) {
-                                            td.push(b1[0].innerHTML.trim());
-                                            td.push(b1[1].innerHTML.trim());
-                                            var b2 = $(this).children('div:last');
-                                            if (b2 && b2.children('span').length === 0) {
-                                                td.push(b2.text().trim());
-                                            }
-                                            else {
-                                                td.push('');
+                                if (tds.length === 3)
+                                {
+                                    leagueName = $(this).text().trim();
+                                }
+                                else if (tds.length === 10) {
+                                    var match = [];
+                                    match.push(leagueName);
+                                    var index = -1;
+                                    tds.each(function () {
+                                        index++;
+                                        if (index === 0) {
+                                            var a1 = $(this).children('b');
+                                            var a2 = $(this).find('div span b:last');
+                                            if (a1.length === 1 && a2.length === 1) {
+                                                match.push(a1.text().trim());
+                                                match.push(a2.text().trim());
+                                            } else {
+                                                match.push($(this).text().trim());
+                                                match.push('');
                                             }
                                         }
-                                    }
-                                    else if (index === 3 || index === 4 || index === 6 || index === 7) {
-                                        var c1 = $(this).find('div a[name=cvmy]');
-                                        if (c1.length === 2) {
-                                            var c2 = $(this).children('div:first');
-                                            if (c2 && c2.children('a').length === 0) {
-                                                td.push(c2.text().trim().replace(/\s+/, '|'));
-                                                td.push(c1[0].innerHTML.trim());
-                                                td.push(c1[1].innerHTML.trim());
+                                        else if (index === 1) {
+                                            var b1 = $(this).find('div span');
+                                            if (b1.length === 2) {
+                                                match.push(b1[0].innerHTML.trim());
+                                                match.push(b1[1].innerHTML.trim());
+                                                var b2 = $(this).children('div:last');
+                                                if (b2 && b2.children('span').length === 0) {
+                                                    match.push(b2.text().trim());
+                                                }
+                                                else {
+                                                    match.push('');
+                                                }
                                             }
                                         }
-                                    }
-                                    else if (index === 5 || index === 8) {
-                                        var d1 = $(this).find('div a');
-                                        if (d1.length === 3) {
-                                            var d = [];
-                                            td.push(d1[0].innerHTML.trim());
-                                            td.push(d1[1].innerHTML.trim());
-                                            td.push(d1[2].innerHTML.trim());
+                                        else if (index === 3 || index === 4 || index === 6 || index === 7) {
+                                            var c1 = $(this).find('div a[name=cvmy]');
+                                            if (c1.length === 2) {
+                                                var c2 = $(this).children('div:first');
+                                                if (c2 && c2.children('a').length === 0) {
+                                                    match.push(c2.text().trim().replace(/\s+/, '|'));
+                                                    match.push(c1[0].innerHTML.trim());
+                                                    match.push(c1[1].innerHTML.trim());
+                                                }
+                                            }
                                         }
-                                    }
-                                    tr.push(td);
-                                });
-                                result.push(tr);
+                                        else if (index === 5 || index === 8) {
+                                            var d1 = $(this).find('div a');
+                                            if (d1.length === 3) {
+                                                match.push(d1[0].innerHTML.trim());
+                                                match.push(d1[1].innerHTML.trim());
+                                                match.push(d1[2].innerHTML.trim());
+                                            }
+                                        }
+                                    });
+                                    matches.push(match);
+                                }
                             });
-                            return JSON.stringify(result);
+                            return JSON.stringify(matches);
                         } catch (ex) {
                             return ex.message;
                         }
                     })();";
                 var result = browser.ExecuteJavascriptWithResult(js);
-                string[][][] arr = JsonConvert.DeserializeObject(result, typeof(string[][][])) as string[][][];
-                if (arr != null)
-                {
-                    foreach (var item in arr)
-                    {   
-                        StringBuilder key = new StringBuilder();
-                        key.Append(item[0][0]);
-                        key.Append(item[0][1]);
-                        key.Append(item[1][0]);
-                    }
-                }
+                var grabbedData = JsonConvert.DeserializeObject(result, typeof(string[][])) as string[][];
                 return grabbedData;
             }
         }

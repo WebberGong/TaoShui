@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Utils;
 
@@ -64,9 +63,9 @@ namespace WebSite
         {
         }
 
-        protected override IDictionary<string, IDictionary<string, string[][][]>> GrabData()
+        protected override string[][] GrabData()
         {
-            return new Dictionary<string, IDictionary<string, string[][][]>>();
+            return null;
         }
     }
 }

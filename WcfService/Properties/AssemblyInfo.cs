@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("Entity")]
+[assembly: AssemblyTitle("WcfService")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Entity")]
+[assembly: AssemblyProduct("WcfService")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
-[assembly: Guid("f9f99a4e-2977-42ba-ac60-f834bf0f06d5")]
+[assembly: Guid("b6c01bed-ac40-4dea-b68a-47c820ababfb")]
 
 // Version information for an assembly consists of the following four values:
 //

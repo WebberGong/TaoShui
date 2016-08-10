@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using Awesomium.Core;
-using Entity;
 using Utils;
+using WcfService;
 using Timer = System.Timers.Timer;
 
 namespace WebSite
 {
     public abstract class WebSiteBase
     {
-        public delegate void WebSiteStatusChangedHandler(WebSiteBase sender, WebSiteStatus status);
-
         protected const string Undefined = "undefined";
         protected const string True = "true";
         protected const string False = "false";
@@ -27,17 +24,16 @@ namespace WebSite
         private int _captchaValidateCount;
         private int _loginFailedCount;
         private Timer _loginTimer;
-        private DateTime _startLoginTime;
+        private Stopwatch _loginStopWatch;
         private WebSiteStatus _webSiteStatus;
 
         protected WebView browser;
         protected int captchaLength;
+        protected GrabDataClient grabDataClient;
         protected int grabDataInterval;
         protected string loginName;
         protected string loginPassword;
         protected int loginTimeOut;
-        protected string isDataReady;
-        protected string grabDataSymbol;
 
         protected WebSiteBase(string loginName, string loginPassword, int captchaLength, int loginTimeOut,
             int grabDataInterval)
@@ -48,8 +44,7 @@ namespace WebSite
             this.loginTimeOut = loginTimeOut;
             this.grabDataInterval = grabDataInterval;
 
-            isDataReady = GetType() + ":IsDataReady";
-            grabDataSymbol = GetType().ToString();
+            grabDataClient = new GrabDataClient();
         }
 
         public string LoginName
@@ -90,16 +85,6 @@ namespace WebSite
             }
         }
 
-        public string IsDataReady
-        {
-            get { return isDataReady; }
-        }
-
-        public string GrabDataSymbol
-        {
-            get { return grabDataSymbol; }
-        }
-
         protected abstract Uri BaseUrl { get; }
         protected abstract Regex ChangeLanguageRegex { get; }
         protected abstract Regex LoginPageRegex { get; }
@@ -112,8 +97,8 @@ namespace WebSite
         protected abstract bool IsCaptchaInputPageReady();
         protected abstract void CaptchaValidate();
         protected abstract void RefreshCaptcha();
-        protected abstract IDictionary<string, IDictionary<string, string[][][]>> GrabData();
-        public event WebSiteStatusChangedHandler WebSiteStatusChanged;
+        protected abstract string[][] GrabData();
+        public event Action<WebSiteBase, WebSiteStatus> WebSiteStatusChanged;
 
         private void Initialize()
         {
@@ -139,13 +124,14 @@ namespace WebSite
             browser.ShowJavascriptDialog += ShowJavascriptDialogHandler;
 
             var tsLoginTimeOut = new TimeSpan(0, 0, loginTimeOut);
-            _startLoginTime = DateTime.Now;
+            _loginStopWatch = new Stopwatch();
             _loginTimer = new Timer(200);
             _loginTimer.Elapsed += (sender, ev) =>
             {
-                if (DateTime.Now > _startLoginTime.Add(tsLoginTimeOut) &&
+                if (_loginStopWatch.Elapsed > tsLoginTimeOut &&
                     WebSiteStatus != WebSiteStatus.LoginSuccessful)
                 {
+                    _loginStopWatch.Reset();
                     _loginTimer.Enabled = false;
                     _loginTimer.Stop();
                     WebSiteStatus = WebSiteStatus.LoginFailed;
@@ -155,6 +141,7 @@ namespace WebSite
                     if (WebSiteStatus == WebSiteStatus.LoginSuccessful ||
                         WebSiteStatus == WebSiteStatus.LoginFailed)
                     {
+                        _loginStopWatch.Reset();
                         _loginTimer.Enabled = false;
                         _loginTimer.Stop();
                     }
@@ -205,7 +192,7 @@ namespace WebSite
 
         protected string JsGetImgBase64String(string getElementQuery, bool leaveOnlyBase64Data = true)
         {
-            string js = @"
+            var js = @"
                 (function() {
                     try {
                         var img = " + getElementQuery + @";
@@ -281,7 +268,8 @@ namespace WebSite
                 if (LoginPageRegex != null && LoginPageRegex.IsMatch(url))
                 {
                     WebSiteStatus = WebSiteStatus.Logging;
-                    _startLoginTime = DateTime.Now;
+                    _loginStopWatch.Reset();
+                    _loginStopWatch.Start();
                     _loginTimer.Enabled = true;
                     _loginTimer.Start();
 
@@ -314,6 +302,7 @@ namespace WebSite
                 if (MainPageRegex != null && MainPageRegex.IsMatch(url))
                 {
                     WebSiteStatus = WebSiteStatus.LoginSuccessful;
+                    _loginStopWatch.Reset();
                     _loginTimer.Enabled = false;
                     _loginTimer.Stop();
 
@@ -332,29 +321,16 @@ namespace WebSite
 
                     var watch = new Stopwatch();
                     watch.Start();
-                    var data = GrabData();
+                    var grabbedData = GrabData();
                     watch.Stop();
 
-                    if (data != null)
+                    grabDataClient.SendData(new GrabbedData { Data = grabbedData, Type = GetType().ToString() });
+
+                    if (grabbedData != null)
                     {
                         var elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
                         LogHelper.LogInfo(GetType(), elapsedTimeMsg);
-
-                        var matchCount = 0;
-                        foreach (var item in data)
-                        {
-                            matchCount += item.Value.Count;
-                        }
-                        LogHelper.LogInfo(GetType(),
-                            string.Format("抓取数据成功, 联赛数: {0}, 比赛数: {1}", data.Count, matchCount));
-
-                        var webSiteData = new WebSiteData
-                        {
-                            WebSiteStatus = _webSiteStatus.ToString(),
-                            GrabbedData = data
-                        };
-                        SharedMemoryManager.Instance.Write(grabDataSymbol, webSiteData);
-                        SharedMemoryManager.Instance.Write(isDataReady, "true");
+                        LogHelper.LogInfo(GetType(), string.Format("抓取到的数据条数:{0}", grabbedData.Length));
                     }
                     Thread.Sleep(grabDataInterval * 1000);
                 }
