@@ -39,7 +39,7 @@ namespace WebSite
 
         protected override Action<string> ShowJavascriptDialog
         {
-            get { return msg => { LogHelper.LogWarn(GetType(), msg); }; }
+            get { return msg => { LogHelper.Instance.LogWarn(GetType(), msg); }; }
         }
 
         protected override void ChangeLanguage()
@@ -72,7 +72,7 @@ namespace WebSite
                         }
                     })();";
                 var result = browser.ExecuteJavascriptWithResult(js);
-                LogHelper.LogInfo(GetType(), "开始登录:" + result);
+                LogHelper.Instance.LogInfo(GetType(), "开始登录:" + result);
             }
         }
 

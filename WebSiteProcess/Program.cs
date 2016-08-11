@@ -13,7 +13,7 @@ namespace WebSiteProcess
             }
             if (args.Length != 6)
             {
-                LogHelper.LogInfo(typeof(Program), "运行出错,传递到该进程的参数不完整!");
+                LogHelper.Instance.LogInfo(typeof(Program), "运行出错,传递到该进程的参数不完整!");
                 return;
             }
             var webSiteType = args[0];

@@ -11,5 +11,8 @@ namespace WcfService
 
         [DataMember]
         public string Type { get; set; }
+
+        [DataMember]
+        public DateTime GrabbedTime { get; set; }
     }
 }

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.ServiceModel;
 using System.Threading;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 using Utils;
 using WcfService;
 
@@ -21,7 +18,9 @@ namespace TaoShui
                 var grabDataService = new GrabDataService();
                 grabDataService.GrabDataSuccess += data =>
                 {
-                    LogHelper.LogInfo(GetType(), string.Format("抓取到的数据条数:{0}", data.Data == null ? 0 : data.Data.Length));
+                    LogHelper.Instance.LogInfo(GetType(), string.Format("Data Length：{0}, Type: {1}, Time: {2}",
+                        data.Data == null ? 0 : data.Data.Length, data.Type,
+                        data.GrabbedTime.ToString("yyyy-MM-dd HH:mm:ss:fff")));
                 };
             })
             {
@@ -30,7 +29,7 @@ namespace TaoShui
                 Priority = ThreadPriority.AboveNormal
             };
             thread.Start();
-            StartProcess("WebSite.MaxBet", "sfb1337952mmm", "Aaaa2235", 4, 60, 1);
+            StartProcess("WebSite.MaxBet", "sfb1337952", "Aaaa2235", 4, 60, 1);
             StartProcess("WebSite.Pinnacle", "hc2at84671", "aaaa2222", 4, 60, 1);
         }
 

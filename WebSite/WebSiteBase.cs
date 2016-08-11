@@ -23,8 +23,8 @@ namespace WebSite
         private readonly int _maxLoginAttemptCount = 3;
         private int _captchaValidateCount;
         private int _loginFailedCount;
-        private Timer _loginTimer;
         private Stopwatch _loginStopWatch;
+        private Timer _loginTimer;
         private WebSiteStatus _webSiteStatus;
 
         protected WebView browser;
@@ -102,7 +102,7 @@ namespace WebSite
 
         private void Initialize()
         {
-            WebCore.Initialize(new WebConfig { LogLevel = LogLevel.Verbose, UserScript = jquery });
+            WebCore.Initialize(new WebConfig {LogLevel = LogLevel.Verbose, UserScript = jquery});
             browser = WebCore.CreateWebView(Screen.PrimaryScreen.WorkingArea.Width,
                 Screen.PrimaryScreen.WorkingArea.Height, WebViewType.Offscreen);
 
@@ -220,13 +220,13 @@ namespace WebSite
         private void JavascriptMessageHandler(object sender, JavascriptMessageEventArgs e)
         {
             var msg = e.Message;
-            LogHelper.LogWarn(GetType(), msg);
+            LogHelper.Instance.LogWarn(GetType(), msg);
         }
 
         private void ShowJavascriptDialogHandler(object sender, JavascriptDialogEventArgs e)
         {
             var msg = e.Message;
-            LogHelper.LogWarn(GetType(), msg);
+            LogHelper.Instance.LogWarn(GetType(), msg);
             ShowJavascriptDialog(msg);
             e.Handled = true;
         }
@@ -234,7 +234,7 @@ namespace WebSite
         private void WebSiteLoading(object sender, LoadingFrameEventArgs e)
         {
             var url = e.Url.ToString();
-            LogHelper.LogInfo(GetType(), "页面正在加载:" + url);
+            LogHelper.Instance.LogInfo(GetType(), "页面正在加载:" + url);
         }
 
         private void WebSiteLoadingComplete(object sender, FrameEventArgs e)
@@ -242,7 +242,7 @@ namespace WebSite
             if (e.IsMainFrame)
             {
                 var url = e.Url.ToString();
-                LogHelper.LogInfo(GetType(), "页面加载成功:" + url);
+                LogHelper.Instance.LogInfo(GetType(), "页面加载成功:" + url);
             }
         }
 
@@ -324,15 +324,20 @@ namespace WebSite
                     var grabbedData = GrabData();
                     watch.Stop();
 
-                    grabDataClient.SendData(new GrabbedData { Data = grabbedData, Type = GetType().ToString() });
+                    grabDataClient.SendData(new GrabbedData
+                    {
+                        Data = grabbedData,
+                        Type = GetType().ToString(),
+                        GrabbedTime = DateTime.Now
+                    });
 
                     if (grabbedData != null)
                     {
                         var elapsedTimeMsg = "抓取数据耗时:" + watch.ElapsedMilliseconds;
-                        LogHelper.LogInfo(GetType(), elapsedTimeMsg);
-                        LogHelper.LogInfo(GetType(), string.Format("抓取到的数据条数:{0}", grabbedData.Length));
+                        LogHelper.Instance.LogInfo(GetType(), elapsedTimeMsg);
+                        LogHelper.Instance.LogInfo(GetType(), string.Format("抓取到的数据条数:{0}", grabbedData.Length));
                     }
-                    Thread.Sleep(grabDataInterval * 1000);
+                    Thread.Sleep(grabDataInterval*1000);
                 }
                 else
                 {
@@ -340,7 +345,7 @@ namespace WebSite
                     Stop();
                     if (_loginFailedCount < _maxLoginAttemptCount)
                     {
-                        Thread.Sleep((int)_loginInterval.TotalSeconds);
+                        Thread.Sleep((int) _loginInterval.TotalSeconds);
                         Run();
                     }
                 }
@@ -350,7 +355,7 @@ namespace WebSite
 
         private void OnWebSiteStatusChanged(WebSiteBase sender, WebSiteStatus status)
         {
-            LogHelper.LogInfo(GetType(), "网站状态: " + status);
+            LogHelper.Instance.LogInfo(GetType(), "网站状态: " + status);
 
             var handler = WebSiteStatusChanged;
             if (handler != null)

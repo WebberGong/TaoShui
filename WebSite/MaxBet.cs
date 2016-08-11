@@ -83,7 +83,7 @@ namespace WebSite
                         }
                     })();";
                 var result = browser.ExecuteJavascriptWithResult(js);
-                LogHelper.LogInfo(GetType(), "设置语言:" + result);
+                LogHelper.Instance.LogInfo(GetType(), "设置语言:" + result);
             }
         }
 
@@ -109,7 +109,7 @@ namespace WebSite
                         }
                     })();";
                 var result = browser.ExecuteJavascriptWithResult(js);
-                LogHelper.LogInfo(GetType(), "开始登录:" + result);
+                LogHelper.Instance.LogInfo(GetType(), "开始登录:" + result);
             }
         }
 
@@ -131,7 +131,7 @@ namespace WebSite
                         }
                     })();";
                 var result = browser.ExecuteJavascriptWithResult(js);
-                LogHelper.LogInfo(GetType(), "当前页是否为验证码输入页:" + result.ToString());
+                LogHelper.Instance.LogInfo(GetType(), "当前页是否为验证码输入页:" + result.ToString());
                 return result.ToString() == True;
             }
             return false;
@@ -147,11 +147,11 @@ namespace WebSite
                 var bitmap = Image.FromStream(stream) as Bitmap;
                 if (bitmap != null)
                 {
-                    LogHelper.LogInfo(GetType(), "获取验证码图片成功");
+                    LogHelper.Instance.LogInfo(GetType(), "获取验证码图片成功");
                     var code = Recogniser.Instance.RecognizeFromImage(bitmap, 4, 3,
                         new HashSet<EnumCaptchaType> {EnumCaptchaType.Number});
                     code = Common.GetNumericFromString(code);
-                    LogHelper.LogInfo(GetType(), "验证码识别结果:" + code);
+                    LogHelper.Instance.LogInfo(GetType(), "验证码识别结果:" + code);
 
                     var js = @"
                         (function() {
@@ -169,11 +169,11 @@ namespace WebSite
                             }
                         })();";
                     var result = browser.ExecuteJavascriptWithResult(js);
-                    LogHelper.LogInfo(GetType(), "提交验证码:" + result);
+                    LogHelper.Instance.LogInfo(GetType(), "提交验证码:" + result);
                 }
                 else
                 {
-                    LogHelper.LogInfo(GetType(), "获取验证码图片失败");
+                    LogHelper.Instance.LogInfo(GetType(), "获取验证码图片失败");
                 }
             }
         }

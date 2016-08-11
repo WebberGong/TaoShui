@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Utils;
 
@@ -8,22 +7,14 @@ namespace WcfService
     [ServiceBehavior(AddressFilterMode = AddressFilterMode.Any, InstanceContextMode = InstanceContextMode.Single)]
     public class GrabDataService : IGrabDataService
     {
-        private ServiceHost _host;
-
-        public event Action<GrabbedData> GrabDataSuccess;
-
         public GrabDataService()
         {
             CheckHost();
         }
 
-        public ServiceHost Host
-        {
-            get
-            {
-                return _host;
-            }
-        }
+        public ServiceHost Host { get; private set; }
+
+        public event Action<GrabbedData> GrabDataSuccess;
 
         public void ReceiveData(GrabbedData data)
         {
@@ -38,17 +29,19 @@ namespace WcfService
         {
             try
             {
-                if (_host == null || _host.State != CommunicationState.Opened)
+                if (Host == null || Host.State != CommunicationState.Opened)
                 {
-                    _host = new ServiceHost(this, new Uri(GrabDataConstants.ServiceBase));
-                    _host.AddServiceEndpoint(typeof(IGrabDataService), new NetNamedPipeBinding(),
+                    Host = new ServiceHost(this, new Uri(GrabDataConstants.ServiceBase));
+                    Host.AddServiceEndpoint(
+                        typeof(IGrabDataService),
+                        new NetNamedPipeBinding {MaxReceivedMessageSize = int.MaxValue},
                         GrabDataConstants.ServiceName);
-                    _host.Open();
+                    Host.Open();
                 }
             }
             catch (Exception ex)
             {
-                LogHelper.LogError(GetType(), "打开抓取数据服务端异常!", ex);
+                LogHelper.Instance.LogError(GetType(), "打开抓取数据服务端异常!", ex);
             }
         }
     }

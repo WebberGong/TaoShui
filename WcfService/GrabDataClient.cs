@@ -11,8 +11,10 @@ namespace WcfService
 
         public GrabDataClient()
         {
-            _myServiceFactory = new ChannelFactory<IGrabDataService>(new NetNamedPipeBinding(),
-                new EndpointAddress(GrabDataConstants.ServiceBase + "/" + GrabDataConstants.ServiceName));
+            _myServiceFactory =
+                new ChannelFactory<IGrabDataService>(
+                    new NetNamedPipeBinding {MaxReceivedMessageSize = int.MaxValue},
+                    new EndpointAddress(GrabDataConstants.ServiceBase + "/" + GrabDataConstants.ServiceName));
             _channel = _myServiceFactory.CreateChannel();
         }
 
@@ -24,12 +26,12 @@ namespace WcfService
                 {
                     try
                     {
-                        LogHelper.LogError(GetType(), "抓取数据客户端已关闭,正在重连...");
+                        LogHelper.Instance.LogError(GetType(), "抓取数据客户端已关闭,正在重连...");
                         _channel = _myServiceFactory.CreateChannel();
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.LogError(GetType(), "重连抓取数据客户端异常!", ex);
+                        LogHelper.Instance.LogError(GetType(), "重连抓取数据客户端异常!", ex);
                     }
                 }
                 return _channel;
