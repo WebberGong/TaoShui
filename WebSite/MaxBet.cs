@@ -12,7 +12,7 @@ namespace WebSite
     public class MaxBet : WebSiteBase
     {
         public MaxBet(string loginName, string loginPassword, int captchaLength,
-            int loginTimeOut = 10, int grabDataInterval = 10)
+            int loginTimeOut, int grabDataInterval)
             : base(loginName, loginPassword, captchaLength, loginTimeOut, grabDataInterval)
         {
         }

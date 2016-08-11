@@ -7,7 +7,7 @@ namespace WebSite
     public class Pinnacle : WebSiteBase
     {
         public Pinnacle(string loginName, string loginPassword, int captchaLength,
-            int loginTimeOut = 10, int grabDataInterval = 5)
+            int loginTimeOut, int grabDataInterval)
             : base(loginName, loginPassword, captchaLength, loginTimeOut, grabDataInterval)
         {
         }

@@ -18,7 +18,7 @@ namespace TaoShui
                 var grabDataService = new GrabDataService();
                 grabDataService.GrabDataSuccess += data =>
                 {
-                    LogHelper.Instance.LogInfo(GetType(), string.Format("Data Length：{0}, Type: {1}, Time: {2}",
+                    LogHelper.Instance.LogInfo(GetType(), string.Format("Data Count：{0}, Type: {1}, Time: {2}",
                         data.Data == null ? 0 : data.Data.Length, data.Type,
                         data.GrabbedTime.ToString("yyyy-MM-dd HH:mm:ss:fff")));
                 };

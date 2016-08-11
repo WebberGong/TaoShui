@@ -28,8 +28,7 @@
         }
 
         public static WebSiteBase CreateWebSite(string webSiteType, string loginName, string loginPassword,
-            int captchaLength, int loginTimeOut,
-            int grabDataInterval)
+            int captchaLength, int loginTimeOut, int grabDataInterval)
         {
             if (webSiteType == typeof(MaxBet).ToString())
             {

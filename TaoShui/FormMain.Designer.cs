@@ -29,7 +29,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(582, 353);
+            this.ClientSize = new System.Drawing.Size(1006, 721);
             this.Name = "FormMain";
             this.Text = "FormMain";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormMain_FormClosed);
