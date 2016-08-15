@@ -187,6 +187,17 @@ namespace WebSite
         {
             lock (browser)
             {
+                var refreshJs = @"
+                        (function() {
+                            try {
+                                this.top.frames['mainFrame'].refreshData_L();
+                                this.top.frames['mainFrame'].refreshData_D();
+                            } catch (ex) {
+                                return ex.message;
+                            }
+                        })();";
+                browser.ExecuteJavascriptWithResult(refreshJs);
+
                 var js = @"
                     (function() {
                         try {

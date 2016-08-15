@@ -17,7 +17,7 @@ namespace WebSite
         protected const string True = "true";
         protected const string False = "false";
 
-        private static readonly string jquery = File.ReadAllText(@"jquery-3.1.0.min.js");
+        private readonly string _jquery;
         private readonly int _captchaValidateMaxCount = 3;
         private readonly TimeSpan _loginInterval = new TimeSpan(0, 5, 0);
         private readonly int _maxLoginAttemptCount = 3;
@@ -45,6 +45,11 @@ namespace WebSite
             this.grabDataInterval = grabDataInterval;
 
             grabDataClient = new GrabDataClient();
+
+            lock (this)
+            {
+                _jquery = File.ReadAllText(@"jquery-3.1.0.min.js");
+            }
         }
 
         public string LoginName
@@ -102,7 +107,7 @@ namespace WebSite
 
         private void Initialize()
         {
-            WebCore.Initialize(new WebConfig {LogLevel = LogLevel.Verbose, UserScript = jquery});
+            WebCore.Initialize(new WebConfig {LogLevel = LogLevel.Verbose, UserScript = _jquery});
             browser = WebCore.CreateWebView(Screen.PrimaryScreen.WorkingArea.Width,
                 Screen.PrimaryScreen.WorkingArea.Height, WebViewType.Offscreen);
 

@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaoShui", "TaoShui\TaoShui.csproj", "{5C4F01AC-783C-4068-82BA-BC32BF6A9F4C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaptchaRecogniser", "CaptchaRecogniser\CaptchaRecogniser.csproj", "{A49647C1-A474-4368-80A7-A59C7E1E5750}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{B2A5C53D-D008-4AD1-89DB-7FFB0710AA74}"
@@ -15,16 +13,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSiteProcess", "WebSitePr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfService", "WcfService\WcfService.csproj", "{F1A19C39-0643-49E3-ABFB-5C71208B761D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaoShui", "TaoShui\TaoShui.csproj", "{C101A02A-A302-43CA-AB8B-87EFCB4A4A72}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5C4F01AC-783C-4068-82BA-BC32BF6A9F4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C4F01AC-783C-4068-82BA-BC32BF6A9F4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C4F01AC-783C-4068-82BA-BC32BF6A9F4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C4F01AC-783C-4068-82BA-BC32BF6A9F4C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A49647C1-A474-4368-80A7-A59C7E1E5750}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A49647C1-A474-4368-80A7-A59C7E1E5750}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A49647C1-A474-4368-80A7-A59C7E1E5750}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -45,6 +41,10 @@ Global
 		{F1A19C39-0643-49E3-ABFB-5C71208B761D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1A19C39-0643-49E3-ABFB-5C71208B761D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1A19C39-0643-49E3-ABFB-5C71208B761D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C101A02A-A302-43CA-AB8B-87EFCB4A4A72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C101A02A-A302-43CA-AB8B-87EFCB4A4A72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C101A02A-A302-43CA-AB8B-87EFCB4A4A72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C101A02A-A302-43CA-AB8B-87EFCB4A4A72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
