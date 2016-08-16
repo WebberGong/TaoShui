@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
 using TaoShui.Model;
 
@@ -16,7 +12,7 @@ namespace TaoShui.ViewModel
         {
             WebSiteSettings = new ObservableCollection<WebSiteSetting>
             {
-                new WebSiteSetting()
+                new WebSiteSetting
                 {
                     Name = "沙巴",
                     Url = "http://www.maxbet.com/",
@@ -26,7 +22,7 @@ namespace TaoShui.ViewModel
                     GrabDataInterval = 1,
                     LoginTimeOut = 10
                 },
-                new WebSiteSetting()
+                new WebSiteSetting
                 {
                     Name = "智博",
                     Url = "http://www.isn99.com/",
@@ -36,7 +32,7 @@ namespace TaoShui.ViewModel
                     GrabDataInterval = 1,
                     LoginTimeOut = 10
                 },
-                new WebSiteSetting()
+                new WebSiteSetting
                 {
                     Name = "沙巴",
                     Url = "http://www.maxbet.com/",
@@ -46,7 +42,7 @@ namespace TaoShui.ViewModel
                     GrabDataInterval = 1,
                     LoginTimeOut = 10
                 },
-                new WebSiteSetting()
+                new WebSiteSetting
                 {
                     Name = "智博",
                     Url = "http://www.isn99.com/",

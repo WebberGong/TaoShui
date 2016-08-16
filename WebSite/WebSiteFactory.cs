@@ -38,6 +38,10 @@
             {
                 return new Pinnacle(loginName, loginPassword, captchaLength, loginTimeOut, grabDataInterval);
             }
+            if (webSiteType == typeof(BetIsn).ToString())
+            {
+                return new BetIsn(loginName, loginPassword, captchaLength, loginTimeOut, grabDataInterval);
+            }
             return null;
         }
     }

@@ -1,70 +1,81 @@
 ﻿<Window
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="TaoShui.MainWindow"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        d:DesignWidth="900" d:DesignHeight="600"
-        FontFamily="Microsoft YaHei"
-        FontSize="12"
-        Title="MainWindow"
-        MinWidth="{Binding MinWidth, Mode=OneWay}" MinHeight="{Binding MinHeight, Mode=OneWay}"
-        ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" WindowState="Maximized"
-        DataContext="{Binding Main, Source={StaticResource Locator}}"
-        Background="LightBlue">
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="TaoShui.MainWindow"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignWidth="900" d:DesignHeight="600"
+    FontFamily="Microsoft YaHei"
+    FontSize="12"
+    Title="MainWindow"
+    MinWidth="{Binding MinWidth, Mode=OneWay}" MinHeight="{Binding MinHeight, Mode=OneWay}"
+    ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" WindowState="Maximized"
+    DataContext="{Binding Main, Source={StaticResource Locator}}"
+    Background="LightYellow">
     <Window.Resources>
         <Style TargetType="Border">
-            <Setter Property="BorderBrush" Value="CornflowerBlue"></Setter>
-            <Setter Property="BorderThickness" Value="1"></Setter>
-            <Setter Property="Margin" Value="2"></Setter>
-            <Setter Property="Background" Value="AliceBlue"></Setter>
+            <Setter Property="BorderBrush" Value="CornflowerBlue" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="Background" Value="AliceBlue" />
         </Style>
     </Window.Resources>
     <Grid Margin="2">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
         </Grid.RowDefinitions>
-        <ContentControl Content="{Binding CurrentViewModel}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+        <ContentControl Content="{Binding CurrentViewModel}" HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch" />
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="25*"/>
-                <ColumnDefinition Width="25*"/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="25*"/>
-                <ColumnDefinition Width="25*"/>
+                <ColumnDefinition Width="25*" />
+                <ColumnDefinition Width="25*" />
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="25*" />
+                <ColumnDefinition Width="25*" />
             </Grid.ColumnDefinitions>
             <Border Grid.Column="0">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
-                        <i:InvokeCommandAction Command="{Binding SettingViewCommand}"></i:InvokeCommandAction>
+                        <i:InvokeCommandAction Command="{Binding SettingViewCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Border>
             <Border Grid.Column="1">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
-                        <i:InvokeCommandAction Command="{Binding WebSiteViewCommand}"></i:InvokeCommandAction>
+                        <i:InvokeCommandAction Command="{Binding WebSiteViewCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Border>
             <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                <CheckBox x:Name="CbAutoBet" Width="80" Height="20" Margin="2" VerticalContentAlignment="Center" Command="{Binding AutoBetCommand}" CommandParameter="{Binding ElementName=CbAutoBet, Path=IsChecked}" IsChecked="{Binding IsAutoBet}">自动下注</CheckBox>
-                <CheckBox x:Name="CbAutoRun" Width="80" Height="20" Margin="2" VerticalContentAlignment="Center" Command="{Binding AutoRunCommand}" CommandParameter="{Binding ElementName=CbAutoRun, Path=IsChecked}" IsChecked="{Binding IsAutoRun}">自动运行</CheckBox>
+                <CheckBox x:Name="CbAutoBet" Width="80" Height="20" Margin="2" VerticalContentAlignment="Center"
+                          Command="{Binding AutoBetCommand}"
+                          CommandParameter="{Binding ElementName=CbAutoBet, Path=IsChecked}"
+                          IsChecked="{Binding IsAutoBet}">
+                    自动下注
+                </CheckBox>
+                <CheckBox x:Name="CbAutoRun" Width="80" Height="20" Margin="2" VerticalContentAlignment="Center"
+                          Command="{Binding AutoRunCommand}"
+                          CommandParameter="{Binding ElementName=CbAutoRun, Path=IsChecked}"
+                          IsChecked="{Binding IsAutoRun}">
+                    自动运行
+                </CheckBox>
             </StackPanel>
             <Border Grid.Column="3">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
-                        <i:InvokeCommandAction Command="{Binding MatchViewCommand}"></i:InvokeCommandAction>
+                        <i:InvokeCommandAction Command="{Binding MatchViewCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Border>
             <Border Grid.Column="4">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
-                        <i:InvokeCommandAction Command="{Binding RelevanceViewCommand}"></i:InvokeCommandAction>
+                        <i:InvokeCommandAction Command="{Binding RelevanceViewCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Border>

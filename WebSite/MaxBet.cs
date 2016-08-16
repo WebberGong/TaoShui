@@ -141,7 +141,7 @@ namespace WebSite
         {
             if (IsBrowserOk())
             {
-                var imgBase64 = JsGetImgBase64String("document.getElementById('validateCode')");
+                var imgBase64 = JsGetImgBase64String("document.getElementById('validateCode')", 135, 54);
                 var imgBytes = Convert.FromBase64String(imgBase64);
                 var stream = new MemoryStream(imgBytes);
                 var bitmap = Image.FromStream(stream) as Bitmap;

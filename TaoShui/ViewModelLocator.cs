@@ -12,7 +12,6 @@
   See http://www.galasoft.ch/mvvm
 */
 
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 using TaoShui.ViewModel;
@@ -45,44 +44,29 @@ namespace TaoShui
 
         public MainViewModel Main
         {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<MainViewModel>();
-            }
+            get { return ServiceLocator.Current.GetInstance<MainViewModel>(); }
         }
 
         public SettingViewModel Setting
         {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<SettingViewModel>();
-            }
+            get { return ServiceLocator.Current.GetInstance<SettingViewModel>(); }
         }
 
         public WebSiteViewModel WebSite
         {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<WebSiteViewModel>();
-            }
+            get { return ServiceLocator.Current.GetInstance<WebSiteViewModel>(); }
         }
 
         public MatchViewModel Match
         {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<MatchViewModel>();
-            }
+            get { return ServiceLocator.Current.GetInstance<MatchViewModel>(); }
         }
 
         public RelevanceViewModel Relevance
         {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<RelevanceViewModel>();
-            }
+            get { return ServiceLocator.Current.GetInstance<RelevanceViewModel>(); }
         }
-        
+
         public static void Cleanup()
         {
             // TODO Clear the ViewModels

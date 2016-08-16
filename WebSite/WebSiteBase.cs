@@ -16,13 +16,13 @@ namespace WebSite
         protected const string Undefined = "undefined";
         protected const string True = "true";
         protected const string False = "false";
+        protected const int CaptchaValidateMaxCount = 5;
+        protected const int MaxLoginAttemptCount = 3;
+        protected int captchaValidateCount;
+        protected int loginAttemptCount;
 
         private readonly string _jquery;
-        private readonly int _captchaValidateMaxCount = 3;
         private readonly TimeSpan _loginInterval = new TimeSpan(0, 5, 0);
-        private readonly int _maxLoginAttemptCount = 3;
-        private int _captchaValidateCount;
-        private int _loginFailedCount;
         private Stopwatch _loginStopWatch;
         private Timer _loginTimer;
         private WebSiteStatus _webSiteStatus;
@@ -156,7 +156,7 @@ namespace WebSite
             _loginTimer.Enabled = false;
 
             _webSiteStatus = WebSiteStatus.NotLogin;
-            _captchaValidateCount = 0;
+            captchaValidateCount = 0;
         }
 
         protected bool IsBrowserOk()
@@ -179,10 +179,11 @@ namespace WebSite
 
         public void DoCaptchaValidate()
         {
-            if (_captchaValidateCount < _captchaValidateMaxCount)
+            if (captchaValidateCount < CaptchaValidateMaxCount)
             {
+                WebSiteStatus = WebSiteStatus.CaptchaValidating;
                 CaptchaValidate();
-                _captchaValidateCount++;
+                captchaValidateCount++;
             }
             else
             {
@@ -195,13 +196,15 @@ namespace WebSite
             RefreshCaptcha();
         }
 
-        protected string JsGetImgBase64String(string getElementQuery, bool leaveOnlyBase64Data = true)
+        protected string JsGetImgBase64String(string getElementQuery, int width, int height, bool leaveOnlyBase64Data = true)
         {
             var js = @"
                 (function() {
                     try {
                         var img = " + getElementQuery + @";
                         var cnv = document.createElement('CANVAS');
+                        cnv.width = " + width + @"; 
+                        cnv.height = " + height + @"; 
                         var ctx = cnv.getContext('2d');
                         ctx.drawImage(img, 0, 0);
                         return cnv.toDataURL();
@@ -232,7 +235,7 @@ namespace WebSite
         {
             var msg = e.Message;
             LogHelper.Instance.LogWarn(GetType(), msg);
-            ShowJavascriptDialog(msg);
+            browser.BeginInvoke(ShowJavascriptDialog, msg);
             e.Handled = true;
         }
 
@@ -292,7 +295,6 @@ namespace WebSite
                 if (IsCaptchaInputPageReady() && CaptchaInputPageRegex != null &&
                     CaptchaInputPageRegex.IsMatch(url))
                 {
-                    WebSiteStatus = WebSiteStatus.CaptchaValidating;
                     DoCaptchaValidate();
                 }
             }
@@ -322,7 +324,7 @@ namespace WebSite
             {
                 if (IsBrowserOk() && _webSiteStatus == WebSiteStatus.LoginSuccessful)
                 {
-                    _loginFailedCount = 0;
+                    loginAttemptCount = 0;
 
                     var watch = new Stopwatch();
                     watch.Start();
@@ -346,9 +348,9 @@ namespace WebSite
                 }
                 else
                 {
-                    _loginFailedCount++;
+                    loginAttemptCount++;
                     Stop();
-                    if (_loginFailedCount < _maxLoginAttemptCount)
+                    if (loginAttemptCount < MaxLoginAttemptCount)
                     {
                         Thread.Sleep((int) _loginInterval.TotalSeconds);
                         Run();

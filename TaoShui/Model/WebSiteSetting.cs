@@ -1,28 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
+﻿using GalaSoft.MvvmLight;
 
 namespace TaoShui.Model
 {
     public class WebSiteSetting : ObservableObject
     {
-        private string _name;
-        private string _url;
-        private string _loginName;
-        private string _password;
         private int _captchaLength;
-        private int _loginTimeOut;
         private int _grabDataInterval;
+        private string _loginName;
+        private int _loginTimeOut;
+        private string _name;
+        private string _password;
+        private string _url;
 
         public string Name
         {
-            get
-            {
-                return _name;
-            }
+            get { return _name; }
             set
             {
                 if (_name != value)
@@ -35,10 +27,7 @@ namespace TaoShui.Model
 
         public string Url
         {
-            get
-            {
-                return _url;
-            }
+            get { return _url; }
             set
             {
                 if (_url != value)
@@ -51,10 +40,7 @@ namespace TaoShui.Model
 
         public string LoginName
         {
-            get
-            {
-                return _loginName;
-            }
+            get { return _loginName; }
             set
             {
                 if (_loginName != value)
@@ -67,10 +53,7 @@ namespace TaoShui.Model
 
         public string Password
         {
-            get
-            {
-                return _password;
-            }
+            get { return _password; }
             set
             {
                 if (_password != value)
@@ -83,10 +66,7 @@ namespace TaoShui.Model
 
         public int CaptchaLength
         {
-            get
-            {
-                return _captchaLength;
-            }
+            get { return _captchaLength; }
             set
             {
                 if (_captchaLength != value)
@@ -99,10 +79,7 @@ namespace TaoShui.Model
 
         public int LoginTimeOut
         {
-            get
-            {
-                return _loginTimeOut;
-            }
+            get { return _loginTimeOut; }
             set
             {
                 if (_loginTimeOut != value)
@@ -115,10 +92,7 @@ namespace TaoShui.Model
 
         public int GrabDataInterval
         {
-            get
-            {
-                return _grabDataInterval;
-            }
+            get { return _grabDataInterval; }
             set
             {
                 if (_grabDataInterval != value)

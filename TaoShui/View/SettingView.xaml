@@ -8,19 +8,19 @@
              d:DesignWidth="900" d:DesignHeight="600">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="200"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="40"></RowDefinition>
+            <RowDefinition Height="200" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
         <DataGrid ItemsSource="{Binding WebSiteSettings}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="*"></DataGridTextColumn>
-                <DataGridTextColumn Header="网址" Binding="{Binding Url}" Width="*"></DataGridTextColumn>
-                <DataGridTextColumn Header="用户名" Binding="{Binding LoginName}" Width="*"></DataGridTextColumn>
-                <DataGridTextColumn Header="密码" Binding="{Binding Password}" Width="*"></DataGridTextColumn>
-                <DataGridTextColumn Header="验证码长度" Binding="{Binding CaptchaLength}" Width="*"></DataGridTextColumn>
-                <DataGridTextColumn Header="登录超时时间" Binding="{Binding LoginTimeOut}" Width="*"></DataGridTextColumn>
-                <DataGridTextColumn Header="抓取数据时间间隔" Binding="{Binding GrabDataInterval}" Width="*"></DataGridTextColumn>
+                <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="*" />
+                <DataGridTextColumn Header="网址" Binding="{Binding Url}" Width="*" />
+                <DataGridTextColumn Header="用户名" Binding="{Binding LoginName}" Width="*" />
+                <DataGridTextColumn Header="密码" Binding="{Binding Password}" Width="*" />
+                <DataGridTextColumn Header="验证码长度" Binding="{Binding CaptchaLength}" Width="*" />
+                <DataGridTextColumn Header="登录超时时间" Binding="{Binding LoginTimeOut}" Width="*" />
+                <DataGridTextColumn Header="抓取数据时间间隔" Binding="{Binding GrabDataInterval}" Width="*" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

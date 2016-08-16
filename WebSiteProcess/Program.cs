@@ -9,7 +9,8 @@ namespace WebSiteProcess
         {
             if (args.Length == 0)
             {
-                args = new[] {"WebSite.MaxBet", "sfb1337952", "Aaaa2235", "4", "60", "1"};
+                //args = new[] { "WebSite.MaxBet", "sfb1337952", "Aaaa2235", "4", "60", "1" };
+                args = new[] { "WebSite.BetIsn", "zb999111", "sss123456", "4", "60", "1" };
             }
             if (args.Length != 6)
             {
