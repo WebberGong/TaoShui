@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using CaptchaRecogniser;
+using Entity;
 using Newtonsoft.Json;
 using Utils;
 
@@ -183,7 +184,7 @@ namespace WebSite
             browser.Source = BaseUrl;
         }
 
-        protected override string[][] GrabData()
+        protected override FootballData[] GrabData()
         {
             lock (browser)
             {
@@ -191,7 +192,6 @@ namespace WebSite
                         (function() {
                             try {
                                 this.top.frames['mainFrame'].refreshData_L();
-                                this.top.frames['mainFrame'].refreshData_D();
                             } catch (ex) {
                                 return ex.message;
                             }
@@ -201,7 +201,7 @@ namespace WebSite
                 var js = @"
                     (function() {
                         try {
-                            var trs = $(this.top.frames['mainFrame'].document).find('#tabbox tbody tr');
+                            var trs = $(this.top.frames['mainFrame'].document).find('#tabbox tbody:first tr');
                             var matches = [];
                             var leagueName = '';
                             trs.each(function() {
@@ -211,8 +211,8 @@ namespace WebSite
                                     leagueName = $(this).text().trim();
                                 }
                                 else if (tds.length === 10) {
-                                    var match = [];
-                                    match.push(leagueName);
+                                    var match = JSON.parse('" + FootballData.GetEmptyObjectJsonString() + @"');
+                                    match.LeagueName = leagueName;
                                     var index = -1;
                                     tds.each(function () {
                                         index++;
@@ -220,44 +220,81 @@ namespace WebSite
                                             var a1 = $(this).children('b');
                                             var a2 = $(this).find('div span b:last');
                                             if (a1.length === 1 && a2.length === 1) {
-                                                match.push(a1.text().trim());
-                                                match.push(a2.text().trim());
+                                                match.Score = a1.text().trim();
+                                                match.Time = a2.text().trim();
                                             } else {
-                                                match.push($(this).text().trim());
-                                                match.push('');
+                                                match.Time = $(this).text().trim();
                                             }
                                         }
                                         else if (index === 1) {
                                             var b1 = $(this).find('div span');
                                             if (b1.length === 2) {
-                                                match.push(b1[0].innerHTML.trim());
-                                                match.push(b1[1].innerHTML.trim());
+                                                match.HostTeam = $(this).find('div span:eq(0)').text().trim();
+                                                match.GuestTeam = $(this).find('div span:eq(1)').text().trim();
                                                 var b2 = $(this).children('div:last');
                                                 if (b2 && b2.children('span').length === 0) {
-                                                    match.push(b2.text().trim());
-                                                }
-                                                else {
-                                                    match.push('');
+                                                    match.DrawnGame = b2.text().trim();
                                                 }
                                             }
                                         }
-                                        else if (index === 3 || index === 4 || index === 6 || index === 7) {
+                                        else if (index === 3) {
                                             var c1 = $(this).find('div a[name=cvmy]');
                                             if (c1.length === 2) {
                                                 var c2 = $(this).children('div:first');
                                                 if (c2 && c2.children('a').length === 0) {
-                                                    match.push(c2.text().trim().replace(/\s+/, '|'));
-                                                    match.push(c1[0].innerHTML.trim());
-                                                    match.push(c1[1].innerHTML.trim());
+                                                    match.WholeConcedePoints = c2.text().trim().replace(/\s+/, '|');
+                                                    match.WholeConcedeHostOdds = $(this).find('div a[name=cvmy]:eq(0)').text().trim();
+                                                    match.WholeConcedeGuestOdds = $(this).find('div a[name=cvmy]:eq(1)').text().trim();
                                                 }
                                             }
                                         }
-                                        else if (index === 5 || index === 8) {
+                                        else if (index === 4) {
+                                            var c1 = $(this).find('div a[name=cvmy]');
+                                            if (c1.length === 2) {
+                                                var c2 = $(this).children('div:first');
+                                                if (c2 && c2.children('a').length === 0) {
+                                                    match.WholeSizeBallPoints = c2.text().trim().replace(/\s+/, '|');
+                                                    match.WholeSizeBallHostOdds = $(this).find('div a[name=cvmy]:eq(0)').text().trim();
+                                                    match.WholeSizeBallGuestOdds = $(this).find('div a[name=cvmy]:eq(1)').text().trim();
+                                                }
+                                            }
+                                        }
+                                        else if (index === 6) {
+                                            var c1 = $(this).find('div a[name=cvmy]');
+                                            if (c1.length === 2) {
+                                                var c2 = $(this).children('div:first');
+                                                if (c2 && c2.children('a').length === 0) {
+                                                    match.HalfConcedePoints = c2.text().trim().replace(/\s+/, '|');
+                                                    match.HalfConcedeHostOdds = $(this).find('div a[name=cvmy]:eq(0)').text().trim();
+                                                    match.HalfConcedeGuestOdds = $(this).find('div a[name=cvmy]:eq(1)').text().trim();
+                                                }
+                                            }
+                                        }
+                                        else if (index === 7) {
+                                            var c1 = $(this).find('div a[name=cvmy]');
+                                            if (c1.length === 2) {
+                                                var c2 = $(this).children('div:first');
+                                                if (c2 && c2.children('a').length === 0) {
+                                                    match.HalfSizeBallPoints = c2.text().trim().replace(/\s+/, '|');
+                                                    match.HalfSizeBallHostOdds = $(this).find('div a[name=cvmy]:eq(0)').text().trim();
+                                                    match.HalfSizeBallGuestOdds = $(this).find('div a[name=cvmy]:eq(1)').text().trim();
+                                                }
+                                            }
+                                        }
+                                        else if (index === 5) {
                                             var d1 = $(this).find('div a');
                                             if (d1.length === 3) {
-                                                match.push(d1[0].innerHTML.trim());
-                                                match.push(d1[1].innerHTML.trim());
-                                                match.push(d1[2].innerHTML.trim());
+                                                match.WholeOneByTwoHostOdds = $(this).find('div a:eq(0)').text().trim();
+                                                match.WholeOneByTwoGuestOdds = $(this).find('div a:eq(1)').text().trim();
+                                                match.WholeOneByTwoDrawnGameOdds = $(this).find('div a:eq(2)').text().trim();
+                                            }
+                                        }
+                                        else if (index === 8) {
+                                            var d1 = $(this).find('div a');
+                                            if (d1.length === 3) {
+                                                match.HalfOneByTwoHostOdds = $(this).find('div a:eq(0)').text().trim();
+                                                match.HalfOneByTwoGuestOdds = $(this).find('div a:eq(1)').text().trim();
+                                                match.HalfOneByTwoDrawnGameOdds = $(this).find('div a:eq(2)').text().trim();
                                             }
                                         }
                                     });
@@ -270,7 +307,7 @@ namespace WebSite
                         }
                     })();";
                 var result = browser.ExecuteJavascriptWithResult(js);
-                var grabbedData = JsonConvert.DeserializeObject(result, typeof(string[][])) as string[][];
+                var grabbedData = JsonConvert.DeserializeObject(result, typeof(FootballData[])) as FootballData[];
                 return grabbedData;
             }
         }

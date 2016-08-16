@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using Entity;
 using Utils;
 
 namespace WebSite
@@ -89,7 +90,7 @@ namespace WebSite
         {
         }
 
-        protected override string[][] GrabData()
+        protected override FootballData[] GrabData()
         {
             return null;
         }

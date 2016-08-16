@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using Awesomium.Core;
+using Entity;
 using Utils;
 using WcfService;
 using Timer = System.Timers.Timer;
@@ -102,7 +103,7 @@ namespace WebSite
         protected abstract bool IsCaptchaInputPageReady();
         protected abstract void CaptchaValidate();
         protected abstract void RefreshCaptcha();
-        protected abstract string[][] GrabData();
+        protected abstract FootballData[] GrabData();
         public event Action<WebSiteBase, WebSiteStatus> WebSiteStatusChanged;
 
         private void Initialize()

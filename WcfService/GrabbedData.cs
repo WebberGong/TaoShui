@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Entity;
 
 namespace WcfService
 {
@@ -7,7 +8,7 @@ namespace WcfService
     public class GrabbedData
     {
         [DataMember]
-        public string[][] Data { get; set; }
+        public FootballData[] Data { get; set; }
 
         [DataMember]
         public string Type { get; set; }

@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfService", "WcfService\Wc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaoShui", "TaoShui\TaoShui.csproj", "{C101A02A-A302-43CA-AB8B-87EFCB4A4A72}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entity", "Entity\Entity.csproj", "{74F6A4C2-E508-4AA2-8993-CA7CC57F0562}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{C101A02A-A302-43CA-AB8B-87EFCB4A4A72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C101A02A-A302-43CA-AB8B-87EFCB4A4A72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C101A02A-A302-43CA-AB8B-87EFCB4A4A72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74F6A4C2-E508-4AA2-8993-CA7CC57F0562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74F6A4C2-E508-4AA2-8993-CA7CC57F0562}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74F6A4C2-E508-4AA2-8993-CA7CC57F0562}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74F6A4C2-E508-4AA2-8993-CA7CC57F0562}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
