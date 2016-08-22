@@ -9,6 +9,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <locator:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:locator="clr-namespace:TaoShui" />
+
             <DataTemplate DataType="{x:Type vm:SettingViewModel}">
                 <v:SettingView />
             </DataTemplate>
@@ -20,6 +21,12 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type vm:RelevanceViewModel}">
                 <v:RelevanceView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:WebSiteSettingViewModel}">
+                <v:WebSiteSettingView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SystemSettingViewModel}">
+                <v:SystemSettingView />
             </DataTemplate>
 
             <Style TargetType="DataGrid">
@@ -42,9 +49,8 @@
                 <Setter Property="Background">
                     <Setter.Value>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Color="White" Offset="0" />
+                            <GradientStop Color="AliceBlue" Offset="0" />
                             <GradientStop Color="LightBlue" Offset="1" />
-                            <GradientStop Color="White" Offset="1" />
                         </LinearGradientBrush>
                     </Setter.Value>
                 </Setter>
@@ -59,20 +65,69 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Style.Triggers>
                     <Trigger Property="AlternationIndex" Value="0">
-                        <Setter Property="Background" Value="AliceBlue" />
+                        <Setter Property="Background" Value="#ffffee" />
                     </Trigger>
                     <Trigger Property="AlternationIndex" Value="1">
-                        <Setter Property="Background" Value="Beige" />
+                        <Setter Property="Background" Value="#ffffcc" />
                     </Trigger>
                     <Trigger Property="IsMouseOver" Value="True">
                         <Setter Property="Background" Value="LightPink" />
                     </Trigger>
                     <Trigger Property="IsSelected" Value="True">
                         <Setter Property="Background" Value="LightGreen" />
-                        <Setter Property="Foreground" Value="Red"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
+            <Style TargetType="GridSplitter">
+                <Setter Property="Background" Value="Transparent"></Setter>
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="LightSkyBlue" Offset="0" />
+                            <GradientStop Color="SteelBlue"  Offset="1" />
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="BorderThickness" Value="1"></Setter>
+                <Setter Property="BorderBrush" Value="DodgerBlue"></Setter>
+            </Style>
+            
+            <ControlTemplate x:Key="SelectableButtonTemplate" TargetType="RadioButton">
+                <Border>
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="LightSkyBlue" Offset="0" />
+                                        <GradientStop Color="SteelBlue"  Offset="1" />
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="BorderThickness" Value="1"></Setter>
+                            <Setter Property="BorderBrush" Value="DodgerBlue"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=IsChecked}" Value="True">
+                                    <Setter Property="BorderThickness" Value="2"></Setter>
+                                    <Setter Property="BorderBrush">
+                                        <Setter.Value>
+                                            <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" 
+                                            RadiusX="1" RadiusY="1">
+                                                <GradientStop Color="White" Offset="1" />
+                                                <GradientStop Color="Red"  Offset="0" />
+                                            </RadialGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=Content}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"></ContentControl>
+                </Border>
+            </ControlTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

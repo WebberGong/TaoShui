@@ -1,12 +1,18 @@
 using System;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
+using Repository;
+using Repository.Entity;
 using TaoShui.ViewModel;
 using Utils;
 using WcfService;
@@ -16,13 +22,13 @@ namespace TaoShui
 {
     public class MainViewModel : ViewModelBase
     {
-        private readonly MatchViewModel _matchViewModel = new MatchViewModel();
-        private readonly double _minHeight = SystemParameters.PrimaryScreenHeight/5*4;
-        private readonly double _minWidth = SystemParameters.PrimaryScreenWidth/5*4;
+        private readonly double _minHeight = SystemParameters.PrimaryScreenHeight / 5 * 4;
+        private readonly double _minWidth = SystemParameters.PrimaryScreenWidth / 5 * 4;
         private readonly Thread _receiveGrabbedDataThread;
-        private readonly RelevanceViewModel _relevanceViewModel = new RelevanceViewModel();
         private readonly SettingViewModel _settingViewModel = new SettingViewModel();
         private readonly WebSiteViewModel _webSiteViewModel = new WebSiteViewModel();
+        private readonly MatchViewModel _matchViewModel = new MatchViewModel();
+        private readonly RelevanceViewModel _relevanceViewModel = new RelevanceViewModel();
         private ViewModelBase _currentViewModel;
         private bool _isAutoBet;
         private bool _isAutoRun;
@@ -76,7 +82,7 @@ namespace TaoShui
         public ViewModelBase CurrentViewModel
         {
             get { return _currentViewModel; }
-            set
+            private set
             {
                 if (_currentViewModel != value)
                 {

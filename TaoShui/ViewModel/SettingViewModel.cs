@@ -1,66 +1,77 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows.Input;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using TaoShui.Model;
 
 namespace TaoShui.ViewModel
 {
     public class SettingViewModel : ViewModelBase
     {
-        private string _name = "Setting";
+        private readonly WebSiteSettingViewModel _webSiteSettingViewModel = new WebSiteSettingViewModel();
+        private readonly SystemSettingViewModel _systemSettingViewModel = new SystemSettingViewModel();
+        private ViewModelBase _currentViewModel;
+        private bool _isWebSiteSettingChecked = true;
+        private bool _isSystemSettingChecked = false;
 
         public SettingViewModel()
         {
-            WebSiteSettings = new ObservableCollection<WebSiteSetting>
-            {
-                new WebSiteSetting
-                {
-                    Name = "沙巴",
-                    Url = "http://www.maxbet.com/",
-                    LoginName = "test1",
-                    Password = "test1",
-                    CaptchaLength = 4,
-                    GrabDataInterval = 1,
-                    LoginTimeOut = 10
-                },
-                new WebSiteSetting
-                {
-                    Name = "智博",
-                    Url = "http://www.isn99.com/",
-                    LoginName = "test2",
-                    Password = "test2",
-                    CaptchaLength = 4,
-                    GrabDataInterval = 1,
-                    LoginTimeOut = 10
-                },
-                new WebSiteSetting
-                {
-                    Name = "沙巴",
-                    Url = "http://www.maxbet.com/",
-                    LoginName = "test1",
-                    Password = "test1",
-                    CaptchaLength = 4,
-                    GrabDataInterval = 1,
-                    LoginTimeOut = 10
-                },
-                new WebSiteSetting
-                {
-                    Name = "智博",
-                    Url = "http://www.isn99.com/",
-                    LoginName = "test2",
-                    Password = "test2",
-                    CaptchaLength = 4,
-                    GrabDataInterval = 1,
-                    LoginTimeOut = 10
-                }
-            };
+            _currentViewModel = _webSiteSettingViewModel;
+            WebSiteSettingViewCommand = new RelayCommand(ExecuteWebSiteSettingViewCommand);
+            SystemSettingViewCommand = new RelayCommand(ExecuteSystemSettingViewCommand);
         }
 
-        public string Name
+        public ViewModelBase CurrentViewModel
         {
-            get { return _name; }
-            set { _name = value; }
+            get { return _currentViewModel; }
+            private set
+            {
+                if (_currentViewModel != value)
+                {
+                    _currentViewModel = value;
+                    RaisePropertyChanged();
+                }
+            }
         }
 
-        public ObservableCollection<WebSiteSetting> WebSiteSettings { get; set; }
+        public bool IsWebSiteSettingChecked
+        {
+            get { return _isWebSiteSettingChecked; }
+            private set
+            {
+                if (_isWebSiteSettingChecked != value)
+                {
+                    _isWebSiteSettingChecked = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public bool IsSystemSettingChecked
+        {
+            get { return _isSystemSettingChecked; }
+            private set
+            {
+                if (_isSystemSettingChecked != value)
+                {
+                    _isSystemSettingChecked = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public ICommand WebSiteSettingViewCommand { get; private set; }
+
+        public ICommand SystemSettingViewCommand { get; private set; }
+
+        private void ExecuteWebSiteSettingViewCommand()
+        {
+            CurrentViewModel = _webSiteSettingViewModel;
+        }
+
+        private void ExecuteSystemSettingViewCommand()
+        {
+            CurrentViewModel = _systemSettingViewModel;
+        }
     }
 }

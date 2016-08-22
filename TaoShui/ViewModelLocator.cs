@@ -40,6 +40,8 @@ namespace TaoShui
             SimpleIoc.Default.Register<WebSiteViewModel>();
             SimpleIoc.Default.Register<MatchViewModel>();
             SimpleIoc.Default.Register<RelevanceViewModel>();
+            SimpleIoc.Default.Register<WebSiteSettingViewModel>();
+            SimpleIoc.Default.Register<SystemSettingViewModel>();
         }
 
         public MainViewModel Main
@@ -65,6 +67,16 @@ namespace TaoShui
         public RelevanceViewModel Relevance
         {
             get { return ServiceLocator.Current.GetInstance<RelevanceViewModel>(); }
+        }
+
+        public WebSiteSettingViewModel WebSiteSetting
+        {
+            get { return ServiceLocator.Current.GetInstance<WebSiteSettingViewModel>(); }
+        }
+
+        public SystemSettingViewModel SystemSetting
+        {
+            get { return ServiceLocator.Current.GetInstance<SystemSettingViewModel>(); }
         }
 
         public static void Cleanup()

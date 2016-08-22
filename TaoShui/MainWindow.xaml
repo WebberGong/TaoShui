@@ -13,14 +13,37 @@
     MinWidth="{Binding MinWidth, Mode=OneWay}" MinHeight="{Binding MinHeight, Mode=OneWay}"
     ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" WindowState="Maximized"
     DataContext="{Binding Main, Source={StaticResource Locator}}"
-    Background="LightYellow">
+    Background="PowderBlue">
     <Window.Resources>
-        <Style TargetType="Border">
-            <Setter Property="BorderBrush" Value="CornflowerBlue" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Margin" Value="2" />
-            <Setter Property="Background" Value="AliceBlue" />
-        </Style>
+        <ControlTemplate x:Key="MainMenuTemplate" TargetType="RadioButton">
+            <Border>
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Margin" Value="2" />
+                        <Setter Property="Background" Value="White" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="BorderBrush" Value="CornflowerBlue" />
+                        <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+                        <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=IsChecked}" Value="True">
+                                <Setter Property="BorderThickness" Value="10"></Setter>
+                                <Setter Property="BorderBrush">
+                                    <Setter.Value>
+                                        <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" 
+                                            RadiusX="1" RadiusY="1">
+                                            <GradientStop Color="White" Offset="1" />
+                                            <GradientStop Color="Red"  Offset="0" />
+                                        </RadialGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=Content}"></ContentControl>
+            </Border>
+        </ControlTemplate>
     </Window.Resources>
     <Grid Margin="2">
         <Grid.RowDefinitions>
@@ -37,20 +60,20 @@
                 <ColumnDefinition Width="25*" />
                 <ColumnDefinition Width="25*" />
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0">
+            <RadioButton Grid.Column="0" GroupName="MainMenu" Template="{StaticResource MainMenuTemplate}" IsChecked="True">
                 <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:EventTrigger EventName="Checked">
                         <i:InvokeCommandAction Command="{Binding SettingViewCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-            </Border>
-            <Border Grid.Column="1">
+            </RadioButton>
+            <RadioButton Grid.Column="1" GroupName="MainMenu" Template="{StaticResource MainMenuTemplate}">
                 <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:EventTrigger EventName="Checked">
                         <i:InvokeCommandAction Command="{Binding WebSiteViewCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-            </Border>
+            </RadioButton>
             <StackPanel Grid.Column="2" VerticalAlignment="Center">
                 <CheckBox x:Name="CbAutoBet" Width="80" Height="20" Margin="2" VerticalContentAlignment="Center"
                           Command="{Binding AutoBetCommand}"
@@ -65,20 +88,20 @@
                     自动运行
                 </CheckBox>
             </StackPanel>
-            <Border Grid.Column="3">
+            <RadioButton Grid.Column="3" GroupName="MainMenu" Template="{StaticResource MainMenuTemplate}">
                 <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:EventTrigger EventName="Checked">
                         <i:InvokeCommandAction Command="{Binding MatchViewCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-            </Border>
-            <Border Grid.Column="4">
+            </RadioButton>
+            <RadioButton Grid.Column="4" GroupName="MainMenu" Template="{StaticResource MainMenuTemplate}">
                 <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                    <i:EventTrigger EventName="Checked">
                         <i:InvokeCommandAction Command="{Binding RelevanceViewCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-            </Border>
+            </RadioButton>
         </Grid>
     </Grid>
 </Window>

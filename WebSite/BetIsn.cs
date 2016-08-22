@@ -157,7 +157,7 @@ namespace WebSite
                                 var trs = $(this).children('tr');
                                 if (trs.length === 1 && $(this).find('tr:eq(0) td').length === 3)
                                 {
-                                    leagueName = trs.find(':eq(0) td:first').text().trim();
+                                    leagueName = $(this).find('tr:eq(0) td:first').text().trim();
                                 }
                                 else if (trs.length === 3 && 
                                     $(this).find('tr:eq(0) td').length === 15 &&
@@ -246,7 +246,7 @@ namespace WebSite
                                             }
                                         }
                                     });
-                                    index = 0;
+                                    var index = -1;
                                     $(this).find('tr:eq(1) td').each(function () {
                                         index++;
                                         if (index === 0) {
@@ -292,7 +292,7 @@ namespace WebSite
                                             }
                                         }
                                     });
-                                    index = 0;
+                                    var index = -1;
                                     $(this).find('tr:eq(2) td').each(function () {
                                         index++;
                                         if (index === 0) {

@@ -4,24 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
-             Margin="2"
+             Margin="2 2 2 0"
              d:DesignWidth="900" d:DesignHeight="600">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="200" />
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
-        <DataGrid ItemsSource="{Binding WebSiteSettings}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="*" />
-                <DataGridTextColumn Header="网址" Binding="{Binding Url}" Width="*" />
-                <DataGridTextColumn Header="用户名" Binding="{Binding LoginName}" Width="*" />
-                <DataGridTextColumn Header="密码" Binding="{Binding Password}" Width="*" />
-                <DataGridTextColumn Header="验证码长度" Binding="{Binding CaptchaLength}" Width="*" />
-                <DataGridTextColumn Header="登录超时时间" Binding="{Binding LoginTimeOut}" Width="*" />
-                <DataGridTextColumn Header="抓取数据时间间隔" Binding="{Binding GrabDataInterval}" Width="*" />
-            </DataGrid.Columns>
-        </DataGrid>
+        <ContentControl Grid.Row="0" Content="{Binding CurrentViewModel}" HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch" />
+        <TabPanel Grid.Row="1" VerticalAlignment="Center">
+            <Canvas Width="2"></Canvas>
+            <RadioButton Height="24" Width="80" GroupName="SettingType" Command="{Binding WebSiteSettingViewCommand}" Template="{StaticResource SelectableButtonTemplate}" IsChecked="{Binding IsWebSiteSettingChecked, Mode=TwoWay}">网站设置</RadioButton>
+            <Canvas Width="5"></Canvas>
+            <RadioButton Height="24" Width="80" GroupName="SettingType" Command="{Binding SystemSettingViewCommand}" Template="{StaticResource SelectableButtonTemplate}" IsChecked="{Binding IsSystemSettingChecked, Mode=TwoWay}">系统设置</RadioButton>
+        </TabPanel>
     </Grid>
 </UserControl>
