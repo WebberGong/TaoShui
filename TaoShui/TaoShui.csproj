@@ -50,6 +50,10 @@
       <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="FontAwesome.Sharp, Version=4.6.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FontAwesome.Sharp.4.6.3\lib\net40\FontAwesome.Sharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
       <Private>True</Private>
@@ -212,8 +216,12 @@
       <Project>{74f6a4c2-e508-4aa2-8993-ca7cc57f0562}</Project>
       <Name>Entity</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FontAwesome\FontAwesome.csproj">
+      <Project>{784b0ae1-d15c-4fd7-a9ae-799081d41323}</Project>
+      <Name>FontAwesome</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Repository\Repository.csproj">
-      <Project>{d8566bbe-2e67-40a9-b9f0-19ac81c1ad79}</Project>
+      <Project>{D8566BBE-2E67-40A9-B9F0-19AC81C1AD79}</Project>
       <Name>Repository</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utils\Utils.csproj">

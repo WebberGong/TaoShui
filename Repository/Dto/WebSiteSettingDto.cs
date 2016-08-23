@@ -1,20 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using GalaSoft.MvvmLight;
 
 namespace Repository.Dto
 {
     [Table("WebSiteSetting")]
-    public class WebSiteSettingDto : ObservableObject
+    public class WebSiteSettingDto
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [StringLength(50)]
         public string Name { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         [StringLength(100)]
         public string Url { get; set; }
 

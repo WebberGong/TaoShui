@@ -5,6 +5,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="clr-namespace:FontAwesomeWPF;assembly=FontAwesomeWPF"
              mc:Ignorable="d"
              Margin="2 2 2 0"
              d:DesignWidth="900" d:DesignHeight="600">
@@ -15,12 +16,18 @@
         </Grid.RowDefinitions>
         <DataGrid Grid.Row="0" ItemsSource="{Binding WebSiteSettings}" Margin="0 0 0 3">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="编号" Binding="{Binding Id}" Width="*" IsReadOnly="True" />
-                <DataGridTextColumn Header="名称" Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*" />
-                <DataGridTextColumn Header="网址" Binding="{Binding Url}" Width="*" />
-                <DataGridTextColumn Header="验证码长度" Binding="{Binding CaptchaLength}" Width="*" />
-                <DataGridTextColumn Header="登录超时时间" Binding="{Binding LoginTimeOut}" Width="*" />
-                <DataGridTextColumn Header="抓取数据时间间隔" Binding="{Binding GrabDataInterval}" Width="*" />
+                <DataGridTextColumn Header="编号" Binding="{Binding Id}" Width="0.5*" IsReadOnly="True" ElementStyle="{StaticResource ContentCenterStyle}" />
+                <DataGridTextColumn Header="名称" Binding="{Binding Name, UpdateSourceTrigger=LostFocus}" Width="*" ElementStyle="{StaticResource ContentCenterStyle}" />
+                <DataGridTextColumn Header="网址" Binding="{Binding Url, UpdateSourceTrigger=LostFocus}" Width="2*" ElementStyle="{StaticResource ContentCenterStyle}" />
+                <DataGridTextColumn Header="验证码长度" Binding="{Binding CaptchaLength, UpdateSourceTrigger=LostFocus}" Width="*" ElementStyle="{StaticResource ContentCenterStyle}" />
+                <DataGridTextColumn Header="登录超时时间" Binding="{Binding LoginTimeOut, UpdateSourceTrigger=LostFocus}" Width="*" ElementStyle="{StaticResource ContentCenterStyle}" />
+                <DataGridTextColumn Header="抓取数据时间间隔" Binding="{Binding GrabDataInterval, UpdateSourceTrigger=LostFocus}" Width="*" ElementStyle="{StaticResource ContentCenterStyle}" />
+                <DataGridTemplateColumn
+                    Width="60" 
+                    HeaderStyle="{StaticResource EditColumnHeaderStyle}"
+                    HeaderTemplate="{StaticResource EditColumnHeaderTemplate}"
+                    CellTemplate="{StaticResource EditColumnCellTemplate}">
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="RowEditEnding">
@@ -48,11 +55,22 @@
             <DataGrid Grid.Row="1" Grid.Column="1" />
             <DataGrid Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" ItemsSource="{Binding WebSites}" Margin="3 0 0 0">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="编号" Binding="{Binding Id}" Width="*" IsReadOnly="True" />
-                    <DataGridTextColumn Header="名称" Binding="{Binding Setting.Name}" Width="*" IsReadOnly="True" />
-                    <DataGridTextColumn Header="用户名" Binding="{Binding LoginName}" Width="*" />
-                    <DataGridTextColumn Header="密码" Binding="{Binding Password}" Width="*" />
+                    <DataGridTextColumn Header="编号" Binding="{Binding Id}" Width="0.5*" IsReadOnly="True" ElementStyle="{StaticResource ContentCenterStyle}" />
+                    <DataGridTextColumn Header="名称" Binding="{Binding Setting.Name}" Width="*" IsReadOnly="True" ElementStyle="{StaticResource ContentCenterStyle}" />
+                    <DataGridTextColumn Header="用户名" Binding="{Binding LoginName, UpdateSourceTrigger=LostFocus}" Width="*" ElementStyle="{StaticResource ContentCenterStyle}" />
+                    <DataGridTextColumn Header="密码" Binding="{Binding Password, UpdateSourceTrigger=LostFocus}" Width="*" ElementStyle="{StaticResource ContentCenterStyle}" />
+                    <DataGridTemplateColumn
+                        Width="60" 
+                        HeaderStyle="{StaticResource EditColumnHeaderStyle}"
+                        HeaderTemplate="{StaticResource EditColumnHeaderTemplate}"
+                        CellTemplate="{StaticResource EditColumnCellTemplate}">
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="RowEditEnding">
+                        <cmd:EventToCommand Command="{Binding WebSiteEditCommand, UpdateSourceTrigger=PropertyChanged}" PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
             </DataGrid>
             <GridSplitter Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Width="3" 
                 HorizontalAlignment="Left" VerticalAlignment="Stretch" />

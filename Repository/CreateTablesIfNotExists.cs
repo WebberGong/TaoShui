@@ -7,7 +7,7 @@ using Repository.Dto;
 
 namespace Repository
 {
-    public class CreateTablesIfNotExists<TContext> : IDatabaseInitializer<TContext> where TContext : DatabaseContext
+    internal class CreateTablesIfNotExists<TContext> : IDatabaseInitializer<TContext> where TContext : DatabaseContext
     {
         public void InitializeDatabase(TContext context)
         {
@@ -88,6 +88,12 @@ namespace Repository
                     },
                     new WebSiteDto
                     {
+                        LoginName = "zb999111",
+                        Password = "sss123456",
+                        SettingId = isn99Setting.Id
+                    },
+                    new WebSiteDto
+                    {
                         LoginName = "hh7d1hi061",
                         Password = "ss123456@",
                         SettingId = pinnacleSetting.Id
@@ -97,12 +103,6 @@ namespace Repository
                         LoginName = "hbhcgc3061",
                         Password = "sss123456",
                         SettingId = sbobetSetting.Id
-                    },
-                    new WebSiteDto
-                    {
-                        LoginName = "zb999111",
-                        Password = "sss123456",
-                        SettingId = isn99Setting.Id
                     }
                 };
                 webSites.ForEach(x => context.WebSites.Add(x));

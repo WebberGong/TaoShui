@@ -4,11 +4,105 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:v="clr-namespace:TaoShui.View"
              xmlns:vm="clr-namespace:TaoShui.ViewModel"
+             xmlns:ui="clr-namespace:FontAwesomeWPF;assembly=FontAwesomeWPF"
              StartupUri="MainWindow.xaml"
              mc:Ignorable="d">
     <Application.Resources>
         <ResourceDictionary>
             <locator:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:locator="clr-namespace:TaoShui" />
+
+            <Style x:Key="FontAwesomeStyle" TargetType="TextBlock">
+                <Setter Property="FontFamily"  Value="pack://application:,,,/FontAwesomeWPF;component/fonts/#FontAwesome" />
+            </Style>
+            <Style x:Key="BorderButton" TargetType="Border">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="LightSkyBlue" Offset="0" />
+                            <GradientStop Color="SteelBlue" Offset="1" />
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="DodgerBlue" />
+            </Style>
+            <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="AliceBlue" Offset="0" />
+                            <GradientStop Color="LightBlue" Offset="1" />
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Height" Value="30" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="CornflowerBlue" />
+                <Setter Property="Margin" Value="-1, -1, -1, 0" />
+                <Setter Property="Padding" Value="3" />
+            </Style>
+            <Style x:Key="EditColumnHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridColumnHeaderStyle}">
+                <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+            </Style>
+            <DataTemplate x:Key="EditColumnHeaderTemplate">
+                <TextBlock Style="{StaticResource FontAwesomeStyle}"
+                    FontSize="20"
+                    Foreground="Green"
+                    Text="{x:Static ui:Fa.Plus_circle}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                </TextBlock>
+            </DataTemplate>
+            <DataTemplate x:Key="EditColumnCellTemplate">
+                <TextBlock Style="{StaticResource FontAwesomeStyle}"
+                    FontSize="20"
+                    Foreground="Red"
+                    Text="{x:Static ui:Fa.Remove}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                </TextBlock>
+            </DataTemplate>
+            <ControlTemplate x:Key="SelectableButtonTemplate" TargetType="RadioButton">
+                <Border>
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="LightSkyBlue" Offset="0" />
+                                        <GradientStop Color="SteelBlue" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Setter Property="BorderBrush" Value="RoyalBlue" />
+                            <Style.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=IsChecked}"
+                                    Value="True">
+                                    <Setter Property="BorderThickness" Value="2" />
+                                    <Setter Property="BorderBrush">
+                                        <Setter.Value>
+                                            <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5"
+                                                                 RadiusX="1" RadiusY="1">
+                                                <GradientStop Color="White" Offset="1" />
+                                                <GradientStop Color="Red" Offset="0" />
+                                            </RadialGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <ContentControl
+                        Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=Content}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+            <Style x:Key="ContentCenterStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
 
             <DataTemplate DataType="{x:Type vm:SettingViewModel}">
                 <v:SettingView />
@@ -32,7 +126,7 @@
             <Style TargetType="DataGrid">
                 <Setter Property="HorizontalGridLinesBrush" Value="CornflowerBlue" />
                 <Setter Property="VerticalGridLinesBrush" Value="CornflowerBlue" />
-                <Setter Property="CanUserResizeColumns" Value="False" />
+                <Setter Property="CanUserResizeColumns" Value="True" />
                 <Setter Property="CanUserResizeRows" Value="False" />
                 <Setter Property="CanUserDeleteRows" Value="False" />
                 <Setter Property="CanUserAddRows" Value="False" />
@@ -45,20 +139,7 @@
                 <Setter Property="SelectionMode" Value="Single" />
                 <Setter Property="SelectionUnit" Value="FullRow" />
             </Style>
-            <Style TargetType="DataGridColumnHeader">
-                <Setter Property="Background">
-                    <Setter.Value>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Color="AliceBlue" Offset="0" />
-                            <GradientStop Color="LightBlue" Offset="1" />
-                        </LinearGradientBrush>
-                    </Setter.Value>
-                </Setter>
-                <Setter Property="Height" Value="30" />
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="BorderBrush" Value="CornflowerBlue" />
-                <Setter Property="Margin" Value="-1, -1, -1, 0" />
-                <Setter Property="Padding" Value="3" />
+            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridColumnHeaderStyle}">
             </Style>
             <Style TargetType="DataGridRow">
                 <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -93,44 +174,6 @@
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="BorderBrush" Value="DodgerBlue" />
             </Style>
-
-            <ControlTemplate x:Key="SelectableButtonTemplate" TargetType="RadioButton">
-                <Border>
-                    <Border.Style>
-                        <Style TargetType="Border">
-                            <Setter Property="Background">
-                                <Setter.Value>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                        <GradientStop Color="LightSkyBlue" Offset="0" />
-                                        <GradientStop Color="SteelBlue" Offset="1" />
-                                    </LinearGradientBrush>
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property="BorderThickness" Value="1" />
-                            <Setter Property="BorderBrush" Value="DeepSkyBlue" />
-                            <Style.Triggers>
-                                <DataTrigger
-                                    Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=IsChecked}"
-                                    Value="True">
-                                    <Setter Property="BorderThickness" Value="2" />
-                                    <Setter Property="BorderBrush">
-                                        <Setter.Value>
-                                            <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5"
-                                                                 RadiusX="1" RadiusY="1">
-                                                <GradientStop Color="White" Offset="1" />
-                                                <GradientStop Color="Red" Offset="0" />
-                                            </RadialGradientBrush>
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
-                    <ContentControl
-                        Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=Content}"
-                        HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
-            </ControlTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

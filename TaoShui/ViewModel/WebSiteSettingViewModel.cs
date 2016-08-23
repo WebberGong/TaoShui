@@ -25,21 +25,38 @@ namespace TaoShui.ViewModel
 
             WebSiteSettings = dataService.GetWebSiteSettings();
             WebSites = dataService.GetWebSites();
+            foreach (var site in WebSites)
+            {
+                site.Setting = WebSiteSettings.FirstOrDefault(x => x.Id == site.SettingId);
+            }
 
             WebSiteSettingEditCommand = new RelayCommand<DataGridRowEditEndingEventArgs>(ExecuteWebSiteSettingEditCommand);
+            WebSiteEditCommand = new RelayCommand<DataGridRowEditEndingEventArgs>(ExecuteWebSiteEditCommand);
         }
 
-        public ObservableCollection<WebSiteSettingDto> WebSiteSettings { get; set; }
+        public ObservableCollection<WebSiteSetting> WebSiteSettings { get; set; }
 
-        public ObservableCollection<WebSiteDto> WebSites { get; set; }
+        public ObservableCollection<WebSite> WebSites { get; set; }
 
         public ICommand WebSiteSettingEditCommand { get; private set; }
+
+        public ICommand WebSiteEditCommand { get; private set; }  
 
         private void ExecuteWebSiteSettingEditCommand(DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
-                _dataService.SaveWebSiteSetting(e.Row.Item as WebSiteSettingDto);
+                var setting = e.Row.Item as WebSiteSetting;
+                _dataService.SaveWebSiteSetting(setting);
+
+            }
+        }
+
+        private void ExecuteWebSiteEditCommand(DataGridRowEditEndingEventArgs e)
+        {
+            if (e.EditAction == DataGridEditAction.Commit)
+            {
+                _dataService.SaveWebSite(e.Row.Item as WebSite);
             }
         }
     }

@@ -6,17 +6,18 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
-using Repository.Dto;
 using TaoShui.Model;
 
 namespace TaoShui.DataService
 {
     public interface IDataService
     {
-        ObservableCollection<WebSiteSettingDto> GetWebSiteSettings();
+        ObservableCollection<WebSiteSetting> GetWebSiteSettings();
 
-        ObservableCollection<WebSiteDto> GetWebSites();
+        ObservableCollection<WebSite> GetWebSites();
 
-        void SaveWebSiteSetting(WebSiteSettingDto setting);
+        void SaveWebSiteSetting(WebSiteSetting setting);
+
+        void SaveWebSite(WebSite site);
     }
 }
