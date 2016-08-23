@@ -19,8 +19,6 @@ namespace WebSite
         protected const string False = "false";
         protected const int CaptchaValidateMaxCount = 5;
         protected const int MaxLoginAttemptCount = 3;
-        protected int captchaValidateCount;
-        protected int loginAttemptCount;
 
         private readonly string _jquery;
         private readonly TimeSpan _loginInterval = new TimeSpan(0, 5, 0);
@@ -30,8 +28,10 @@ namespace WebSite
 
         protected WebView browser;
         protected int captchaLength;
+        protected int captchaValidateCount;
         protected GrabDataClient grabDataClient;
         protected int grabDataInterval;
+        protected int loginAttemptCount;
         protected string loginName;
         protected string loginPassword;
         protected int loginTimeOut;
@@ -197,7 +197,8 @@ namespace WebSite
             RefreshCaptcha();
         }
 
-        protected string JsGetImgBase64String(string getElementQuery, int width, int height, bool leaveOnlyBase64Data = true)
+        protected string JsGetImgBase64String(string getElementQuery, int width, int height,
+            bool leaveOnlyBase64Data = true)
         {
             var js = @"
                 (function() {

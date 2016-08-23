@@ -1,58 +1,46 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Input;
+using AutoMapper;
+using AutoMapper.Configuration;
+using AutoMapper.Configuration.Conventions;
+using AutoMapper.Mappers;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
+using Repository.Dto;
+using TaoShui.DataService;
 using TaoShui.Model;
 
 namespace TaoShui.ViewModel
 {
     public class WebSiteSettingViewModel : ViewModelBase
     {
-        public WebSiteSettingViewModel()
+        private readonly IDataService _dataService;
+
+        public WebSiteSettingViewModel(IDataService dataService)
         {
-            WebSiteSettings = new ObservableCollection<WebSiteSetting>
-            {
-                new WebSiteSetting
-                {
-                    Name = "沙巴",
-                    Url = "http://www.maxbet.com/",
-                    LoginName = "test1",
-                    Password = "test1",
-                    CaptchaLength = 4,
-                    GrabDataInterval = 1,
-                    LoginTimeOut = 10
-                },
-                new WebSiteSetting
-                {
-                    Name = "智博",
-                    Url = "http://www.isn99.com/",
-                    LoginName = "test2",
-                    Password = "test2",
-                    CaptchaLength = 4,
-                    GrabDataInterval = 1,
-                    LoginTimeOut = 10
-                },
-                new WebSiteSetting
-                {
-                    Name = "沙巴",
-                    Url = "http://www.maxbet.com/",
-                    LoginName = "test1",
-                    Password = "test1",
-                    CaptchaLength = 4,
-                    GrabDataInterval = 1,
-                    LoginTimeOut = 10
-                },
-                new WebSiteSetting
-                {
-                    Name = "智博",
-                    Url = "http://www.isn99.com/",
-                    LoginName = "test2",
-                    Password = "test2",
-                    CaptchaLength = 4,
-                    GrabDataInterval = 1,
-                    LoginTimeOut = 10
-                }
-            };
+            _dataService = dataService;
+
+            WebSiteSettings = dataService.GetWebSiteSettings();
+            WebSites = dataService.GetWebSites();
+
+            WebSiteSettingEditCommand = new RelayCommand<DataGridRowEditEndingEventArgs>(ExecuteWebSiteSettingEditCommand);
         }
 
-        public ObservableCollection<WebSiteSetting> WebSiteSettings { get; set; }
+        public ObservableCollection<WebSiteSettingDto> WebSiteSettings { get; set; }
+
+        public ObservableCollection<WebSiteDto> WebSites { get; set; }
+
+        public ICommand WebSiteSettingEditCommand { get; private set; }
+
+        private void ExecuteWebSiteSettingEditCommand(DataGridRowEditEndingEventArgs e)
+        {
+            if (e.EditAction == DataGridEditAction.Commit)
+            {
+                _dataService.SaveWebSiteSetting(e.Row.Item as WebSiteSettingDto);
+            }
+        }
     }
 }

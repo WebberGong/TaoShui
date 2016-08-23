@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Data;
 using System.Data.Entity;
-using System.Data.Entity.Migrations;
-using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Repository.Entity;
+using Repository.Dto;
 
 namespace Repository
 {
@@ -17,9 +11,11 @@ namespace Repository
         {
             Database.SetInitializer(
                 new CreateTablesIfNotExists<DatabaseContext>());
-            Configuration.LazyLoadingEnabled = false;
+            Configuration.LazyLoadingEnabled = true;
         }
 
-        public DbSet<WebSiteSetting> WebSiteSettings { get; set; }
+        public DbSet<WebSiteSettingDto> WebSiteSettings { get; set; }
+
+        public DbSet<WebSiteDto> WebSites { get; set; }
     }
 }

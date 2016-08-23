@@ -14,6 +14,7 @@
 
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
+using TaoShui.DataService;
 using TaoShui.ViewModel;
 
 namespace TaoShui
@@ -24,17 +25,6 @@ namespace TaoShui
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
-            //if (ViewModelBase.IsInDesignModeStatic)
-            //{
-            //    // Create design time view services and models
-            //    SimpleIoc.Default.Register<IDataService, DesignDataService>();
-            //}
-            //else
-            //{
-            //    // Create run time view services and models
-            //    SimpleIoc.Default.Register<IDataService, DataService>();
-            //}
-
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<SettingViewModel>();
             SimpleIoc.Default.Register<WebSiteViewModel>();
@@ -42,46 +32,13 @@ namespace TaoShui
             SimpleIoc.Default.Register<RelevanceViewModel>();
             SimpleIoc.Default.Register<WebSiteSettingViewModel>();
             SimpleIoc.Default.Register<SystemSettingViewModel>();
+
+            SimpleIoc.Default.Register<IDataService, DataService.DataService>();
         }
 
         public MainViewModel Main
         {
             get { return ServiceLocator.Current.GetInstance<MainViewModel>(); }
-        }
-
-        public SettingViewModel Setting
-        {
-            get { return ServiceLocator.Current.GetInstance<SettingViewModel>(); }
-        }
-
-        public WebSiteViewModel WebSite
-        {
-            get { return ServiceLocator.Current.GetInstance<WebSiteViewModel>(); }
-        }
-
-        public MatchViewModel Match
-        {
-            get { return ServiceLocator.Current.GetInstance<MatchViewModel>(); }
-        }
-
-        public RelevanceViewModel Relevance
-        {
-            get { return ServiceLocator.Current.GetInstance<RelevanceViewModel>(); }
-        }
-
-        public WebSiteSettingViewModel WebSiteSetting
-        {
-            get { return ServiceLocator.Current.GetInstance<WebSiteSettingViewModel>(); }
-        }
-
-        public SystemSettingViewModel SystemSetting
-        {
-            get { return ServiceLocator.Current.GetInstance<SystemSettingViewModel>(); }
-        }
-
-        public static void Cleanup()
-        {
-            // TODO Clear the ViewModels
         }
     }
 }

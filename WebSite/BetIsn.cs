@@ -79,7 +79,7 @@ namespace WebSite
                 var imgBytes = Convert.FromBase64String(imgBase64);
                 var stream = new MemoryStream(imgBytes);
                 var bitmap = Image.FromStream(stream) as Bitmap;
-                string code = string.Empty;
+                var code = string.Empty;
                 if (bitmap != null)
                 {
                     LogHelper.Instance.LogInfo(GetType(), "获取验证码图片成功");

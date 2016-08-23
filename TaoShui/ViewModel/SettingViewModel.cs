@@ -1,20 +1,20 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using TaoShui.Model;
+using Microsoft.Practices.ServiceLocation;
+using TaoShui.DataService;
 
 namespace TaoShui.ViewModel
 {
     public class SettingViewModel : ViewModelBase
     {
-        private readonly WebSiteSettingViewModel _webSiteSettingViewModel = new WebSiteSettingViewModel();
-        private readonly SystemSettingViewModel _systemSettingViewModel = new SystemSettingViewModel();
+        private readonly SystemSettingViewModel _systemSettingViewModel = ServiceLocator.Current.GetInstance<SystemSettingViewModel>();
+        private readonly WebSiteSettingViewModel _webSiteSettingViewModel = ServiceLocator.Current.GetInstance<WebSiteSettingViewModel>();
         private ViewModelBase _currentViewModel;
+        private bool _isSystemSettingChecked;
         private bool _isWebSiteSettingChecked = true;
-        private bool _isSystemSettingChecked = false;
 
-        public SettingViewModel()
+        public SettingViewModel(IDataService dataService)
         {
             _currentViewModel = _webSiteSettingViewModel;
             WebSiteSettingViewCommand = new RelayCommand(ExecuteWebSiteSettingViewCommand);

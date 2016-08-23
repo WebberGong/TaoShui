@@ -41,9 +41,9 @@
                 <Setter Property="RowHeaderWidth" Value="0" />
                 <Setter Property="AutoGenerateColumns" Value="False" />
                 <Setter Property="AlternationCount" Value="2" />
-                <Setter Property="Background" Value="White"></Setter>
-                <Setter Property="SelectionMode" Value="Single"></Setter>
-                <Setter Property="SelectionUnit" Value="FullRow"></Setter>
+                <Setter Property="Background" Value="White" />
+                <Setter Property="SelectionMode" Value="Single" />
+                <Setter Property="SelectionUnit" Value="FullRow" />
             </Style>
             <Style TargetType="DataGridColumnHeader">
                 <Setter Property="Background">
@@ -79,21 +79,21 @@
                 </Style.Triggers>
             </Style>
             <Style TargetType="GridSplitter">
-                <Setter Property="Background" Value="Transparent"></Setter>
+                <Setter Property="Background" Value="Transparent" />
             </Style>
             <Style TargetType="Button">
                 <Setter Property="Background">
                     <Setter.Value>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                             <GradientStop Color="LightSkyBlue" Offset="0" />
-                            <GradientStop Color="SteelBlue"  Offset="1" />
+                            <GradientStop Color="SteelBlue" Offset="1" />
                         </LinearGradientBrush>
                     </Setter.Value>
                 </Setter>
-                <Setter Property="BorderThickness" Value="1"></Setter>
-                <Setter Property="BorderBrush" Value="DodgerBlue"></Setter>
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="DodgerBlue" />
             </Style>
-            
+
             <ControlTemplate x:Key="SelectableButtonTemplate" TargetType="RadioButton">
                 <Border>
                     <Border.Style>
@@ -102,21 +102,23 @@
                                 <Setter.Value>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                                         <GradientStop Color="LightSkyBlue" Offset="0" />
-                                        <GradientStop Color="SteelBlue"  Offset="1" />
+                                        <GradientStop Color="SteelBlue" Offset="1" />
                                     </LinearGradientBrush>
                                 </Setter.Value>
                             </Setter>
-                            <Setter Property="BorderThickness" Value="1"></Setter>
-                            <Setter Property="BorderBrush" Value="DodgerBlue"></Setter>
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Setter Property="BorderBrush" Value="DeepSkyBlue" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=IsChecked}" Value="True">
-                                    <Setter Property="BorderThickness" Value="2"></Setter>
+                                <DataTrigger
+                                    Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=IsChecked}"
+                                    Value="True">
+                                    <Setter Property="BorderThickness" Value="2" />
                                     <Setter Property="BorderBrush">
                                         <Setter.Value>
-                                            <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" 
-                                            RadiusX="1" RadiusY="1">
+                                            <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5"
+                                                                 RadiusX="1" RadiusY="1">
                                                 <GradientStop Color="White" Offset="1" />
-                                                <GradientStop Color="Red"  Offset="0" />
+                                                <GradientStop Color="Red" Offset="0" />
                                             </RadialGradientBrush>
                                         </Setter.Value>
                                     </Setter>
@@ -124,8 +126,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=Content}"
-                        HorizontalAlignment="Center" VerticalAlignment="Center"></ContentControl>
+                    <ContentControl
+                        Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=RadioButton}, Path=Content}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
             </ControlTemplate>
         </ResourceDictionary>

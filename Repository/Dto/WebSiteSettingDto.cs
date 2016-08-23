@@ -1,29 +1,21 @@
-﻿using System;
-using System.Collections;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Migrations.Model;
+using GalaSoft.MvvmLight;
 
-namespace Repository.Entity
+namespace Repository.Dto
 {
     [Table("WebSiteSetting")]
-    public class WebSiteSetting
+    public class WebSiteSettingDto : ObservableObject
     {
-        public WebSiteSetting()
-        {
-            Id = Guid.NewGuid().ToString();
-        }
-
-        [Key]
-        [MaxLength(50)]
-        public string Id { get; set; }
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long Id { get; set; }
 
         [Required]
-        [MaxLength(50)]
+        [StringLength(50)]
         public string Name { get; set; }
 
         [Required]
-        [MaxLength(100)]
+        [StringLength(100)]
         public string Url { get; set; }
 
         [Required]

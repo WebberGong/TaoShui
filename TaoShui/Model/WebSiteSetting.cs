@@ -4,13 +4,25 @@ namespace TaoShui.Model
 {
     public class WebSiteSetting : ObservableObject
     {
+        private long _id;
+        private string _name;
+        private string _url;
         private int _captchaLength;
         private int _grabDataInterval;
-        private string _loginName;
         private int _loginTimeOut;
-        private string _name;
-        private string _password;
-        private string _url;
+
+        public long Id
+        {
+            get { return _id; }
+            set
+            {
+                if (_id != value)
+                {
+                    _id = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
 
         public string Name
         {
@@ -33,32 +45,6 @@ namespace TaoShui.Model
                 if (_url != value)
                 {
                     _url = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public string LoginName
-        {
-            get { return _loginName; }
-            set
-            {
-                if (_loginName != value)
-                {
-                    _loginName = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public string Password
-        {
-            get { return _password; }
-            set
-            {
-                if (_password != value)
-                {
-                    _password = value;
                     RaisePropertyChanged();
                 }
             }
