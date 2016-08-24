@@ -11,11 +11,11 @@ namespace Repository.Dto
         public long Id { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "网站名不能为空")]
-        [StringLength(50, ErrorMessage = "网站名不能大于50字符")]
+        [StringLength(50, ErrorMessage = "网站名长度不能大于50字符")]
         public string Name { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "网站地址不能为空")]
-        [StringLength(100, ErrorMessage = "网站地址不能大于100字符")]
+        [StringLength(100, ErrorMessage = "网站地址长度不能大于100字符")]
         public string Url { get; set; }
 
         [Range(1, 10, ErrorMessage = "验证码长度必须介于1至10字符之间")]

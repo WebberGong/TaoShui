@@ -30,9 +30,35 @@
                                     ElementStyle="{StaticResource ContentCenterStyle}" />
                 <DataGridTemplateColumn
                     Width="60"
-                    HeaderStyle="{StaticResource EditColumnHeaderStyle}"
-                    HeaderTemplate="{StaticResource EditColumnHeaderTemplate}"
-                    CellTemplate="{StaticResource EditColumnCellTemplate}" />
+                    HeaderStyle="{StaticResource EditColumnHeaderStyle}">
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Style="{StaticResource EditColumnHeaderContentStyle}"
+                                       DataContext="{Binding}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                        <i:InvokeCommandAction
+                                            Command="{Binding WebSiteSettingAddCommand}"
+                                            CommandParameter="{Binding Path=CurrentCell, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Style="{StaticResource EditColumnCellContentStyle}"
+                                       DataContext="{Binding}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                        <i:InvokeCommandAction
+                                            Command="{Binding WebSiteSettingRemoveCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="RowEditEnding">
@@ -71,10 +97,33 @@
                     <DataGridTextColumn Header="密码" Binding="{Binding Password, UpdateSourceTrigger=LostFocus}"
                                         Width="*" ElementStyle="{StaticResource ContentCenterStyle}" />
                     <DataGridTemplateColumn
-                        Width="60"
-                        HeaderStyle="{StaticResource EditColumnHeaderStyle}"
-                        HeaderTemplate="{StaticResource EditColumnHeaderTemplate}"
-                        CellTemplate="{StaticResource EditColumnCellTemplate}" />
+                    Width="60"
+                    HeaderStyle="{StaticResource EditColumnHeaderStyle}">
+                        <DataGridTemplateColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Style="{StaticResource EditColumnHeaderContentStyle}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                        <i:InvokeCommandAction
+                                            Command="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.HeaderTemplate>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Style="{StaticResource EditColumnCellContentStyle}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                        <i:InvokeCommandAction
+                                            Command="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="RowEditEnding">

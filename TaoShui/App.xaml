@@ -15,6 +15,9 @@
                 <Setter Property="FontFamily"
                         Value="pack://application:,,,/FontAwesomeWPF;component/fonts/#FontAwesome" />
             </Style>
+            <Style x:Key="ContentCenterStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
             <Style x:Key="BorderButton" TargetType="Border">
                 <Setter Property="Background">
                     <Setter.Value>
@@ -47,22 +50,20 @@
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             </Style>
-            <DataTemplate x:Key="EditColumnHeaderTemplate">
-                <TextBlock Style="{StaticResource FontAwesomeStyle}"
-                           FontSize="20"
-                           Foreground="Green"
-                           Text="{x:Static ui:Fa.Plus_circle}"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center" />
-            </DataTemplate>
-            <DataTemplate x:Key="EditColumnCellTemplate">
-                <TextBlock Style="{StaticResource FontAwesomeStyle}"
-                           FontSize="20"
-                           Foreground="Red"
-                           Text="{x:Static ui:Fa.Remove}"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center" />
-            </DataTemplate>
+            <Style x:Key="EditColumnHeaderContentStyle" TargetType="TextBlock" BasedOn="{StaticResource FontAwesomeStyle}">
+                <Setter Property="FontSize" Value="20"></Setter>
+                <Setter Property="Foreground" Value="Green"></Setter>
+                <Setter Property="Text" Value="{x:Static ui:Fa.Plus_circle}"></Setter>
+                <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+                <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            </Style>
+            <Style x:Key="EditColumnCellContentStyle" TargetType="TextBlock" BasedOn="{StaticResource FontAwesomeStyle}">
+                <Setter Property="FontSize" Value="20"></Setter>
+                <Setter Property="Foreground" Value="Red"></Setter>
+                <Setter Property="Text" Value="{x:Static ui:Fa.Remove}"></Setter>
+                <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+                <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            </Style>
             <ControlTemplate x:Key="SelectableButtonTemplate" TargetType="RadioButton">
                 <Border>
                     <Border.Style>
@@ -100,9 +101,6 @@
                         HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
             </ControlTemplate>
-            <Style x:Key="ContentCenterStyle" TargetType="{x:Type TextBlock}">
-                <Setter Property="VerticalAlignment" Value="Center" />
-            </Style>
 
             <DataTemplate DataType="{x:Type vm:SettingViewModel}">
                 <v:SettingView />

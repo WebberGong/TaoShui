@@ -22,8 +22,9 @@ namespace TaoShui.ViewModel
             foreach (var site in WebSites)
                 site.Setting = WebSiteSettings.FirstOrDefault(x => x.Id == site.SettingId);
 
-            WebSiteSettingEditCommand =
-                new RelayCommand<DataGridRowEditEndingEventArgs>(ExecuteWebSiteSettingEditCommand);
+            WebSiteSettingAddCommand = new RelayCommand<object>(ExecuteWebSiteSettingAddCommand);
+            WebSiteSettingEditCommand = new RelayCommand<DataGridRowEditEndingEventArgs>(ExecuteWebSiteSettingEditCommand);
+            WebSiteSettingRemoveCommand = new RelayCommand<DataGridCellInfo>(ExecuteWebSiteSettingRemoveCommand);
             WebSiteEditCommand = new RelayCommand<DataGridRowEditEndingEventArgs>(ExecuteWebSiteEditCommand);
         }
 
@@ -31,9 +32,19 @@ namespace TaoShui.ViewModel
 
         public ObservableCollection<WebSite> WebSites { get; set; }
 
+        public ICommand WebSiteSettingAddCommand { get; private set; }
+
         public ICommand WebSiteSettingEditCommand { get; private set; }
 
+        public ICommand WebSiteSettingRemoveCommand { get; private set; }
+
         public ICommand WebSiteEditCommand { get; private set; }
+
+        private void ExecuteWebSiteSettingAddCommand(object currentCell)
+        {
+            var cell = currentCell as DataGridCell;
+            WebSiteSettings.Add(new WebSiteSetting());
+        }
 
         private void ExecuteWebSiteSettingEditCommand(DataGridRowEditEndingEventArgs e)
         {
@@ -42,6 +53,10 @@ namespace TaoShui.ViewModel
                 var setting = e.Row.Item as WebSiteSetting;
                 _dataService.SaveWebSiteSetting(setting);
             }
+        }
+
+        private void ExecuteWebSiteSettingRemoveCommand(DataGridCellInfo cell)
+        {
         }
 
         private void ExecuteWebSiteEditCommand(DataGridRowEditEndingEventArgs e)
