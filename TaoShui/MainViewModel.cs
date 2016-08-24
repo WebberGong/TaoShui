@@ -50,9 +50,8 @@ namespace TaoShui
                 {
                     if (IsAutoRun)
                     {
-                        LogHelper.Instance.LogInfo(GetType(), string.Format("Data Count£º{0}, Type: {1}, Time: {2}",
-                            data.Data == null ? 0 : data.Data.Length, data.Type,
-                            data.GrabbedTime.ToString("yyyy-MM-dd HH:mm:ss:fff")));
+                        LogHelper.Instance.LogInfo(GetType(), string.Format("Data Count£º{0}, Type: {1}, Time: {2:yyyy-MM-dd HH:mm:ss:fff}",
+                            data.Data == null ? 0 : data.Data.Length, data.Type, data.GrabbedTime));
                         Console.WriteLine(JsonConvert.SerializeObject(data));
                     }
                 };

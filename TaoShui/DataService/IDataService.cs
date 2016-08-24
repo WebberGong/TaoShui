@@ -5,12 +5,20 @@ namespace TaoShui.DataService
 {
     public interface IDataService
     {
-        ObservableCollection<WebSiteSetting> GetWebSiteSettings();
+        ObservableCollection<WebSiteSetting> SelectAllWebSiteSettings();
 
-        ObservableCollection<WebSite> GetWebSites();
+        ObservableCollection<WebSite> SelectAllWebSites();
 
-        void SaveWebSiteSetting(WebSiteSetting setting);
+        bool UpdateWebSiteSetting(WebSiteSetting setting);
 
-        void SaveWebSite(WebSite site);
+        bool UpdateWebSite(WebSite site);
+
+        bool DeleteWebSiteSetting(WebSiteSetting setting);
+
+        bool DeleteWebSite(WebSite site);
+
+        bool InsertWebSiteSetting(WebSiteSetting setting);
+
+        bool InsertWebSite(WebSite site);
     }
 }

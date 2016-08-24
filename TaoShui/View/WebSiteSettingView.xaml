@@ -5,9 +5,11 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:TaoShui.ViewModel"
              mc:Ignorable="d"
              Margin="2 2 2 0"
-             d:DesignWidth="900" d:DesignHeight="600">
+             d:DesignWidth="900" d:DesignHeight="600"
+             d:DataContext="{d:DesignInstance Type=vm:WebSiteSettingViewModel}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="200" />
@@ -15,31 +17,30 @@
         </Grid.RowDefinitions>
         <DataGrid Grid.Row="0" ItemsSource="{Binding WebSiteSettings}" Margin="0 0 0 3">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="编号" Binding="{Binding Id}" Width="0.5*" IsReadOnly="True"
+                <DataGridTextColumn Header="编号" Binding="{Binding Id, Mode=TwoWay}" Width="0.5*" IsReadOnly="True"
                                     ElementStyle="{StaticResource ContentCenterStyle}" />
-                <DataGridTextColumn Header="名称" Binding="{Binding Name, UpdateSourceTrigger=LostFocus}" Width="*"
+                <DataGridTextColumn Header="名称" Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="*"
                                     ElementStyle="{StaticResource ContentCenterStyle}" />
-                <DataGridTextColumn Header="网址" Binding="{Binding Url, UpdateSourceTrigger=LostFocus}" Width="2*"
+                <DataGridTextColumn Header="网址" Binding="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="2*"
                                     ElementStyle="{StaticResource ContentCenterStyle}" />
-                <DataGridTextColumn Header="验证码长度" Binding="{Binding CaptchaLength, UpdateSourceTrigger=LostFocus}"
+                <DataGridTextColumn Header="验证码长度" Binding="{Binding CaptchaLength, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                     Width="*" ElementStyle="{StaticResource ContentCenterStyle}" />
-                <DataGridTextColumn Header="登录超时时间" Binding="{Binding LoginTimeOut, UpdateSourceTrigger=LostFocus}"
+                <DataGridTextColumn Header="登录超时时间" Binding="{Binding LoginTimeOut, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                     Width="*" ElementStyle="{StaticResource ContentCenterStyle}" />
                 <DataGridTextColumn Header="抓取数据时间间隔"
-                                    Binding="{Binding GrabDataInterval, UpdateSourceTrigger=LostFocus}" Width="*"
+                                    Binding="{Binding GrabDataInterval, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="*"
                                     ElementStyle="{StaticResource ContentCenterStyle}" />
                 <DataGridTemplateColumn
                     Width="60"
                     HeaderStyle="{StaticResource EditColumnHeaderStyle}">
                     <DataGridTemplateColumn.HeaderTemplate>
                         <DataTemplate>
-                            <TextBlock Style="{StaticResource EditColumnHeaderContentStyle}"
-                                       DataContext="{Binding}">
+                            <TextBlock Style="{StaticResource EditColumnHeaderContentStyle}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseLeftButtonDown">
                                         <i:InvokeCommandAction
-                                            Command="{Binding WebSiteSettingAddCommand}"
-                                            CommandParameter="{Binding Path=CurrentCell, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                            Command="{Binding DataContext.WebSiteSettingAddCommand, 
+                                            RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"/>
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </TextBlock>
@@ -47,21 +48,22 @@
                     </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Style="{StaticResource EditColumnCellContentStyle}"
-                                       DataContext="{Binding}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                                        <i:InvokeCommandAction
-                                            Command="{Binding WebSiteSettingRemoveCommand}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
+                            <TextBlock Style="{StaticResource EditColumnCellContentStyle}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                                            <i:InvokeCommandAction 
+                                                Command="{Binding DataContext.WebSiteSettingRemoveCommand, 
+                                                RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"
+                                                CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
                             </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
             <i:Interaction.Triggers>
-                <i:EventTrigger EventName="RowEditEnding">
+                <i:EventTrigger EventName="CellEditEnding">
                     <cmd:EventToCommand
                         Command="{Binding WebSiteSettingEditCommand, UpdateSourceTrigger=PropertyChanged}"
                         PassEventArgsToCommand="True" />
@@ -88,24 +90,25 @@
             <DataGrid Grid.Row="1" Grid.Column="1" />
             <DataGrid Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" ItemsSource="{Binding WebSites}" Margin="3 0 0 0">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="编号" Binding="{Binding Id}" Width="0.5*" IsReadOnly="True"
+                    <DataGridTextColumn Header="编号" Binding="{Binding Id, Mode=TwoWay}" Width="0.5*" IsReadOnly="True"
                                         ElementStyle="{StaticResource ContentCenterStyle}" />
-                    <DataGridTextColumn Header="名称" Binding="{Binding Setting.Name}" Width="*" IsReadOnly="True"
+                    <DataGridTextColumn Header="名称" Binding="{Binding Setting.Name, Mode=TwoWay}" Width="*" IsReadOnly="True"
                                         ElementStyle="{StaticResource ContentCenterStyle}" />
-                    <DataGridTextColumn Header="用户名" Binding="{Binding LoginName, UpdateSourceTrigger=LostFocus}"
+                    <DataGridTextColumn Header="用户名" Binding="{Binding LoginName, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                         Width="*" ElementStyle="{StaticResource ContentCenterStyle}" />
-                    <DataGridTextColumn Header="密码" Binding="{Binding Password, UpdateSourceTrigger=LostFocus}"
+                    <DataGridTextColumn Header="密码" Binding="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                         Width="*" ElementStyle="{StaticResource ContentCenterStyle}" />
                     <DataGridTemplateColumn
-                    Width="60"
-                    HeaderStyle="{StaticResource EditColumnHeaderStyle}">
+                        Width="60"
+                        HeaderStyle="{StaticResource EditColumnHeaderStyle}">
                         <DataGridTemplateColumn.HeaderTemplate>
                             <DataTemplate>
                                 <TextBlock Style="{StaticResource EditColumnHeaderContentStyle}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="MouseLeftButtonDown">
                                         <i:InvokeCommandAction
-                                            Command="{Binding}" />
+                                            Command="{Binding DataContext.WebSiteAddCommand, 
+                                            RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"/>
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                                 </TextBlock>
@@ -114,19 +117,21 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Style="{StaticResource EditColumnCellContentStyle}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                                        <i:InvokeCommandAction
-                                            Command="{Binding}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                                            <i:InvokeCommandAction 
+                                                Command="{Binding DataContext.WebSiteRemoveCommand, 
+                                                RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"
+                                                CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
                                 </TextBlock>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
                 <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="RowEditEnding">
+                    <i:EventTrigger EventName="CellEditEnding">
                         <cmd:EventToCommand Command="{Binding WebSiteEditCommand, UpdateSourceTrigger=PropertyChanged}"
                                             PassEventArgsToCommand="True" />
                     </i:EventTrigger>
