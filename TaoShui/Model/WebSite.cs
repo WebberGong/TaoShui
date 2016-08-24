@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using GalaSoft.MvvmLight;
+﻿using GalaSoft.MvvmLight;
 
 namespace TaoShui.Model
 {
@@ -8,8 +7,8 @@ namespace TaoShui.Model
         private long _id;
         private string _loginName;
         private string _password;
-        private long _settingId;
         private WebSiteSetting _setting;
+        private long _settingId;
 
         public long Id
         {

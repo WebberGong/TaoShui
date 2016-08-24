@@ -17,15 +17,11 @@ namespace Utils
             get
             {
                 if (_instance == null)
-                {
                     lock (locker)
                     {
                         if (_instance == null)
-                        {
                             _instance = new LogHelper();
-                        }
                     }
-                }
                 return _instance;
             }
         }

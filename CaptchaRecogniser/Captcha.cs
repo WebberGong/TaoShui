@@ -25,7 +25,6 @@ namespace CaptchaRecogniser
             var images = new Image[numberOfSymbols];
 
             foreach (var blob in Image.ExtractBlobs().OrderBy(si => si.Rectangle.X))
-            {
                 if (blob.Area > 30)
                 {
                     var newSymbol = new Bitmap(45, 45);
@@ -46,7 +45,6 @@ namespace CaptchaRecogniser
 
                     symbolCounter++;
                 }
-            }
 
             return images;
         }

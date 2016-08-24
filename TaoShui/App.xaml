@@ -12,7 +12,8 @@
             <locator:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:locator="clr-namespace:TaoShui" />
 
             <Style x:Key="FontAwesomeStyle" TargetType="TextBlock">
-                <Setter Property="FontFamily"  Value="pack://application:,,,/FontAwesomeWPF;component/fonts/#FontAwesome" />
+                <Setter Property="FontFamily"
+                        Value="pack://application:,,,/FontAwesomeWPF;component/fonts/#FontAwesome" />
             </Style>
             <Style x:Key="BorderButton" TargetType="Border">
                 <Setter Property="Background">
@@ -41,27 +42,26 @@
                 <Setter Property="Margin" Value="-1, -1, -1, 0" />
                 <Setter Property="Padding" Value="3" />
             </Style>
-            <Style x:Key="EditColumnHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridColumnHeaderStyle}">
-                <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
-                <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+            <Style x:Key="EditColumnHeaderStyle" TargetType="DataGridColumnHeader"
+                   BasedOn="{StaticResource DataGridColumnHeaderStyle}">
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             </Style>
             <DataTemplate x:Key="EditColumnHeaderTemplate">
                 <TextBlock Style="{StaticResource FontAwesomeStyle}"
-                    FontSize="20"
-                    Foreground="Green"
-                    Text="{x:Static ui:Fa.Plus_circle}"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-                </TextBlock>
+                           FontSize="20"
+                           Foreground="Green"
+                           Text="{x:Static ui:Fa.Plus_circle}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
             </DataTemplate>
             <DataTemplate x:Key="EditColumnCellTemplate">
                 <TextBlock Style="{StaticResource FontAwesomeStyle}"
-                    FontSize="20"
-                    Foreground="Red"
-                    Text="{x:Static ui:Fa.Remove}"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-                </TextBlock>
+                           FontSize="20"
+                           Foreground="Red"
+                           Text="{x:Static ui:Fa.Remove}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
             </DataTemplate>
             <ControlTemplate x:Key="SelectableButtonTemplate" TargetType="RadioButton">
                 <Border>
@@ -139,8 +139,7 @@
                 <Setter Property="SelectionMode" Value="Single" />
                 <Setter Property="SelectionUnit" Value="FullRow" />
             </Style>
-            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridColumnHeaderStyle}">
-            </Style>
+            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridColumnHeaderStyle}" />
             <Style TargetType="DataGridRow">
                 <Setter Property="VerticalContentAlignment" Value="Center" />
                 <Setter Property="VerticalAlignment" Value="Center" />

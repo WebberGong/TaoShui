@@ -4,12 +4,12 @@ namespace TaoShui.Model
 {
     public class WebSiteSetting : ObservableObject
     {
-        private long _id;
-        private string _name;
-        private string _url;
         private int _captchaLength;
         private int _grabDataInterval;
+        private long _id;
         private int _loginTimeOut;
+        private string _name;
+        private string _url;
 
         public long Id
         {

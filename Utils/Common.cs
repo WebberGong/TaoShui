@@ -16,10 +16,8 @@ namespace Utils
             var attributes = fieldInfo.GetCustomAttributes(
                 typeof(DescriptionAttribute), false) as DescriptionAttribute[];
 
-            if (attributes != null && attributes.Length > 0)
-            {
+            if ((attributes != null) && (attributes.Length > 0))
                 return attributes[0].Description;
-            }
             return enumName;
         }
 
@@ -28,16 +26,14 @@ namespace Utils
             var attributes = propertyInfo.GetCustomAttributes(
                 typeof(DescriptionAttribute), false) as DescriptionAttribute[];
 
-            if (attributes != null && attributes.Length > 0)
-            {
+            if ((attributes != null) && (attributes.Length > 0))
                 return attributes[0].Description;
-            }
             return propertyInfo.Name;
         }
 
         public static string GetNumericFromString(string str)
         {
-            return str.Where(c => c >= 48 && c <= 58).Aggregate(string.Empty, (current, c) => current + c);
+            return str.Where(c => (c >= 48) && (c <= 58)).Aggregate(string.Empty, (current, c) => current + c);
         }
 
         public static string InnerTextTrim(string innerText)

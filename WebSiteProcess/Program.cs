@@ -8,10 +8,7 @@ namespace WebSiteProcess
         private static void Main(string[] args)
         {
             if (args.Length == 0)
-            {
-                //args = new[] { "WebSite.MaxBet", "sfb1337952", "Aaaa2235", "4", "60", "1" };
                 args = new[] {"WebSite.BetIsn", "zb999111", "sss123456", "4", "60", "1"};
-            }
             if (args.Length != 6)
             {
                 LogHelper.Instance.LogInfo(typeof(Program), "运行出错,传递到该进程的参数不完整!");

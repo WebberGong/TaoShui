@@ -29,7 +29,7 @@ namespace WcfService
         {
             try
             {
-                if (Host == null || Host.State != CommunicationState.Opened)
+                if ((Host == null) || (Host.State != CommunicationState.Opened))
                 {
                     Host = new ServiceHost(this, new Uri(GrabDataConstants.ServiceBase));
                     Host.AddServiceEndpoint(

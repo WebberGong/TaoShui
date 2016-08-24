@@ -134,8 +134,8 @@ namespace WebSite
             _loginTimer = new Timer(200);
             _loginTimer.Elapsed += (sender, ev) =>
             {
-                if (_loginStopWatch.Elapsed > tsLoginTimeOut &&
-                    WebSiteStatus != WebSiteStatus.LoginSuccessful)
+                if ((_loginStopWatch.Elapsed > tsLoginTimeOut) &&
+                    (WebSiteStatus != WebSiteStatus.LoginSuccessful))
                 {
                     _loginStopWatch.Reset();
                     _loginTimer.Enabled = false;
@@ -144,8 +144,8 @@ namespace WebSite
                 }
                 else
                 {
-                    if (WebSiteStatus == WebSiteStatus.LoginSuccessful ||
-                        WebSiteStatus == WebSiteStatus.LoginFailed)
+                    if ((WebSiteStatus == WebSiteStatus.LoginSuccessful) ||
+                        (WebSiteStatus == WebSiteStatus.LoginFailed))
                     {
                         _loginStopWatch.Reset();
                         _loginTimer.Enabled = false;
@@ -162,7 +162,7 @@ namespace WebSite
 
         protected bool IsBrowserOk()
         {
-            return browser != null && browser.IsLive && !browser.IsCrashed && !browser.IsDisposed &&
+            return (browser != null) && browser.IsLive && !browser.IsCrashed && !browser.IsDisposed &&
                    browser.IsDocumentReady;
         }
 
@@ -216,13 +216,9 @@ namespace WebSite
                 })();";
             string data = browser.ExecuteJavascriptWithResult(js);
             if (data == Undefined)
-            {
                 return string.Empty;
-            }
             if (leaveOnlyBase64Data && data.Contains(","))
-            {
                 data = data.Substring(data.IndexOf(",", StringComparison.Ordinal) + 1);
-            }
 
             return data;
         }
@@ -262,10 +258,8 @@ namespace WebSite
             {
                 var url = e.Url.ToString();
 
-                if (ChangeLanguageRegex != null && ChangeLanguageRegex.IsMatch(url))
-                {
+                if ((ChangeLanguageRegex != null) && ChangeLanguageRegex.IsMatch(url))
                     ChangeLanguage();
-                }
             }
         }
 
@@ -275,7 +269,7 @@ namespace WebSite
             {
                 var url = e.Url.ToString();
 
-                if (LoginPageRegex != null && LoginPageRegex.IsMatch(url))
+                if ((LoginPageRegex != null) && LoginPageRegex.IsMatch(url))
                 {
                     WebSiteStatus = WebSiteStatus.Logging;
                     _loginStopWatch.Reset();
@@ -294,11 +288,9 @@ namespace WebSite
             {
                 var url = e.Url.ToString();
 
-                if (IsCaptchaInputPageReady() && CaptchaInputPageRegex != null &&
+                if (IsCaptchaInputPageReady() && (CaptchaInputPageRegex != null) &&
                     CaptchaInputPageRegex.IsMatch(url))
-                {
                     DoCaptchaValidate();
-                }
             }
         }
 
@@ -308,7 +300,7 @@ namespace WebSite
             {
                 var url = e.Url.ToString();
 
-                if (MainPageRegex != null && MainPageRegex.IsMatch(url))
+                if ((MainPageRegex != null) && MainPageRegex.IsMatch(url))
                 {
                     WebSiteStatus = WebSiteStatus.LoginSuccessful;
                     _loginStopWatch.Reset();
@@ -323,8 +315,7 @@ namespace WebSite
         private void DoGrabData()
         {
             while (true)
-            {
-                if (IsBrowserOk() && _webSiteStatus == WebSiteStatus.LoginSuccessful)
+                if (IsBrowserOk() && (_webSiteStatus == WebSiteStatus.LoginSuccessful))
                 {
                     loginAttemptCount = 0;
 
@@ -358,7 +349,6 @@ namespace WebSite
                         Run();
                     }
                 }
-            }
             // ReSharper disable once FunctionNeverReturns
         }
 
@@ -368,9 +358,7 @@ namespace WebSite
 
             var handler = WebSiteStatusChanged;
             if (handler != null)
-            {
                 handler(sender, status);
-            }
         }
     }
 }

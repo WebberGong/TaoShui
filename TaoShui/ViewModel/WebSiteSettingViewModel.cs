@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
-using AutoMapper;
-using AutoMapper.Configuration;
-using AutoMapper.Configuration.Conventions;
-using AutoMapper.Mappers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using Repository.Dto;
 using TaoShui.DataService;
 using TaoShui.Model;
 
@@ -26,11 +20,10 @@ namespace TaoShui.ViewModel
             WebSiteSettings = dataService.GetWebSiteSettings();
             WebSites = dataService.GetWebSites();
             foreach (var site in WebSites)
-            {
                 site.Setting = WebSiteSettings.FirstOrDefault(x => x.Id == site.SettingId);
-            }
 
-            WebSiteSettingEditCommand = new RelayCommand<DataGridRowEditEndingEventArgs>(ExecuteWebSiteSettingEditCommand);
+            WebSiteSettingEditCommand =
+                new RelayCommand<DataGridRowEditEndingEventArgs>(ExecuteWebSiteSettingEditCommand);
             WebSiteEditCommand = new RelayCommand<DataGridRowEditEndingEventArgs>(ExecuteWebSiteEditCommand);
         }
 
@@ -40,7 +33,7 @@ namespace TaoShui.ViewModel
 
         public ICommand WebSiteSettingEditCommand { get; private set; }
 
-        public ICommand WebSiteEditCommand { get; private set; }  
+        public ICommand WebSiteEditCommand { get; private set; }
 
         private void ExecuteWebSiteSettingEditCommand(DataGridRowEditEndingEventArgs e)
         {
@@ -48,16 +41,13 @@ namespace TaoShui.ViewModel
             {
                 var setting = e.Row.Item as WebSiteSetting;
                 _dataService.SaveWebSiteSetting(setting);
-
             }
         }
 
         private void ExecuteWebSiteEditCommand(DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
-            {
                 _dataService.SaveWebSite(e.Row.Item as WebSite);
-            }
         }
     }
 }

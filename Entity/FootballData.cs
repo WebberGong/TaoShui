@@ -34,9 +34,7 @@ namespace Entity
         public static string GetEmptyObjectJsonString()
         {
             if (string.IsNullOrEmpty(_emptyObjectJsonString))
-            {
                 _emptyObjectJsonString = JsonConvert.SerializeObject(new FootballData());
-            }
             return _emptyObjectJsonString;
         }
     }

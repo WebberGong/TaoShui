@@ -23,7 +23,6 @@ namespace WcfService
             get
             {
                 if (_myServiceFactory.State != CommunicationState.Opened)
-                {
                     try
                     {
                         LogHelper.Instance.LogError(GetType(), "抓取数据客户端已关闭,正在重连...");
@@ -33,7 +32,6 @@ namespace WcfService
                     {
                         LogHelper.Instance.LogError(GetType(), "重连抓取数据客户端异常!", ex);
                     }
-                }
                 return _channel;
             }
         }

@@ -1,15 +1,8 @@
-﻿
-
-
-
-
-
-namespace FontAwesomeWPF
+﻿namespace FontAwesomeWPF
 {
-
     public static class Fa
     {
-		public static string _500px = "\uf26e";
+        public static string _500px = "\uf26e";
         public static string Adjust = "\uf042";
         public static string Adn = "\uf170";
         public static string Align_center = "\uf037";
@@ -683,9 +676,5 @@ namespace FontAwesomeWPF
         public static string Youtube = "\uf167";
         public static string Youtube_play = "\uf16a";
         public static string Youtube_square = "\uf166";
-        	}
-        
-        	
+    }
 }
-        
-        

@@ -5,11 +5,11 @@ namespace TaoShui.ViewModel
 {
     public class WebSiteViewModel : ViewModelBase
     {
+        private string _name = "WebSite";
+
         public WebSiteViewModel(IDataService dataService)
         {
         }
-
-        private string _name = "WebSite";
 
         public string Name
         {

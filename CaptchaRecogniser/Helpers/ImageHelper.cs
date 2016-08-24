@@ -185,7 +185,6 @@ namespace CaptchaRecogniser.Helpers
             int[] apetureMinY = {-(coreSize/2), -(coreSize/2), 0, 0};
             int[] apetureMaxY = {0, 0, coreSize/2, coreSize/2};
             for (var x = 0; x < newBitmap.Width; ++x)
-            {
                 for (var y = 0; y < newBitmap.Height; ++y)
                 {
                     int[] rValues = {0, 0, 0, 0};
@@ -199,60 +198,44 @@ namespace CaptchaRecogniser.Helpers
                     int[] minGValue = {255, 255, 255, 255};
                     int[] minBValue = {255, 255, 255, 255};
                     for (var i = 0; i < 4; ++i)
-                    {
                         for (var x2 = apetureMinX[i]; x2 < apetureMaxX[i]; ++x2)
                         {
                             var tempX = x + x2;
-                            if (tempX >= 0 && tempX < newBitmap.Width)
-                            {
+                            if ((tempX >= 0) && (tempX < newBitmap.Width))
                                 for (var y2 = apetureMinY[i]; y2 < apetureMaxY[i]; ++y2)
                                 {
                                     var tempY = y + y2;
-                                    if (tempY >= 0 && tempY < newBitmap.Height)
+                                    if ((tempY >= 0) && (tempY < newBitmap.Height))
                                     {
                                         var tempColor = tempBitmap.GetPixel(tempX, tempY);
                                         rValues[i] += tempColor.R;
                                         gValues[i] += tempColor.G;
                                         bValues[i] += tempColor.B;
                                         if (tempColor.R > maxRValue[i])
-                                        {
                                             maxRValue[i] = tempColor.R;
-                                        }
                                         else if (tempColor.R < minRValue[i])
-                                        {
                                             minRValue[i] = tempColor.R;
-                                        }
 
                                         if (tempColor.G > maxGValue[i])
-                                        {
                                             maxGValue[i] = tempColor.G;
-                                        }
                                         else if (tempColor.G < minGValue[i])
-                                        {
                                             minGValue[i] = tempColor.G;
-                                        }
 
                                         if (tempColor.B > maxBValue[i])
-                                        {
                                             maxBValue[i] = tempColor.B;
-                                        }
                                         else if (tempColor.B < minBValue[i])
-                                        {
                                             minBValue[i] = tempColor.B;
-                                        }
                                         ++numPixels[i];
                                     }
                                 }
-                            }
                         }
-                    }
                     var j = 0;
                     var minDifference = 10000;
                     for (var i = 0; i < 4; ++i)
                     {
                         var currentDifference = maxRValue[i] - minRValue[i] + (maxGValue[i] - minGValue[i]) +
                                                 (maxBValue[i] - minBValue[i]);
-                        if (currentDifference < minDifference && numPixels[i] > 0)
+                        if ((currentDifference < minDifference) && (numPixels[i] > 0))
                         {
                             j = i;
                             minDifference = currentDifference;
@@ -264,7 +247,6 @@ namespace CaptchaRecogniser.Helpers
                         bValues[j]/numPixels[j]);
                     newBitmap.SetPixel(x, y, meanPixel);
                 }
-            }
             return newBitmap;
         }
     }

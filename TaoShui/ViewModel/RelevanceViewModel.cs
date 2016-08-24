@@ -5,11 +5,11 @@ namespace TaoShui.ViewModel
 {
     public class RelevanceViewModel : ViewModelBase
     {
+        private string _name = "Relevance";
+
         public RelevanceViewModel(IDataService dataService)
         {
         }
-
-        private string _name = "Relevance";
 
         public string Name
         {

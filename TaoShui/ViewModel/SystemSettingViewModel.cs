@@ -5,12 +5,11 @@ namespace TaoShui.ViewModel
 {
     public class SystemSettingViewModel : ViewModelBase
     {
+        private string _name = "SystemSetting";
 
         public SystemSettingViewModel(IDataService dataService)
         {
         }
-
-        private string _name = "SystemSetting";
 
         public string Name
         {

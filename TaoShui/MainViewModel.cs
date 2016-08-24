@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
@@ -19,13 +18,16 @@ namespace TaoShui
 {
     public class MainViewModel : ViewModelBase
     {
+        private readonly MatchViewModel _matchViewModel = ServiceLocator.Current.GetInstance<MatchViewModel>();
         private readonly double _minHeight = SystemParameters.PrimaryScreenHeight/5*4;
         private readonly double _minWidth = SystemParameters.PrimaryScreenWidth/5*4;
         private readonly Thread _receiveGrabbedDataThread;
+
+        private readonly RelevanceViewModel _relevanceViewModel =
+            ServiceLocator.Current.GetInstance<RelevanceViewModel>();
+
         private readonly SettingViewModel _settingViewModel = ServiceLocator.Current.GetInstance<SettingViewModel>();
         private readonly WebSiteViewModel _webSiteViewModel = ServiceLocator.Current.GetInstance<WebSiteViewModel>();
-        private readonly MatchViewModel _matchViewModel = ServiceLocator.Current.GetInstance<MatchViewModel>();
-        private readonly RelevanceViewModel _relevanceViewModel = ServiceLocator.Current.GetInstance<RelevanceViewModel>();
         private ViewModelBase _currentViewModel;
         private bool _isAutoBet;
         private bool _isAutoRun;
@@ -157,7 +159,6 @@ namespace TaoShui
         private void ExecuteAutoRunCommand(bool isChecked)
         {
             if (isChecked)
-            {
                 if ((_receiveGrabbedDataThread.ThreadState & ThreadState.Unstarted) == ThreadState.Unstarted)
                 {
                     _receiveGrabbedDataThread.Start();
@@ -165,7 +166,6 @@ namespace TaoShui
                     StartProcess("WebSite.Pinnacle", "hh7d1hi061", "ss123456@", 4, 60, 1);
                     StartProcess("WebSite.BetIsn", "zb999111", "sss123456", 4, 60, 1);
                 }
-            }
         }
 
         private void StartProcess(string webSiteType, string loginName, string loginPassword,
@@ -188,13 +188,11 @@ namespace TaoShui
         {
             var processes = Process.GetProcessesByName("WebSiteProcess");
             foreach (var p in processes)
-            {
                 if (Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WebSiteProcess.exe") == p.MainModule.FileName)
                 {
                     p.Kill();
                     p.Close();
                 }
-            }
         }
     }
 }

@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Entity.Validation;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using AutoMapper;
+using Newtonsoft.Json;
 using Repository;
 using Repository.Dto;
 using TaoShui.Model;
-using Newtonsoft.Json;
 
 namespace TaoShui.DataService
 {
@@ -58,17 +57,21 @@ namespace TaoShui.DataService
                 var dto = context.WebSiteSettings.FirstOrDefault(x => x.Id == setting.Id);
                 if (dto != null)
                 {
-                    string serialized = JsonConvert.SerializeObject(dto);
+                    var serialized = JsonConvert.SerializeObject(dto);
                     _mapper.Map(setting, dto);
                     var errors = context.GetValidationErrors();
-                    if (errors.Count() > 0)
+                    var results = errors as IList<DbEntityValidationResult> ?? errors.ToList();
+                    var errorMsgs = GetValidationErrors(results);
+                    if (string.IsNullOrEmpty(errorMsgs))
                     {
-                        var obj = JsonConvert.DeserializeObject(serialized, typeof(WebSiteSettingDto)) as WebSiteSettingDto;
-                        _mapper.Map(obj, setting);
+                        context.SaveChanges();
                     }
                     else
                     {
-                        context.SaveChanges();
+                        MessageBox.Show(errorMsgs);
+                        var obj =
+                            JsonConvert.DeserializeObject(serialized, typeof(WebSiteSettingDto)) as WebSiteSettingDto;
+                        _mapper.Map(obj, setting);
                     }
                 }
             }
@@ -81,20 +84,34 @@ namespace TaoShui.DataService
                 var dto = context.WebSites.FirstOrDefault(x => x.Id == site.Id);
                 if (dto != null)
                 {
-                    string serialized = JsonConvert.SerializeObject(dto);
+                    var serialized = JsonConvert.SerializeObject(dto);
                     _mapper.Map(site, dto);
                     var errors = context.GetValidationErrors();
-                    if (errors.Count() > 0)
-                    {
-                        var obj = JsonConvert.DeserializeObject(serialized, typeof(WebSiteDto)) as WebSiteDto;
-                        _mapper.Map(obj, site);
-                    }
-                    else
+                    var results = errors as IList<DbEntityValidationResult> ?? errors.ToList();
+                    var errorMsgs = GetValidationErrors(results);
+                    if (string.IsNullOrEmpty(errorMsgs))
                     {
                         context.SaveChanges();
                     }
+                    else
+                    {
+                        MessageBox.Show(errorMsgs);
+                        var obj = JsonConvert.DeserializeObject(serialized, typeof(WebSiteDto)) as WebSiteDto;
+                        _mapper.Map(obj, site);
+                    }
                 }
             }
+        }
+
+        private string GetValidationErrors(IList<DbEntityValidationResult> results)
+        {
+            var errorMsg = string.Empty;
+            if (results.Any())
+                foreach (var result in results)
+                    if (!result.IsValid)
+                        foreach (var error in result.ValidationErrors)
+                            errorMsg += error.ErrorMessage;
+            return errorMsg;
         }
     }
 }

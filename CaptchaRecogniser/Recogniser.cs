@@ -30,9 +30,7 @@ namespace CaptchaRecogniser
             var allCaptchaType = Enum.GetValues(typeof(EnumCaptchaType));
             _defaultCaptchaTypeSet = new HashSet<EnumCaptchaType>();
             foreach (var captchaType in allCaptchaType)
-            {
                 _defaultCaptchaTypeSet.Add((EnumCaptchaType) captchaType);
-            }
         }
 
         public static Recogniser Instance
@@ -40,15 +38,11 @@ namespace CaptchaRecogniser
             get
             {
                 if (_instance == null)
-                {
                     lock (locker)
                     {
                         if (_instance == null)
-                        {
                             _instance = new Recogniser();
-                        }
                     }
-                }
                 return _instance;
             }
         }
@@ -88,12 +82,10 @@ namespace CaptchaRecogniser
                 {
                     var stream = response.GetResponseStream();
                     if (stream != null)
-                    {
                         using (var bitMap = Image.FromStream(stream) as Bitmap)
                         {
                             return Recognize(bitMap, maxLength, binarizeCount, captchaTypeSet);
                         }
-                    }
                 }
             }
             return string.Empty;
@@ -104,21 +96,15 @@ namespace CaptchaRecogniser
         {
             var captha = new Captcha(bitMap);
             for (var i = 0; i < binarizeCount; i++)
-            {
                 captha.Binarize(200);
-            }
             var image = captha.Image as Bitmap;
 
             var validValueListBuilder = new StringBuilder();
 
-            if (captchaTypeSet == null || captchaTypeSet.Count < 1)
-            {
+            if ((captchaTypeSet == null) || (captchaTypeSet.Count < 1))
                 captchaTypeSet = _defaultCaptchaTypeSet;
-            }
             foreach (var captchaType in captchaTypeSet)
-            {
                 validValueListBuilder.Append(Common.GetDescriptionAttribute(captchaType));
-            }
 
             string plainText;
             lock (_ocr)
@@ -134,7 +120,7 @@ namespace CaptchaRecogniser
                 var enumerator = matches.GetEnumerator();
                 var filteredBuilder = new StringBuilder();
                 var count = 0;
-                while (enumerator.MoveNext() && count < maxLength)
+                while (enumerator.MoveNext() && (count < maxLength))
                 {
                     filteredBuilder.Append(enumerator.Current.ToString().ToCharArray());
                     count++;

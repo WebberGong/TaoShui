@@ -5,11 +5,11 @@ namespace TaoShui.ViewModel
 {
     public class MatchViewModel : ViewModelBase
     {
+        private string _name = "Match";
+
         public MatchViewModel(IDataService dataService)
         {
         }
-
-        private string _name = "Match";
 
         public string Name
         {

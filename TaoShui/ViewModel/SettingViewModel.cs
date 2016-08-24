@@ -8,8 +8,12 @@ namespace TaoShui.ViewModel
 {
     public class SettingViewModel : ViewModelBase
     {
-        private readonly SystemSettingViewModel _systemSettingViewModel = ServiceLocator.Current.GetInstance<SystemSettingViewModel>();
-        private readonly WebSiteSettingViewModel _webSiteSettingViewModel = ServiceLocator.Current.GetInstance<WebSiteSettingViewModel>();
+        private readonly SystemSettingViewModel _systemSettingViewModel =
+            ServiceLocator.Current.GetInstance<SystemSettingViewModel>();
+
+        private readonly WebSiteSettingViewModel _webSiteSettingViewModel =
+            ServiceLocator.Current.GetInstance<WebSiteSettingViewModel>();
+
         private ViewModelBase _currentViewModel;
         private bool _isSystemSettingChecked;
         private bool _isWebSiteSettingChecked = true;

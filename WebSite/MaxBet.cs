@@ -65,9 +65,7 @@ namespace WebSite
         ~MaxBet()
         {
             if (Recogniser.Instance != null)
-            {
                 Recogniser.Instance.Dispose();
-            }
         }
 
         protected override void ChangeLanguage()
