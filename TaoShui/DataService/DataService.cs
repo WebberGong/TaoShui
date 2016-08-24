@@ -53,9 +53,7 @@ namespace TaoShui.DataService
         public bool UpdateWebSiteSetting(WebSiteSetting setting)
         {
             if (setting == null)
-            {
                 return false;
-            }
             using (var context = new DatabaseContext())
             {
                 var dto = context.WebSiteSettings.FirstOrDefault(x => x.Id == setting.Id);
@@ -71,14 +69,11 @@ namespace TaoShui.DataService
                         context.SaveChanges();
                         return true;
                     }
-                    else
-                    {
-                        MessageBox.Show(errorMsgs);
-                        var obj =
-                            JsonConvert.DeserializeObject(serialized, typeof(WebSiteSettingDto)) as WebSiteSettingDto;
-                        _mapper.Map(obj, setting);
-                        return false;
-                    }
+                    MessageBox.Show(errorMsgs);
+                    var obj =
+                        JsonConvert.DeserializeObject(serialized, typeof(WebSiteSettingDto)) as WebSiteSettingDto;
+                    _mapper.Map(obj, setting);
+                    return false;
                 }
                 return false;
             }
@@ -87,9 +82,7 @@ namespace TaoShui.DataService
         public bool UpdateWebSite(WebSite site)
         {
             if (site == null)
-            {
                 return false;
-            }
             using (var context = new DatabaseContext())
             {
                 var dto = context.WebSites.FirstOrDefault(x => x.Id == site.Id);
@@ -105,13 +98,10 @@ namespace TaoShui.DataService
                         context.SaveChanges();
                         return true;
                     }
-                    else
-                    {
-                        MessageBox.Show(errorMsgs);
-                        var obj = JsonConvert.DeserializeObject(serialized, typeof(WebSiteDto)) as WebSiteDto;
-                        _mapper.Map(obj, site);
-                        return false;
-                    }
+                    MessageBox.Show(errorMsgs);
+                    var obj = JsonConvert.DeserializeObject(serialized, typeof(WebSiteDto)) as WebSiteDto;
+                    _mapper.Map(obj, site);
+                    return false;
                 }
                 return false;
             }
@@ -120,9 +110,7 @@ namespace TaoShui.DataService
         public bool DeleteWebSiteSetting(WebSiteSetting setting)
         {
             if (setting == null)
-            {
                 return false;
-            }
             using (var context = new DatabaseContext())
             {
                 var dto = context.WebSiteSettings.FirstOrDefault(x => x.Id == setting.Id);
@@ -140,9 +128,7 @@ namespace TaoShui.DataService
         public bool DeleteWebSite(WebSite site)
         {
             if (site == null)
-            {
                 return false;
-            }
             using (var context = new DatabaseContext())
             {
                 var dto = context.WebSites.FirstOrDefault(x => x.Id == site.Id);
@@ -159,9 +145,7 @@ namespace TaoShui.DataService
         public bool InsertWebSiteSetting(WebSiteSetting setting)
         {
             if (setting == null)
-            {
                 return false;
-            }
             using (var context = new DatabaseContext())
             {
                 var dto = _mapper.Map<WebSiteSettingDto>(setting);
@@ -174,20 +158,15 @@ namespace TaoShui.DataService
                     context.SaveChanges();
                     return true;
                 }
-                else
-                {
-                    MessageBox.Show(errorMsgs);
-                    return false;
-                }
+                MessageBox.Show(errorMsgs);
+                return false;
             }
         }
 
         public bool InsertWebSite(WebSite site)
         {
             if (site == null)
-            {
                 return false;
-            }
             using (var context = new DatabaseContext())
             {
                 var dto = _mapper.Map<WebSiteDto>(site);
@@ -200,11 +179,8 @@ namespace TaoShui.DataService
                     context.SaveChanges();
                     return true;
                 }
-                else
-                {
-                    MessageBox.Show(errorMsgs);
-                    return false;
-                }
+                MessageBox.Show(errorMsgs);
+                return false;
             }
         }
 
