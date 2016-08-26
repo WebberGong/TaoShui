@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using FontAwesome.Sharp;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Practices.ServiceLocation;
@@ -21,6 +23,7 @@ namespace TaoShui
         private readonly MatchViewModel _matchViewModel = ServiceLocator.Current.GetInstance<MatchViewModel>();
         private readonly double _minHeight = SystemParameters.PrimaryScreenHeight/5*4;
         private readonly double _minWidth = SystemParameters.PrimaryScreenWidth/5*4;
+        private readonly ImageSource _icon = IconChar.Bolt.ToImageSource(new SolidColorBrush(Colors.Gold), 100);
         private readonly Thread _receiveGrabbedDataThread;
 
         private readonly RelevanceViewModel _relevanceViewModel =
@@ -125,6 +128,11 @@ namespace TaoShui
         public double MinHeight
         {
             get { return _minHeight; }
+        }
+
+        public ImageSource Icon
+        {
+            get { return _icon; }
         }
 
         private void ExecuteClosedCommand()

@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="TaoShui.Shared.InputItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d"
+             x:Name="Root" x:FieldModifier="private">
+    <UserControl.Resources>
+        <DataTemplate x:Key="TextBoxDataTemplate">
+            <TextBox Grid.Column="1" Margin="5" DataContext="{Binding ElementName=Root}" 
+                     Text="{Binding Value, Mode=TwoWay}" VerticalContentAlignment="Center"></TextBox>
+        </DataTemplate>
+        <DataTemplate x:Key="ComboBoxDataTemplate">
+            <ComboBox DataContext="{Binding ElementName=Root}" 
+                      ItemsSource="{Binding Value, Mode=OneWay}" Margin="5" 
+                      SelectedItem="{Binding Selected, Mode=TwoWay}" 
+                      VerticalContentAlignment="Center"
+                      SelectedValuePath="Id" DisplayMemberPath="Name">
+            </ComboBox>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="40" MinWidth="300">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30*"></ColumnDefinition>
+            <ColumnDefinition Width="70*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10" DataContext="{Binding ElementName=Root}" Text="{Binding Text, Mode=OneWay}"></TextBlock>
+        <ContentControl Grid.Column="1" DataContext="{Binding ElementName=Root}" ContentTemplate="{Binding ValueTemplate, Mode=OneWay}">
+        </ContentControl>
+    </Grid>
+</UserControl>
+
+
+

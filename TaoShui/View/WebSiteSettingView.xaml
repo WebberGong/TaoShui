@@ -7,7 +7,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:TaoShui.ViewModel"
              mc:Ignorable="d"
-             Margin="2 2 2 0"
              d:DesignWidth="900" d:DesignHeight="600"
              d:DataContext="{d:DesignInstance Type=vm:WebSiteSettingViewModel}">
     <Grid>
@@ -19,7 +18,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="编号" Binding="{Binding Id, Mode=TwoWay}" Width="0.5*" IsReadOnly="True"
                                     ElementStyle="{StaticResource ContentCenterStyle}" />
-                <DataGridTextColumn Header="名称" Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                <DataGridTextColumn Header="网站名" Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                     Width="*"
                                     ElementStyle="{StaticResource ContentCenterStyle}" />
                 <DataGridTextColumn Header="网址" Binding="{Binding Url, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
@@ -97,7 +96,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="编号" Binding="{Binding Id, Mode=TwoWay}" Width="0.5*" IsReadOnly="True"
                                         ElementStyle="{StaticResource ContentCenterStyle}" />
-                    <DataGridTextColumn Header="名称" Binding="{Binding Setting.Name, Mode=TwoWay}" Width="*"
+                    <DataGridTextColumn Header="网站名" Binding="{Binding Setting.Name, Mode=TwoWay}" Width="*"
                                         IsReadOnly="True"
                                         ElementStyle="{StaticResource ContentCenterStyle}" />
                     <DataGridTextColumn Header="用户名"

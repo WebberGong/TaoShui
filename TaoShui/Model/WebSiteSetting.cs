@@ -1,8 +1,9 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System.ComponentModel;
+using GalaSoft.MvvmLight;
 
 namespace TaoShui.Model
 {
-    public class WebSiteSetting : ObservableObject
+    public class WebSiteSetting : ObservableObject, IModelBase
     {
         private int _captchaLength;
         private int _grabDataInterval;
@@ -24,6 +25,7 @@ namespace TaoShui.Model
             }
         }
 
+        [DisplayName(@"网站名")]
         public string Name
         {
             get { return _name; }
@@ -37,6 +39,7 @@ namespace TaoShui.Model
             }
         }
 
+        [DisplayName(@"网址")]
         public string Url
         {
             get { return _url; }
@@ -50,6 +53,7 @@ namespace TaoShui.Model
             }
         }
 
+        [DisplayName(@"验证码长度")]
         public int CaptchaLength
         {
             get { return _captchaLength; }
@@ -63,6 +67,7 @@ namespace TaoShui.Model
             }
         }
 
+        [DisplayName(@"登录超时时间")]
         public int LoginTimeOut
         {
             get { return _loginTimeOut; }
@@ -76,6 +81,7 @@ namespace TaoShui.Model
             }
         }
 
+        [DisplayName(@"抓取数据时间间隔")]
         public int GrabDataInterval
         {
             get { return _grabDataInterval; }

@@ -1,14 +1,28 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
+using GalaSoft.MvvmLight;
 
 namespace TaoShui.Model
 {
-    public class WebSite : ObservableObject
+    public class WebSite : ObservableObject, IModelBase
     {
         private long _id;
         private string _loginName;
         private string _password;
-        private WebSiteSetting _setting;
         private long _settingId;
+        private string _name;
+        private WebSiteSetting _setting;
+        private ObservableCollection<WebSiteSetting> _settings;
+
+        public WebSite()
+        {       
+        }
+
+        public WebSite(ObservableCollection<WebSiteSetting> settings)
+        {
+            _settings = settings;
+        }
 
         public long Id
         {
@@ -23,6 +37,35 @@ namespace TaoShui.Model
             }
         }
 
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        [DisplayName(@"网站名")]
+        [ForeignKey("Setting")]
+        public ObservableCollection<WebSiteSetting> Settings
+        {
+            get { return _settings; }
+            set
+            {
+                if (_settings != value)
+                {
+                    _settings = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        [DisplayName(@"用户名")]
         public string LoginName
         {
             get { return _loginName; }
@@ -36,6 +79,7 @@ namespace TaoShui.Model
             }
         }
 
+        [DisplayName(@"密码")]
         public string Password
         {
             get { return _password; }
@@ -60,6 +104,7 @@ namespace TaoShui.Model
                     RaisePropertyChanged();
                 }
             }
+
         }
 
         public WebSiteSetting Setting
@@ -70,6 +115,8 @@ namespace TaoShui.Model
                 if (_setting != value)
                 {
                     _setting = value;
+                    SettingId = _setting.Id;
+                    Name = _setting.Name;
                     RaisePropertyChanged();
                 }
             }

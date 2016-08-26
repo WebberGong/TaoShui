@@ -13,7 +13,8 @@
     MinWidth="{Binding MinWidth, Mode=OneWay}" MinHeight="{Binding MinHeight, Mode=OneWay}"
     ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen" WindowState="Maximized"
     DataContext="{Binding Main, Source={StaticResource Locator}}"
-    Background="PowderBlue">
+    Background="PowderBlue"
+    Icon="{Binding Icon, Mode=OneWay}">
     <Window.Resources>
         <ControlTemplate x:Key="MainMenuTemplate" TargetType="RadioButton">
             <Border>

@@ -84,6 +84,7 @@
   <ItemGroup>
     <Compile Include="CreateTablesIfNotExists.cs" />
     <Compile Include="DatabaseContext.cs" />
+    <Compile Include="DbEntitySaveResult.cs" />
     <Compile Include="Dto\WebSiteDto.cs" />
     <Compile Include="Dto\WebSiteSettingDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

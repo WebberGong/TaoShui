@@ -28,6 +28,8 @@ namespace TaoShui.DataService
             _mapper = mapperConfig.CreateMapper();
         }
 
+        #region WebSiteSetting
+
         public ObservableCollection<WebSiteSetting> SelectAllWebSiteSettings()
         {
             using (var context = new DatabaseContext())
@@ -35,17 +37,6 @@ namespace TaoShui.DataService
                 var list = context.WebSiteSettings.ToList();
                 var results = new ObservableCollection<WebSiteSetting>();
                 list.ForEach(x => results.Add(_mapper.Map<WebSiteSettingDto, WebSiteSetting>(x)));
-                return results;
-            }
-        }
-
-        public ObservableCollection<WebSite> SelectAllWebSites()
-        {
-            using (var context = new DatabaseContext())
-            {
-                var list = context.WebSites.ToList();
-                var results = new ObservableCollection<WebSite>();
-                list.ForEach(x => results.Add(_mapper.Map<WebSiteDto, WebSite>(x)));
                 return results;
             }
         }
@@ -79,34 +70,6 @@ namespace TaoShui.DataService
             }
         }
 
-        public bool UpdateWebSite(WebSite site)
-        {
-            if (site == null)
-                return false;
-            using (var context = new DatabaseContext())
-            {
-                var dto = context.WebSites.FirstOrDefault(x => x.Id == site.Id);
-                if (dto != null)
-                {
-                    var serialized = JsonConvert.SerializeObject(dto);
-                    _mapper.Map(site, dto);
-                    var errors = context.GetValidationErrors();
-                    var results = errors as IList<DbEntityValidationResult> ?? errors.ToList();
-                    var errorMsgs = GetValidationErrors(results);
-                    if (string.IsNullOrEmpty(errorMsgs))
-                    {
-                        context.SaveChanges();
-                        return true;
-                    }
-                    MessageBox.Show(errorMsgs);
-                    var obj = JsonConvert.DeserializeObject(serialized, typeof(WebSiteDto)) as WebSiteDto;
-                    _mapper.Map(obj, site);
-                    return false;
-                }
-                return false;
-            }
-        }
-
         public bool DeleteWebSiteSetting(WebSiteSetting setting)
         {
             if (setting == null)
@@ -118,23 +81,6 @@ namespace TaoShui.DataService
                 {
                     context.WebSiteSettings.Remove(dto);
                     context.WebSites.RemoveRange(context.WebSites.Where(x => x.SettingId == dto.Id));
-                    context.SaveChanges();
-                    return true;
-                }
-                return false;
-            }
-        }
-
-        public bool DeleteWebSite(WebSite site)
-        {
-            if (site == null)
-                return false;
-            using (var context = new DatabaseContext())
-            {
-                var dto = context.WebSites.FirstOrDefault(x => x.Id == site.Id);
-                if (dto != null)
-                {
-                    context.WebSites.Remove(dto);
                     context.SaveChanges();
                     return true;
                 }
@@ -163,6 +109,66 @@ namespace TaoShui.DataService
             }
         }
 
+        #endregion
+
+        #region WebSite
+
+        public ObservableCollection<WebSite> SelectAllWebSites()
+        {
+            using (var context = new DatabaseContext())
+            {
+                var list = context.WebSites.ToList();
+                var results = new ObservableCollection<WebSite>();
+                list.ForEach(x => results.Add(_mapper.Map<WebSiteDto, WebSite>(x)));
+                return results;
+            }
+        }
+
+        public bool UpdateWebSite(WebSite site)
+        {
+            if (site == null)
+                return false;
+            using (var context = new DatabaseContext())
+            {
+                var dto = context.WebSites.FirstOrDefault(x => x.Id == site.Id);
+                if (dto != null)
+                {
+                    var serialized = JsonConvert.SerializeObject(dto);
+                    _mapper.Map(site, dto);
+                    var errors = context.GetValidationErrors();
+                    var results = errors as IList<DbEntityValidationResult> ?? errors.ToList();
+                    var errorMsgs = GetValidationErrors(results);
+                    if (string.IsNullOrEmpty(errorMsgs))
+                    {
+                        context.SaveChanges();
+                        return true;
+                    }
+                    MessageBox.Show(errorMsgs);
+                    var obj = JsonConvert.DeserializeObject(serialized, typeof(WebSiteDto)) as WebSiteDto;
+                    _mapper.Map(obj, site);
+                    return false;
+                }
+                return false;
+            }
+        }
+
+        public bool DeleteWebSite(WebSite site)
+        {
+            if (site == null)
+                return false;
+            using (var context = new DatabaseContext())
+            {
+                var dto = context.WebSites.FirstOrDefault(x => x.Id == site.Id);
+                if (dto != null)
+                {
+                    context.WebSites.Remove(dto);
+                    context.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+        }
+
         public bool InsertWebSite(WebSite site)
         {
             if (site == null)
@@ -184,6 +190,10 @@ namespace TaoShui.DataService
             }
         }
 
+        #endregion
+
+        #region Function
+
         private string GetValidationErrors(IList<DbEntityValidationResult> results)
         {
             var errorMsg = string.Empty;
@@ -194,5 +204,7 @@ namespace TaoShui.DataService
                             errorMsg += error.ErrorMessage;
             return errorMsg;
         }
+
+        #endregion
     }
 }

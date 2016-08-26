@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
-             Margin="2 2 2 0"
              d:DesignWidth="900" d:DesignHeight="600">
     <Grid>
         <TextBlock Text="{Binding Name}" Width="Auto" Height="Auto" FontSize="48" HorizontalAlignment="Center"

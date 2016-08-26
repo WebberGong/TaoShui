@@ -6,6 +6,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using TaoShui.DataService;
 using TaoShui.Model;
+using TaoShui.Shared;
 
 namespace TaoShui.ViewModel
 {
@@ -49,6 +50,8 @@ namespace TaoShui.ViewModel
 
         private void ExecuteWebSiteSettingAddCommand()
         {
+            var setting = new WebSiteSetting();
+            new NewEntityWindow<WebSiteSetting>(setting).ShowDialog();
         }
 
         private void ExecuteWebSiteSettingEditCommand(DataGridCellEditEndingEventArgs e)
@@ -71,6 +74,8 @@ namespace TaoShui.ViewModel
 
         private void ExecuteWebSiteAddCommand()
         {
+            var site = new WebSite(WebSiteSettings);
+            new NewEntityWindow<WebSite>(site).ShowDialog();
         }
 
         private void ExecuteWebSiteEditCommand(DataGridCellEditEndingEventArgs e)

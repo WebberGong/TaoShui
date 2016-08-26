@@ -120,8 +120,13 @@
     </ApplicationDefinition>
     <Compile Include="DataService\DataService.cs" />
     <Compile Include="DataService\IDataService.cs" />
+    <Compile Include="Model\IModelBase.cs" />
     <Compile Include="Model\WebSite.cs" />
     <Compile Include="Model\WebSiteSetting.cs" />
+    <Compile Include="Shared\InputItem.xaml.cs">
+      <DependentUpon>InputItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Shared\NewEntityWindow.cs" />
     <Compile Include="ViewModel\SystemSettingViewModel.cs" />
     <Compile Include="ViewModel\RelevanceViewModel.cs" />
     <Compile Include="ViewModel\MatchViewModel.cs" />
@@ -160,6 +165,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Shared\InputItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\MatchView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
