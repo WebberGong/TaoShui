@@ -56,16 +56,25 @@
                    BasedOn="{StaticResource FontAwesomeStyle}">
                 <Setter Property="FontSize" Value="20" />
                 <Setter Property="Foreground" Value="Green" />
-                <Setter Property="Text" Value="{x:Static ui:Fa.Plus_circle}" />
+                <Setter Property="Text" Value="{x:Static ui:Fa.Plus_square}" />
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="VerticalAlignment" Value="Stretch" />
                 <Setter Property="TextAlignment" Value="Center" />
             </Style>
-            <Style x:Key="EditColumnCellContentStyle" TargetType="TextBlock"
+            <Style x:Key="EditColumnCellEditContentStyle" TargetType="TextBlock"
                    BasedOn="{StaticResource FontAwesomeStyle}">
                 <Setter Property="FontSize" Value="20" />
-                <Setter Property="Foreground" Value="Red" />
-                <Setter Property="Text" Value="{x:Static ui:Fa.Remove}" />
+                <Setter Property="Foreground" Value="DarkSlateBlue" />
+                <Setter Property="Text" Value="{x:Static ui:Fa.Edit}" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="VerticalAlignment" Value="Stretch" />
+                <Setter Property="TextAlignment" Value="Center" />
+            </Style>
+            <Style x:Key="EditColumnCellRemoveContentStyle" TargetType="TextBlock"
+                   BasedOn="{StaticResource FontAwesomeStyle}">
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="Foreground" Value="OrangeRed" />
+                <Setter Property="Text" Value="{x:Static ui:Fa.Trash}" />
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="VerticalAlignment" Value="Stretch" />
                 <Setter Property="TextAlignment" Value="Center" />
@@ -144,6 +153,7 @@
                 <Setter Property="Background" Value="White" />
                 <Setter Property="SelectionMode" Value="Single" />
                 <Setter Property="SelectionUnit" Value="FullRow" />
+                <Setter Property="IsReadOnly" Value="True" />
             </Style>
             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridColumnHeaderStyle}" />
             <Style TargetType="DataGridRow">

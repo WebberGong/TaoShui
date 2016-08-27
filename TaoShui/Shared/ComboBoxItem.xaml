@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="TaoShui.Shared.InputItem"
+﻿<UserControl x:Class="TaoShui.Shared.ComboBoxItem"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -11,8 +11,12 @@
             <ColumnDefinition Width="70*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10" DataContext="{Binding ElementName=Root}" Text="{Binding Text, Mode=OneWay}"></TextBlock>
-        <TextBox Grid.Column="1" Margin="8" DataContext="{Binding ElementName=Root}" 
-            Text="{Binding Value, Mode=TwoWay}" VerticalContentAlignment="Center"></TextBox>
+        <ComboBox Grid.Column="1" DataContext="{Binding ElementName=Root}" 
+                      ItemsSource="{Binding Items, Mode=OneWay}" Margin="8" 
+                      SelectedItem="{Binding Selected, Mode=TwoWay}" 
+                      VerticalContentAlignment="Center"
+                      SelectedValuePath="Id" DisplayMemberPath="Name">
+        </ComboBox>
     </Grid>
 </UserControl>
 

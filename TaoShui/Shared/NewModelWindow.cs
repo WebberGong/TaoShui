@@ -22,12 +22,14 @@ namespace TaoShui.Shared
         where TModel : ObservableObject, IModelBase
         where TDto : new()
     {
-        private readonly IDataService<TModel, TDto> _dataService;
+        private readonly bool _isNew;
         private readonly TModel _model;
+        private readonly IDataService<TModel, TDto> _dataService;
         private readonly Action<DbResult, TModel> _callBackAction;
 
-        public NewModelWindow(TModel model, IDataService<TModel, TDto> dataService, Action<DbResult, TModel> callBackAction, int width = 450)
+        public NewModelWindow(bool isNew, TModel model, IDataService<TModel, TDto> dataService, Action<DbResult, TModel> callBackAction, int width = 450)
         {
+            _isNew = isNew;
             _model = model;
             _dataService = dataService;
             _callBackAction = callBackAction;
@@ -38,24 +40,25 @@ namespace TaoShui.Shared
             var panelInput = new StackPanel() { Margin = new Thickness(20) };
             foreach (var p in props)
             {
-                var item = new InputItem();
                 var displayNameAttrs = p.GetCustomAttributes(typeof(DisplayNameAttribute), false);
                 if (displayNameAttrs.Any())
                 {
                     var displayNameAttr = displayNameAttrs.FirstOrDefault() as DisplayNameAttribute;
-                    if (displayNameAttr != null) item.Text = displayNameAttr.DisplayName + ":";
-                    var bindingMode = BindingMode.TwoWay;
-                    if (p.SetMethod == null)
-                    {
-                        bindingMode = BindingMode.OneWay;
-                        item.IsEnabled = false;
-                    }
-                    var value = p.GetValue(_model);
-                    item.Value = value;
                     var valueType = p.PropertyType;
-                    item.ValueType = valueType;
                     if (valueType.IsPrimitive || valueType == typeof(string))
                     {
+                        var item = new InputItem();
+                        if (displayNameAttr != null)
+                        {
+                            item.Text = displayNameAttr.DisplayName + ":";
+                        }
+                        var bindingMode = BindingMode.TwoWay;
+                        if (p.SetMethod == null)
+                        {
+                            bindingMode = BindingMode.OneWay;
+                            item.IsEnabled = false;
+                        }
+
                         Binding valueBinding = new Binding()
                         {
                             Source = _model,
@@ -64,6 +67,7 @@ namespace TaoShui.Shared
                             UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                         };
                         BindingOperations.SetBinding(item, InputItem.ValueProperty, valueBinding);
+                        panelInput.Children.Add(item);
                     }
                     else if (valueType.IsArray || valueType.GetInterface("IEnumerable") != null)
                     {
@@ -73,14 +77,19 @@ namespace TaoShui.Shared
                             var foreignKeyAttr = foreignKeyAttrs.FirstOrDefault() as ForeignKeyAttribute;
                             if (foreignKeyAttr != null)
                             {
-                                Binding valueBinding = new Binding()
+                                var item = new ComboBoxItem();
+                                if (displayNameAttr != null)
+                                {
+                                    item.Text = displayNameAttr.DisplayName + ":";
+                                }
+                                Binding itemsBinding = new Binding()
                                 {
                                     Source = _model,
                                     Path = new PropertyPath(p.Name),
                                     Mode = BindingMode.OneWay,
                                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                                 };
-                                BindingOperations.SetBinding(item, InputItem.ValueProperty, valueBinding);
+                                BindingOperations.SetBinding(item, ComboBoxItem.ItemsProperty, itemsBinding);
 
                                 Binding selectedBinding = new Binding()
                                 {
@@ -89,15 +98,11 @@ namespace TaoShui.Shared
                                     Mode = BindingMode.TwoWay,
                                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                                 };
-                                BindingOperations.SetBinding(item, InputItem.SelectedProperty, selectedBinding);
+                                BindingOperations.SetBinding(item, ComboBoxItem.SelectedProperty, selectedBinding);
+                                panelInput.Children.Add(item);
                             }
                         }
                     }
-                    else
-                    {
-                        continue;
-                    }
-                    panelInput.Children.Add(item);
                 }
             }
             panelMain.Children.Add(panelInput);
@@ -117,20 +122,20 @@ namespace TaoShui.Shared
             ResizeMode = ResizeMode.NoResize;
             Topmost = true;
             ShowInTaskbar = false;
-            Icon = IconChar.PlusCircle.ToImageSource(new SolidColorBrush(Colors.ForestGreen), 100);
+            Icon = _isNew ? IconHelper.ToImageSource(FontAwesomeWPF.Fa.Plus_square, new SolidColorBrush(Colors.ForestGreen), 100) : 
+                IconHelper.ToImageSource(FontAwesomeWPF.Fa.Edit, new SolidColorBrush(Colors.DarkSlateBlue), 100);
             FontFamily = new FontFamily("Microsoft YaHei");
             FontSize = 12;
         }
 
         private void ExecuteSaveCommand()
         {
-            var result = _dataService.Insert(_model);
+            DbResult result = _isNew ? _dataService.Insert(_model) : _dataService.Update(_model);
 
             if (_callBackAction != null)
             {
                 _callBackAction(result, _model);
             }
-
             if (result.IsSuccess)
             {
                 MyMessageBox.ShowInformationDialog(result.CombinedMsg);

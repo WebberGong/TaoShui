@@ -57,7 +57,7 @@ namespace TaoShui.Model
             get { return _settings; }
             set
             {
-                if (_settings != value)
+                if (value != null && _settings != value)
                 {
                     _settings = value;
                     RaisePropertyChanged();
@@ -112,7 +112,7 @@ namespace TaoShui.Model
             get { return _setting; }
             set
             {
-                if (_setting != value)
+                if (value != null && _setting != value)
                 {
                     _setting = value;
                     SettingId = _setting.Id;

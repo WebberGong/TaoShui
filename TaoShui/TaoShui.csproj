@@ -128,6 +128,9 @@
     <Compile Include="Model\IModelBase.cs" />
     <Compile Include="Model\WebSite.cs" />
     <Compile Include="Model\WebSiteSetting.cs" />
+    <Compile Include="Shared\ComboBoxItem.xaml.cs">
+      <DependentUpon>ComboBoxItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Shared\InputItem.xaml.cs">
       <DependentUpon>InputItem.xaml</DependentUpon>
     </Compile>
@@ -173,6 +176,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Shared\ComboBoxItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Shared\InputItem.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -29,14 +29,16 @@ namespace TaoShui.ViewModel
             WebSiteSettings = _webSiteSettingDs.SelectAll();
             WebSites = _webSiteDs.SelectAll();
             foreach (var site in WebSites)
+            {
                 site.Setting = WebSiteSettings.FirstOrDefault(x => x.Id == site.SettingId);
+                site.Settings = WebSiteSettings;
+            }
 
             WebSiteSettingAddCommand = new RelayCommand(ExecuteWebSiteSettingAddCommand);
-            WebSiteSettingEditCommand =
-                new RelayCommand<DataGridCellEditEndingEventArgs>(ExecuteWebSiteSettingEditCommand);
+            WebSiteSettingEditCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteSettingEditCommand);
             WebSiteSettingRemoveCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteSettingRemoveCommand);
             WebSiteAddCommand = new RelayCommand(ExecuteWebSiteAddCommand);
-            WebSiteEditCommand = new RelayCommand<DataGridCellEditEndingEventArgs>(ExecuteWebSiteEditCommand);
+            WebSiteEditCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteEditCommand);
             WebSiteRemoveCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteRemoveCommand);
         }
 
@@ -60,6 +62,7 @@ namespace TaoShui.ViewModel
         {
             var setting = new WebSiteSetting();
             new NewModelWindow<WebSiteSetting, WebSiteSettingDto>(
+                true,
                 setting, 
                 _webSiteSettingDs,
                 (result, model) =>
@@ -71,19 +74,18 @@ namespace TaoShui.ViewModel
                 }).ShowDialog();
         }
 
-        private void ExecuteWebSiteSettingEditCommand(DataGridCellEditEndingEventArgs e)
+        private void ExecuteWebSiteSettingEditCommand(ContentPresenter contentPresenter)
         {
-            if (e.EditAction == DataGridEditAction.Commit)
+            var setting = contentPresenter.Content as WebSiteSetting;
+            if (setting != null)
             {
-                var result = _webSiteSettingDs.Update(e.Row.Item as WebSiteSetting);
-                if (result.IsSuccess)
-                {
-                    MyMessageBox.ShowInformationDialog(result.CombinedMsg);
-                }
-                else
-                {
-                    MyMessageBox.ShowWarningDialog(result.CombinedMsg);
-                }
+                new NewModelWindow<WebSiteSetting, WebSiteSettingDto>(
+                    false,
+                    setting,
+                    _webSiteSettingDs,
+                    (result, model) =>
+                    {
+                    }).ShowDialog();
             }
         }
 
@@ -114,6 +116,7 @@ namespace TaoShui.ViewModel
         {
             var site = new WebSite(WebSiteSettings);
             new NewModelWindow<WebSite, WebSiteDto>(
+                true,
                 site,
                 _webSiteDs,
                 (result, model) =>
@@ -125,19 +128,18 @@ namespace TaoShui.ViewModel
                 }).ShowDialog();
         }
 
-        private void ExecuteWebSiteEditCommand(DataGridCellEditEndingEventArgs e)
+        private void ExecuteWebSiteEditCommand(ContentPresenter contentPresenter)
         {
-            if (e.EditAction == DataGridEditAction.Commit)
+            var site = contentPresenter.Content as WebSite;
+            if (site != null)
             {
-                var result = _webSiteDs.Update(e.Row.Item as WebSite);
-                if (result.IsSuccess)
-                {
-                    MyMessageBox.ShowInformationDialog(result.CombinedMsg);
-                }
-                else
-                {
-                    MyMessageBox.ShowWarningDialog(result.CombinedMsg);
-                }
+                new NewModelWindow<WebSite, WebSiteDto>(
+                    false,
+                    site,
+                    _webSiteDs,
+                    (result, model) =>
+                    {
+                    }).ShowDialog();
             }
         }
 

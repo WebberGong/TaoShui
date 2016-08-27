@@ -19,12 +19,13 @@ using TaoShui.Model;
 
 namespace TaoShui.Shared
 {
-    public partial class InputItem : UserControl, INotifyPropertyChanged
+    public partial class ComboBoxItem : UserControl, INotifyPropertyChanged
     {
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(InputItem));
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(string), typeof(InputItem));
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(ComboBoxItem));
+        public static readonly DependencyProperty ItemsProperty = DependencyProperty.Register("Items", typeof(IEnumerable<IModelBase>), typeof(ComboBoxItem));
+        public static readonly DependencyProperty SelectedProperty = DependencyProperty.Register("Selected", typeof(IModelBase), typeof(ComboBoxItem));
 
-        public InputItem()
+        public ComboBoxItem()
         {
             InitializeComponent();
         }
@@ -42,16 +43,29 @@ namespace TaoShui.Shared
             }
         }
 
-        public string Value
+        public IEnumerable<IModelBase> Items
         {
             get
             {
-                return GetValue(ValueProperty) as string;
+                return GetValue(ItemsProperty) as IEnumerable<IModelBase>;
             }
             set
             {
-                SetValue(ValueProperty, value);
-                OnPropertyChanged("Value");
+                SetValue(ItemsProperty, value);
+                OnPropertyChanged("Items");
+            }
+        }
+
+        public IModelBase Selected
+        {
+            get
+            {
+                return GetValue(SelectedProperty) as IModelBase;
+            }
+            set
+            {
+                SetValue(SelectedProperty, value);
+                OnPropertyChanged("Selected");
             }
         }
 
