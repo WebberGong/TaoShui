@@ -103,6 +103,7 @@ namespace TaoShui.DataService
                 if (string.IsNullOrEmpty(errorMsgs))
                 {
                     context.SaveChanges();
+                    model.Id = dto.Id;
                     return new DbResult<WebSiteSettingDto>(true, null, EnumOkMsg.添加数据成功.ToString(), dto);
                 }
                 return new DbResult<WebSiteSettingDto>(false, errors, EnumErrorMsg.数据校验失败.ToString(), dto);
