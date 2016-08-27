@@ -12,6 +12,7 @@ using AutoMapper.Execution;
 using FontAwesome.Sharp;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
+using Newtonsoft.Json;
 using TaoShui.DataService;
 using TaoShui.Model;
 using Utils;
@@ -25,9 +26,9 @@ namespace TaoShui.Shared
         private readonly bool _isNew;
         private readonly TModel _model;
         private readonly IDataService<TModel, TDto> _dataService;
-        private readonly Action<DbResult, TModel> _callBackAction;
+        private readonly Action<DbResult<TDto>, TModel> _callBackAction;
 
-        public NewModelWindow(bool isNew, TModel model, IDataService<TModel, TDto> dataService, Action<DbResult, TModel> callBackAction, int width = 450)
+        public NewModelWindow(bool isNew, TModel model, IDataService<TModel, TDto> dataService, Action<DbResult<TDto>, TModel> callBackAction, int width = 450)
         {
             _isNew = isNew;
             _model = model;
@@ -130,7 +131,7 @@ namespace TaoShui.Shared
 
         private void ExecuteSaveCommand()
         {
-            DbResult result = _isNew ? _dataService.Insert(_model) : _dataService.Update(_model);
+            DbResult<TDto> result = _isNew ? _dataService.Insert(_model) : _dataService.Update(_model);
 
             if (_callBackAction != null)
             {
@@ -160,7 +161,12 @@ namespace TaoShui.Shared
         {
             if (_callBackAction != null)
             {
-                _callBackAction(new DbResult(false, null, "操作已取消"), _model);
+                var dto = _dataService.SelectDtoById(_model.Id);
+                if (dto != null)
+                {
+                    _dataService.Mapper.Map(dto, _model);
+                }
+                _callBackAction(new DbResult<TDto>(false, null, "操作已取消", dto), _model);
             }
             Close();
         }

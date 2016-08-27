@@ -26,8 +26,8 @@ namespace TaoShui.ViewModel
             _webSiteSettingDs = webSiteSettingDs;
             _webSiteDs = webSiteDs;
 
-            WebSiteSettings = _webSiteSettingDs.SelectAll();
-            WebSites = _webSiteDs.SelectAll();
+            WebSiteSettings = _webSiteSettingDs.SelectAllModel();
+            WebSites = _webSiteDs.SelectAllModel();
             foreach (var site in WebSites)
             {
                 site.Setting = WebSiteSettings.FirstOrDefault(x => x.Id == site.SettingId);

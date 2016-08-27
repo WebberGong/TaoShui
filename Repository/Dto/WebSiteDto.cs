@@ -20,8 +20,5 @@ namespace Repository.Dto
 
         [Required]
         public long SettingId { get; set; }
-
-        //[ForeignKey("SettingId")]
-        //public virtual WebSiteSettingDto Setting { get; set; }
     }
 }

@@ -28,12 +28,23 @@ namespace TaoShui.DataService
             _mapper = mapperConfig.CreateMapper();
         }
 
-        public abstract ObservableCollection<TModel> SelectAll();
+        public abstract ObservableCollection<TModel> SelectAllModel();
 
-        public abstract DbResult Update(TModel model);
+        public abstract TModel SelectModelById(long id);
 
-        public abstract DbResult Delete(TModel model);
+        public abstract ObservableCollection<TDto> SelectAllDto();
 
-        public abstract DbResult Insert(TModel model);
+        public abstract TDto SelectDtoById(long id);
+
+        public abstract DbResult<TDto> Update(TModel model);
+
+        public abstract DbResult<TDto> Delete(TModel model);
+
+        public abstract DbResult<TDto> Insert(TModel model);
+
+        public IMapper Mapper
+        {
+            get { return _mapper; }
+        }
     }
 }

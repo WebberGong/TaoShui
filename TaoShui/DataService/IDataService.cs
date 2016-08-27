@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using AutoMapper;
 using GalaSoft.MvvmLight;
 using TaoShui.Model;
 
@@ -8,12 +9,20 @@ namespace TaoShui.DataService
         where TModel : ObservableObject, IModelBase 
         where TDto : new()
     {
-        ObservableCollection<TModel> SelectAll();
+        ObservableCollection<TModel> SelectAllModel();
 
-        DbResult Update(TModel model);
+        TModel SelectModelById(long id);
 
-        DbResult Delete(TModel model);
+        ObservableCollection<TDto> SelectAllDto();
 
-        DbResult Insert(TModel model);
+        TDto SelectDtoById(long id);
+
+        DbResult<TDto> Update(TModel model);
+
+        DbResult<TDto> Delete(TModel model);
+
+        DbResult<TDto> Insert(TModel model);
+
+        IMapper Mapper { get; }
     }
 }

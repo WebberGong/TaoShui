@@ -119,6 +119,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DataService\DataServiceBase.cs" />
+    <Compile Include="DataService\DbResultBase.cs" />
     <Compile Include="DataService\DbResult.cs" />
     <Compile Include="DataService\EnumErrorMsg.cs" />
     <Compile Include="DataService\EnumOkMsg.cs" />
