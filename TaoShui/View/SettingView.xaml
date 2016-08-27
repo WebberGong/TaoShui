@@ -15,13 +15,13 @@
                         VerticalContentAlignment="Stretch" />
         <TabPanel Grid.Row="1" VerticalAlignment="Center">
             <Canvas Width="2" />
-            <RadioButton Height="24" Width="80" GroupName="SettingType" Command="{Binding WebSiteSettingViewCommand}"
+            <RadioButton GroupName="SettingType" Command="{Binding WebSiteSettingViewCommand}"
                          Template="{StaticResource SelectableButtonTemplate}"
                          IsChecked="{Binding IsWebSiteSettingChecked, Mode=TwoWay}">
                 网站设置
             </RadioButton>
             <Canvas Width="5" />
-            <RadioButton Height="24" Width="80" GroupName="SettingType" Command="{Binding SystemSettingViewCommand}"
+            <RadioButton GroupName="SettingType" Command="{Binding SystemSettingViewCommand}"
                          Template="{StaticResource SelectableButtonTemplate}"
                          IsChecked="{Binding IsSystemSettingChecked, Mode=TwoWay}">
                 系统设置

@@ -7,7 +7,7 @@ namespace TaoShui.ViewModel
     {
         private string _name = "Match";
 
-        public MatchViewModel(IDataService dataService)
+        public MatchViewModel()
         {
         }
 

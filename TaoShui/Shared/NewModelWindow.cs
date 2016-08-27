@@ -11,17 +11,31 @@ using System.Windows.Media;
 using AutoMapper.Execution;
 using FontAwesome.Sharp;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
+using TaoShui.DataService;
 using TaoShui.Model;
+using Utils;
 
 namespace TaoShui.Shared
 {
-    public class NewEntityWindow<T> : Window where T : ObservableObject, IModelBase
+    public class NewModelWindow<TModel, TDto> : Window
+        where TModel : ObservableObject, IModelBase
+        where TDto : new()
     {
-        public NewEntityWindow(T entity, int width = 500)
+        private readonly IDataService<TModel, TDto> _dataService;
+        private readonly TModel _model;
+        private readonly Action<DbResult, TModel> _callBackAction;
+
+        public NewModelWindow(TModel model, IDataService<TModel, TDto> dataService, Action<DbResult, TModel> callBackAction, int width = 450)
         {
-            Type type = typeof(T);
+            _model = model;
+            _dataService = dataService;
+            _callBackAction = callBackAction;
+
+            Type type = typeof(TModel);
             var props = type.GetProperties();
-            var panel = new StackPanel { Margin = new Thickness(20) };
+            var panelMain = new StackPanel();
+            var panelInput = new StackPanel() { Margin = new Thickness(20) };
             foreach (var p in props)
             {
                 var item = new InputItem();
@@ -36,7 +50,7 @@ namespace TaoShui.Shared
                         bindingMode = BindingMode.OneWay;
                         item.IsEnabled = false;
                     }
-                    var value = p.GetValue(entity);
+                    var value = p.GetValue(_model);
                     item.Value = value;
                     var valueType = p.PropertyType;
                     item.ValueType = valueType;
@@ -44,7 +58,7 @@ namespace TaoShui.Shared
                     {
                         Binding valueBinding = new Binding()
                         {
-                            Source = entity,
+                            Source = _model,
                             Path = new PropertyPath(p.Name),
                             Mode = bindingMode,
                             UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
@@ -61,7 +75,7 @@ namespace TaoShui.Shared
                             {
                                 Binding valueBinding = new Binding()
                                 {
-                                    Source = entity,
+                                    Source = _model,
                                     Path = new PropertyPath(p.Name),
                                     Mode = BindingMode.OneWay,
                                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
@@ -70,7 +84,7 @@ namespace TaoShui.Shared
 
                                 Binding selectedBinding = new Binding()
                                 {
-                                    Source = entity,
+                                    Source = _model,
                                     Path = new PropertyPath(foreignKeyAttr.Name),
                                     Mode = BindingMode.TwoWay,
                                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
@@ -83,10 +97,19 @@ namespace TaoShui.Shared
                     {
                         continue;
                     }
-                    panel.Children.Add(item);
+                    panelInput.Children.Add(item);
                 }
             }
-            Content = panel;
+            panelMain.Children.Add(panelInput);
+
+            SaveFooter footer = new SaveFooter
+            {
+                SaveCommand = new RelayCommand(ExecuteSaveCommand),
+                CancelCommand = new RelayCommand(ExecuteCancelCommand)
+            };
+            panelMain.Children.Add(footer);
+
+            Content = panelMain;
             Width = width;
             SizeToContent = SizeToContent.Height;
             WindowStyle = WindowStyle.SingleBorderWindow;
@@ -97,6 +120,44 @@ namespace TaoShui.Shared
             Icon = IconChar.PlusCircle.ToImageSource(new SolidColorBrush(Colors.ForestGreen), 100);
             FontFamily = new FontFamily("Microsoft YaHei");
             FontSize = 12;
+        }
+
+        private void ExecuteSaveCommand()
+        {
+            var result = _dataService.Insert(_model);
+
+            if (_callBackAction != null)
+            {
+                _callBackAction(result, _model);
+            }
+
+            if (result.IsSuccess)
+            {
+                MyMessageBox.ShowInformationDialog(result.CombinedMsg);
+            }
+            else
+            {
+                MyMessageBox.ShowWarningDialog(result.CombinedMsg);
+            }
+
+            if (result.IsValidationFailed)
+            {
+                return;
+            }
+
+            if (result.IsSuccess)
+            {
+                Close();
+            }
+        }
+
+        private void ExecuteCancelCommand()
+        {
+            if (_callBackAction != null)
+            {
+                _callBackAction(new DbResult(false, null, "操作已取消"), _model);
+            }
+            Close();
         }
     }
 }

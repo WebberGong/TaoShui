@@ -7,12 +7,12 @@
              x:Name="Root" x:FieldModifier="private">
     <UserControl.Resources>
         <DataTemplate x:Key="TextBoxDataTemplate">
-            <TextBox Grid.Column="1" Margin="5" DataContext="{Binding ElementName=Root}" 
+            <TextBox Grid.Column="1" Margin="8" DataContext="{Binding ElementName=Root}" 
                      Text="{Binding Value, Mode=TwoWay}" VerticalContentAlignment="Center"></TextBox>
         </DataTemplate>
         <DataTemplate x:Key="ComboBoxDataTemplate">
             <ComboBox DataContext="{Binding ElementName=Root}" 
-                      ItemsSource="{Binding Value, Mode=OneWay}" Margin="5" 
+                      ItemsSource="{Binding Value, Mode=OneWay}" Margin="8" 
                       SelectedItem="{Binding Selected, Mode=TwoWay}" 
                       VerticalContentAlignment="Center"
                       SelectedValuePath="Id" DisplayMemberPath="Name">

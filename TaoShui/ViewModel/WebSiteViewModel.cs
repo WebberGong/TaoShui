@@ -7,7 +7,7 @@ namespace TaoShui.ViewModel
     {
         private string _name = "WebSite";
 
-        public WebSiteViewModel(IDataService dataService)
+        public WebSiteViewModel()
         {
         }
 

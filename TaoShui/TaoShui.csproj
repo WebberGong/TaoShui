@@ -118,7 +118,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="DataService\DataService.cs" />
+    <Compile Include="DataService\DataServiceBase.cs" />
+    <Compile Include="DataService\DbResult.cs" />
+    <Compile Include="DataService\EnumErrorMsg.cs" />
+    <Compile Include="DataService\EnumOkMsg.cs" />
+    <Compile Include="DataService\WebSiteDataService.cs" />
+    <Compile Include="DataService\WebSiteSettingDataService.cs" />
     <Compile Include="DataService\IDataService.cs" />
     <Compile Include="Model\IModelBase.cs" />
     <Compile Include="Model\WebSite.cs" />
@@ -126,7 +131,10 @@
     <Compile Include="Shared\InputItem.xaml.cs">
       <DependentUpon>InputItem.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Shared\NewEntityWindow.cs" />
+    <Compile Include="Shared\NewModelWindow.cs" />
+    <Compile Include="Shared\SaveFooter.xaml.cs">
+      <DependentUpon>SaveFooter.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel\SystemSettingViewModel.cs" />
     <Compile Include="ViewModel\RelevanceViewModel.cs" />
     <Compile Include="ViewModel\MatchViewModel.cs" />
@@ -168,6 +176,10 @@
     <Page Include="Shared\InputItem.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Shared\SaveFooter.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\MatchView.xaml">
       <SubType>Designer</SubType>

@@ -35,7 +35,7 @@ namespace TaoShui
         private bool _isAutoBet;
         private bool _isAutoRun;
 
-        public MainViewModel(IDataService dataService)
+        public MainViewModel()
         {
             _currentViewModel = _settingViewModel;
             ClosedCommand = new RelayCommand(ExecuteClosedCommand);

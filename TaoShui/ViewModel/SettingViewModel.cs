@@ -18,7 +18,7 @@ namespace TaoShui.ViewModel
         private bool _isSystemSettingChecked;
         private bool _isWebSiteSettingChecked = true;
 
-        public SettingViewModel(IDataService dataService)
+        public SettingViewModel()
         {
             _currentViewModel = _webSiteSettingViewModel;
             WebSiteSettingViewCommand = new RelayCommand(ExecuteWebSiteSettingViewCommand);

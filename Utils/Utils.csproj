@@ -53,6 +53,7 @@
     <Compile Include="Common.cs" />
     <Compile Include="CommonEqualityComparer.cs" />
     <Compile Include="LogHelper.cs" />
+    <Compile Include="MyMessageBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

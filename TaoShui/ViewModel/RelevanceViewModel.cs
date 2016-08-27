@@ -7,7 +7,7 @@ namespace TaoShui.ViewModel
     {
         private string _name = "Relevance";
 
-        public RelevanceViewModel(IDataService dataService)
+        public RelevanceViewModel()
         {
         }
 

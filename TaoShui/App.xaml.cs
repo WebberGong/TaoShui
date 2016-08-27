@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System.Globalization;
+using System.Threading;
+using System.Windows;
+using log4net;
 
 namespace TaoShui
 {
@@ -7,5 +10,12 @@ namespace TaoShui
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            var culture = CultureInfo.GetCultureInfo("zh-cn");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+            Thread.CurrentThread.CurrentCulture = culture;
+        }
     }
 }

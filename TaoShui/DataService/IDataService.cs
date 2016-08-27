@@ -1,24 +1,19 @@
 ﻿using System.Collections.ObjectModel;
+using GalaSoft.MvvmLight;
 using TaoShui.Model;
 
 namespace TaoShui.DataService
 {
-    public interface IDataService
+    public interface IDataService<TModel, TDto> 
+        where TModel : ObservableObject, IModelBase 
+        where TDto : new()
     {
-        ObservableCollection<WebSiteSetting> SelectAllWebSiteSettings();
+        ObservableCollection<TModel> SelectAll();
 
-        ObservableCollection<WebSite> SelectAllWebSites();
+        DbResult Update(TModel model);
 
-        bool UpdateWebSiteSetting(WebSiteSetting setting);
+        DbResult Delete(TModel model);
 
-        bool UpdateWebSite(WebSite site);
-
-        bool DeleteWebSiteSetting(WebSiteSetting setting);
-
-        bool DeleteWebSite(WebSite site);
-
-        bool InsertWebSiteSetting(WebSiteSetting setting);
-
-        bool InsertWebSite(WebSite site);
+        DbResult Insert(TModel model);
     }
 }

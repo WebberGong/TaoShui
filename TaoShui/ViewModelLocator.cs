@@ -14,7 +14,9 @@
 
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
+using Repository.Dto;
 using TaoShui.DataService;
+using TaoShui.Model;
 using TaoShui.ViewModel;
 
 namespace TaoShui
@@ -33,7 +35,8 @@ namespace TaoShui
             SimpleIoc.Default.Register<WebSiteSettingViewModel>();
             SimpleIoc.Default.Register<SystemSettingViewModel>();
 
-            SimpleIoc.Default.Register<IDataService, DataService.DataService>();
+            SimpleIoc.Default.Register<IDataService<WebSiteSetting, WebSiteSettingDto>, WebSiteSettingDataService>();
+            SimpleIoc.Default.Register<IDataService<WebSite, WebSiteDto>, WebSiteDataService>();
         }
 
         public MainViewModel Main
