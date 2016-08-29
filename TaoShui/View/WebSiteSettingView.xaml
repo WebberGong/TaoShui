@@ -37,24 +37,10 @@
                 <DataGridTemplateColumn
                     Width="60"
                     HeaderStyle="{StaticResource EditColumnHeaderStyle}">
-                    <DataGridTemplateColumn.HeaderTemplate>
-                        <DataTemplate>
-                            <TextBlock Style="{StaticResource EditColumnHeaderContentStyle}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                                        <i:InvokeCommandAction
-                                            Command="{Binding DataContext.WebSiteSettingAddCommand, 
-                                            RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </TextBlock>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Style="{StaticResource EditColumnCellEditContentStyle}">
@@ -62,16 +48,6 @@
                                         <i:EventTrigger EventName="MouseLeftButtonDown">
                                             <i:InvokeCommandAction
                                                 Command="{Binding DataContext.WebSiteSettingEditCommand, 
-                                                RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"
-                                                CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </TextBlock>
-                                <TextBlock Grid.Column="1" Style="{StaticResource EditColumnCellRemoveContentStyle}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                                            <i:InvokeCommandAction
-                                                Command="{Binding DataContext.WebSiteSettingRemoveCommand, 
                                                 RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"
                                                 CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
                                         </i:EventTrigger>

@@ -104,7 +104,6 @@ namespace TaoShui.Model
                     RaisePropertyChanged();
                 }
             }
-
         }
 
         public WebSiteSetting Setting
