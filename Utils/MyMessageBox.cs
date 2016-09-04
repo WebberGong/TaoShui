@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace Utils
 {
@@ -23,10 +18,10 @@ namespace Utils
         {
             return MessageBox.Show(msg, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+
         public static DialogResult ShowQuestionDialog(string msg)
         {
             return MessageBox.Show(msg, "询问", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
         }
-
     }
 }

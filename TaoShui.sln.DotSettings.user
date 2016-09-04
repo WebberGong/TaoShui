@@ -7,4 +7,5 @@
   &lt;Assembly Path="D:\TaoShui\packages\WatiN.2.1.0\lib\net40\WatiN.Core.dll" /&gt;&#xD;
   &lt;Assembly Path="D:\TaoShui\packages\System.Data.SQLite.EF6.1.0.102.0\lib\net45\System.Data.SQLite.EF6.dll" /&gt;&#xD;
   &lt;Assembly Path="D:\TaoShui\packages\System.Data.SQLite.Core.1.0.102.0\lib\net45\System.Data.SQLite.dll" /&gt;&#xD;
+  &lt;Assembly Path="D:\TaoShui\packages\shim.drawing.3.0.1\lib\net45\Shim.Drawing.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String></wpf:ResourceDictionary>

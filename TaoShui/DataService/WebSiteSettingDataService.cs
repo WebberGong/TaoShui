@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.Entity.Validation;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
-using AutoMapper;
 using Newtonsoft.Json;
 using Repository;
 using Repository.Dto;
@@ -46,7 +42,7 @@ namespace TaoShui.DataService
             }
         }
 
-        public override DbResult< WebSiteSettingDto> Update(WebSiteSetting model)
+        public override DbResult<WebSiteSettingDto> Update(WebSiteSetting model)
         {
             if (model == null)
                 return new DbResult<WebSiteSettingDto>(false, null, EnumErrorMsg.参数为空.ToString(), null);

@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:TaoShui.ViewModel"
+             xmlns:v="clr-namespace:TaoShui.View"
              mc:Ignorable="d"
              d:DesignWidth="900" d:DesignHeight="600"
              d:DataContext="{d:DesignInstance Type=vm:WebSiteSettingViewModel}">
@@ -41,7 +41,7 @@
                         <DataTemplate>
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Style="{StaticResource EditColumnCellEditContentStyle}">
                                     <i:Interaction.Triggers>
@@ -70,7 +70,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <DataGrid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="0 0 3 0" />
+            <v:WebSiteRelation Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="0 0 3 0" DataContext="{Binding WebSiteSettings, Mode=OneWay}"></v:WebSiteRelation>
             <GridSplitter Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Width="3" HorizontalAlignment="Right"
                           VerticalAlignment="Stretch" />
             <DataGrid Grid.Row="0" Grid.Column="1" Margin="0 0 0 3" />
@@ -110,8 +110,8 @@
                             <DataTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"></ColumnDefinition>
-                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" Style="{StaticResource EditColumnCellEditContentStyle}">
                                         <i:Interaction.Triggers>
@@ -123,7 +123,8 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBlock>
-                                    <TextBlock Grid.Column="1" Style="{StaticResource EditColumnCellRemoveContentStyle}">
+                                    <TextBlock Grid.Column="1"
+                                               Style="{StaticResource EditColumnCellRemoveContentStyle}">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction
@@ -131,7 +132,7 @@
                                                     RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"
                                                     CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
                                             </i:EventTrigger>
-                                    </i:Interaction.Triggers>
+                                        </i:Interaction.Triggers>
                                     </TextBlock>
                                 </Grid>
                             </DataTemplate>

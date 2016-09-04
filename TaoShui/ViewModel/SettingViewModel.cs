@@ -2,7 +2,6 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Practices.ServiceLocation;
-using TaoShui.DataService;
 
 namespace TaoShui.ViewModel
 {

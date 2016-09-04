@@ -10,17 +10,18 @@ using TaoShui.DataService;
 using TaoShui.Model;
 using TaoShui.Shared;
 using Utils;
-using MessageBox = System.Windows.MessageBox;
 
 namespace TaoShui.ViewModel
 {
     public class WebSiteSettingViewModel : ViewModelBase
     {
-        private readonly IDataService<WebSiteSetting, WebSiteSettingDto> _webSiteSettingDs;
         private readonly IDataService<WebSite, WebSiteDto> _webSiteDs;
+        private readonly IDataService<WebSiteSetting, WebSiteSettingDto> _webSiteSettingDs;
+        private ObservableCollection<WebSiteSetting> _webSiteSettings;
+        private ObservableCollection<WebSite> _webSites;
 
         public WebSiteSettingViewModel(
-            IDataService<WebSiteSetting, WebSiteSettingDto> webSiteSettingDs, 
+            IDataService<WebSiteSetting, WebSiteSettingDto> webSiteSettingDs,
             IDataService<WebSite, WebSiteDto> webSiteDs)
         {
             _webSiteSettingDs = webSiteSettingDs;
@@ -42,9 +43,25 @@ namespace TaoShui.ViewModel
             WebSiteRemoveCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteRemoveCommand);
         }
 
-        public ObservableCollection<WebSiteSetting> WebSiteSettings { get; set; }
+        public ObservableCollection<WebSiteSetting> WebSiteSettings
+        {
+            get { return _webSiteSettings; }
+            private set
+            {
+                _webSiteSettings = value;
+                RaisePropertyChanged();
+            }
+        }
 
-        public ObservableCollection<WebSite> WebSites { get; set; }
+        public ObservableCollection<WebSite> WebSites
+        {
+            get { return _webSites; }
+            private set
+            {
+                _webSites = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public ICommand WebSiteSettingAddCommand { get; private set; }
 
@@ -63,14 +80,12 @@ namespace TaoShui.ViewModel
             var setting = new WebSiteSetting();
             new NewModelWindow<WebSiteSetting, WebSiteSettingDto>(
                 true,
-                setting, 
+                setting,
                 _webSiteSettingDs,
                 (result, model) =>
                 {
                     if (result.IsSuccess)
-                    {
                         WebSiteSettings.Add(model);
-                    }
                 }).ShowDialog();
         }
 
@@ -78,22 +93,17 @@ namespace TaoShui.ViewModel
         {
             var setting = contentPresenter.Content as WebSiteSetting;
             if (setting != null)
-            {
                 new NewModelWindow<WebSiteSetting, WebSiteSettingDto>(
                     false,
                     setting,
                     _webSiteSettingDs,
-                    (result, model) =>
-                    {
-                    }).ShowDialog();
-            }
+                    (result, model) => { }).ShowDialog();
         }
 
         private void ExecuteWebSiteSettingRemoveCommand(ContentPresenter contentPresenter)
         {
             var setting = contentPresenter.Content as WebSiteSetting;
             if (setting != null)
-            {
                 if (MyMessageBox.ShowQuestionDialog("确定要删除该条数据吗?") == DialogResult.OK)
                 {
                     var result = _webSiteSettingDs.Delete(setting);
@@ -109,7 +119,6 @@ namespace TaoShui.ViewModel
                         MyMessageBox.ShowWarningDialog(result.CombinedMsg);
                     }
                 }
-            }
         }
 
         private void ExecuteWebSiteAddCommand()
@@ -122,9 +131,7 @@ namespace TaoShui.ViewModel
                 (result, model) =>
                 {
                     if (result.IsSuccess)
-                    {
                         WebSites.Add(model);
-                    }
                 }).ShowDialog();
         }
 
@@ -132,22 +139,17 @@ namespace TaoShui.ViewModel
         {
             var site = contentPresenter.Content as WebSite;
             if (site != null)
-            {
                 new NewModelWindow<WebSite, WebSiteDto>(
                     false,
                     site,
                     _webSiteDs,
-                    (result, model) =>
-                    {
-                    }).ShowDialog();
-            }
+                    (result, model) => { }).ShowDialog();
         }
 
         private void ExecuteWebSiteRemoveCommand(ContentPresenter contentPresenter)
         {
             var site = contentPresenter.Content as WebSite;
             if (site != null)
-            {
                 if (MyMessageBox.ShowQuestionDialog("确定要删除该条数据吗?") == DialogResult.OK)
                 {
                     var result = _webSiteDs.Delete(site);
@@ -161,7 +163,6 @@ namespace TaoShui.ViewModel
                         MyMessageBox.ShowWarningDialog(result.CombinedMsg);
                     }
                 }
-            }
         }
     }
 }

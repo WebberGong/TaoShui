@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.Entity.Validation;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using AutoMapper;
 using Newtonsoft.Json;
 using Repository;
 using Repository.Dto;
@@ -14,7 +7,7 @@ using TaoShui.Model;
 
 namespace TaoShui.DataService
 {
-    class WebSiteDataService : DataServiceBase<WebSite, WebSiteDto>
+    internal class WebSiteDataService : DataServiceBase<WebSite, WebSiteDto>
     {
         public override ObservableCollection<WebSite> SelectAllModel()
         {

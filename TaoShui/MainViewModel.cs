@@ -6,11 +6,11 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using FontAwesome.Sharp;
+using FontAwesomeWPF;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Practices.ServiceLocation;
 using Newtonsoft.Json;
-using TaoShui.DataService;
 using TaoShui.ViewModel;
 using Utils;
 using WcfService;
@@ -20,10 +20,10 @@ namespace TaoShui
 {
     public class MainViewModel : ViewModelBase
     {
+        private readonly ImageSource _icon = IconHelper.ToImageSource(Fa.Bolt, new SolidColorBrush(Colors.Gold), 100);
         private readonly MatchViewModel _matchViewModel = ServiceLocator.Current.GetInstance<MatchViewModel>();
         private readonly double _minHeight = SystemParameters.PrimaryScreenHeight/5*4;
         private readonly double _minWidth = SystemParameters.PrimaryScreenWidth/5*4;
-        private readonly ImageSource _icon = IconHelper.ToImageSource(FontAwesomeWPF.Fa.Bolt, new SolidColorBrush(Colors.Gold), 100);
         private readonly Thread _receiveGrabbedDataThread;
 
         private readonly RelevanceViewModel _relevanceViewModel =

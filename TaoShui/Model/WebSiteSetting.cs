@@ -12,33 +12,6 @@ namespace TaoShui.Model
         private string _name;
         private string _url;
 
-        public long Id
-        {
-            get { return _id; }
-            set
-            {
-                if (_id != value)
-                {
-                    _id = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        [DisplayName(@"网站名")]
-        public string Name
-        {
-            get { return _name; }
-            set
-            {
-                if (_name != value)
-                {
-                    _name = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
         [DisplayName(@"网址")]
         public string Url
         {
@@ -90,6 +63,33 @@ namespace TaoShui.Model
                 if (_grabDataInterval != value)
                 {
                     _grabDataInterval = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public long Id
+        {
+            get { return _id; }
+            set
+            {
+                if (_id != value)
+                {
+                    _id = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        [DisplayName(@"网站名")]
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
                     RaisePropertyChanged();
                 }
             }

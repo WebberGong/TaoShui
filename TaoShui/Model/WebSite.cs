@@ -9,45 +9,19 @@ namespace TaoShui.Model
     {
         private long _id;
         private string _loginName;
-        private string _password;
-        private long _settingId;
         private string _name;
+        private string _password;
         private WebSiteSetting _setting;
+        private long _settingId;
         private ObservableCollection<WebSiteSetting> _settings;
 
         public WebSite()
-        {       
+        {
         }
 
         public WebSite(ObservableCollection<WebSiteSetting> settings)
         {
             _settings = settings;
-        }
-
-        public long Id
-        {
-            get { return _id; }
-            set
-            {
-                if (_id != value)
-                {
-                    _id = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public string Name
-        {
-            get { return _name; }
-            set
-            {
-                if (_name != value)
-                {
-                    _name = value;
-                    RaisePropertyChanged();
-                }
-            }
         }
 
         [DisplayName(@"网站名")]
@@ -57,7 +31,7 @@ namespace TaoShui.Model
             get { return _settings; }
             set
             {
-                if (value != null && _settings != value)
+                if ((value != null) && (_settings != value))
                 {
                     _settings = value;
                     RaisePropertyChanged();
@@ -111,11 +85,37 @@ namespace TaoShui.Model
             get { return _setting; }
             set
             {
-                if (value != null && _setting != value)
+                if ((value != null) && (_setting != value))
                 {
                     _setting = value;
                     SettingId = _setting.Id;
                     Name = _setting.Name;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public long Id
+        {
+            get { return _id; }
+            set
+            {
+                if (_id != value)
+                {
+                    _id = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
                     RaisePropertyChanged();
                 }
             }

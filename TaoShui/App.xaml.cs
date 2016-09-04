@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Threading;
 using System.Windows;
-using log4net;
 
 namespace TaoShui
 {

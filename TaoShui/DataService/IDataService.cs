@@ -5,10 +5,11 @@ using TaoShui.Model;
 
 namespace TaoShui.DataService
 {
-    public interface IDataService<TModel, TDto> 
-        where TModel : ObservableObject, IModelBase 
+    public interface IDataService<TModel, TDto>
+        where TModel : ObservableObject, IModelBase
         where TDto : new()
     {
+        IMapper Mapper { get; }
         ObservableCollection<TModel> SelectAllModel();
 
         TModel SelectModelById(long id);
@@ -22,7 +23,5 @@ namespace TaoShui.DataService
         DbResult<TDto> Delete(TModel model);
 
         DbResult<TDto> Insert(TModel model);
-
-        IMapper Mapper { get; }
     }
 }
