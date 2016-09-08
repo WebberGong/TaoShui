@@ -50,7 +50,7 @@ namespace CustomDrawing.Core
         public float HitY;
         public bool DoHitTest = false;
         public bool DoRender;
-        public PinTypes SnapMode = PinTypes.Origin | PinTypes.Connector;
+        public PinTypes SnapMode = PinTypes.Connector;
         public float HitRadius = 10f;
         private HashSet<int> _selectedHash;
         private HashSet<int> _hitTestHash;

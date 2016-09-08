@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using CustomDrawing;
 using CustomDrawing.Core;
 using TaoShui.Model;
+using Line = CustomDrawing.Core.Line;
 
 namespace TaoShui.View
 {
@@ -82,7 +83,7 @@ namespace TaoShui.View
         private void WebSiteRelation_OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
             ObservableCollection<WebSiteSetting> webSiteSettings = DataContext as ObservableCollection<WebSiteSetting>;
-            Drawing(webSiteSettings);
+            ReDrawing(webSiteSettings);
         }
 
         #region Drawing
@@ -97,24 +98,81 @@ namespace TaoShui.View
 
             var g = CreateCustomGate();
 
-            float x = (float)(Canvas.ActualWidth / 5);
+            float x = (float)(Canvas.ActualWidth / 8);
             float y = 30f;
             foreach (var setting in webSiteSettings)
             {
-                InsertGate(g, setting.Name, x, y, 0f);
-                InsertGate(g, setting.Name, (float)(Canvas.ActualWidth - x - 60f), y, 0f);
-                y += 50f;
+                InsertGate(g, setting.Name, x, y, 0f, Postion.Left);
+                InsertGate(g, setting.Name, (float)(Canvas.ActualWidth - x - 60f), y, 0f, Postion.Right);
+                y += 40f;
             }
             _editor.Redraw();
         }
 
-        private void InsertGate(Custom g, string text, float x, float y, float angle)
+        private void ReDrawing(ObservableCollection<WebSiteSetting> webSiteSettings)
+        {
+            if (webSiteSettings == null)
+            {
+                return;
+            }
+            float x = (float)(Canvas.ActualWidth / 8);
+
+            foreach (var elem in _root.Painter.Elements)
+            {
+                if (elem is Reference)
+                {
+                    var reference = elem as Reference;
+                    switch (reference.Position)
+                    {
+                        case Postion.Top:
+                            break;
+                        case Postion.Bottom:
+                            break;
+                        case Postion.Left:
+                            reference.Origin.X = x;
+                            break;
+                        case Postion.Right:
+                            reference.Origin.X = (float)(Canvas.ActualWidth - x - 60f);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else if (elem is Line)
+                {
+
+                }
+            }
+            _editor.Redraw();
+        }
+
+        private void InsertGate(Custom g, string text, float x, float y, float angle, Postion postion)
         {
             var rg = _factory.CreateReference(null, g, x, y);
             var o = g.Variables[0] as Text;
-            if (o != null) rg.Variables.Add(o.Id, text);
+            if (o != null)
+            {
+                rg.Variables.Add(o.Id, text);
+                rg.Position = postion;
+            }
             rg.Angle = angle;
-            CreateConnectorsGate(rg);
+            switch (postion)
+            {
+                case Postion.Top:
+                    rg.Connectors.Add(_factory.CreatePin(rg, 30f, 30f, PinTypes.Connector));
+                    break;
+                case Postion.Bottom:
+                    rg.Connectors.Add(_factory.CreatePin(rg, 30f, 0f, PinTypes.Connector));
+                    break;
+                case Postion.Left:
+                    rg.Connectors.Add(_factory.CreatePin(rg, 60f, 15f, PinTypes.Connector));
+                    break;
+                case Postion.Right:
+                    rg.Connectors.Add(_factory.CreatePin(rg, 0f, 15f, PinTypes.Connector));
+                    break;
+                default:
+                    break;
+            }
             _root.Painter.Elements.Add(rg);
         }
 
@@ -143,14 +201,6 @@ namespace TaoShui.View
             custom.Variables.Add(text);
 
             return custom;
-        }
-
-        private void CreateConnectorsGate(Reference reference)
-        {
-            reference.Connectors.Add(_factory.CreatePin(reference, 30f, 0f, PinTypes.Connector));
-            reference.Connectors.Add(_factory.CreatePin(reference, 60f, 15f, PinTypes.Connector));
-            reference.Connectors.Add(_factory.CreatePin(reference, 30f, 30f, PinTypes.Connector));
-            reference.Connectors.Add(_factory.CreatePin(reference, 0f, 15f, PinTypes.Connector));
         }
 
         #endregion

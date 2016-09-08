@@ -49,6 +49,7 @@
     <Compile Include="Core\EditMode.cs" />
     <Compile Include="Core\Editor.cs" />
     <Compile Include="Core\Element.cs" />
+    <Compile Include="Core\Postion.cs" />
     <Compile Include="Core\Factory.cs" />
     <Compile Include="Core\HAlign.cs" />
     <Compile Include="Core\IPointer.cs" />

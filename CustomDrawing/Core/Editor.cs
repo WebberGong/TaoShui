@@ -300,18 +300,14 @@ namespace CustomDrawing.Core
             if (Painter.Selected != null)
             {
                 _line.End = Painter.Selected;
+                Painter.Elements.Add(_line.ExternalRectangle);
                 Painter.ResetSelected();
-                Painter.Elements.Add(_line);
-                if (Painter.IsDirty())
-                {
-                    Redraw();
-                }
             }
             else
             {
                 RemoveCurrentElement();
-                Redraw();
             }
+            Redraw();
             _line = null;
         }
 

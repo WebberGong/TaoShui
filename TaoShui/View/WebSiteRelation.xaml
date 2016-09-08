@@ -6,20 +6,23 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              MinWidth="200"
+             MinHeight="200"
              DataContextChanged="WebSiteRelation_OnDataContextChanged"
              SizeChanged="WebSiteRelation_OnSizeChanged">
     <Grid>
         <Border BorderBrush="CornflowerBlue" BorderThickness="1">
-            <Canvas x:Name="Canvas" Background="AliceBlue" RenderOptions.EdgeMode="Unspecified">
-                <Canvas.LayoutTransform>
-                    <TransformGroup>
-                        <ScaleTransform ScaleX="1" ScaleY="1"/>
-                        <SkewTransform/>
-                        <RotateTransform/>
-                        <TranslateTransform/>
-                    </TransformGroup>
-                </Canvas.LayoutTransform>
-            </Canvas>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <Canvas x:Name="Canvas" Background="AliceBlue" RenderOptions.EdgeMode="Unspecified">
+                    <Canvas.LayoutTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1" ScaleY="1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Canvas.LayoutTransform>
+                </Canvas>
+            </ScrollViewer>
         </Border>
     </Grid>
 </UserControl>
