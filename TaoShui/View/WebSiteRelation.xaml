@@ -3,26 +3,77 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
-             MinWidth="200"
-             MinHeight="200"
-             DataContextChanged="WebSiteRelation_OnDataContextChanged"
-             SizeChanged="WebSiteRelation_OnSizeChanged">
+             xmlns:ui="clr-namespace:FontAwesomeWPF;assembly=FontAwesomeWPF"
+             Background="White">
+    <UserControl.Resources>
+        <Style TargetType="Border">
+            <Setter Property="BorderBrush" Value="CornflowerBlue"></Setter>
+            <Setter Property="BorderThickness" Value="1"></Setter>
+            <Setter Property="Background" Value="White"></Setter>
+        </Style>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource FontAwesomeStyle}">
+            <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <TextBlock Text="{x:Static ui:Fa.Check}" FontSize="30" Foreground="Green">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource FontAwesomeStyle}">
+                                            <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+                                            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="False">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <TextBlock Text="{x:Static ui:Fa.Minus}" FontSize="30" Foreground="Black">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock" BasedOn="{StaticResource FontAwesomeStyle}">
+                                            <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+                                            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
     <Grid>
-        <Border BorderBrush="CornflowerBlue" BorderThickness="1">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                <Canvas x:Name="Canvas" Background="AliceBlue" RenderOptions.EdgeMode="Unspecified">
-                    <Canvas.LayoutTransform>
-                        <TransformGroup>
-                            <ScaleTransform ScaleX="1" ScaleY="1"/>
-                            <SkewTransform/>
-                            <RotateTransform/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </Canvas.LayoutTransform>
-                </Canvas>
-            </ScrollViewer>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Border Grid.Row="0" Grid.Column="0" Margin="0 0 1 0">
+            <TextBlock Text="{x:Static ui:Fa.Link}" FontSize="30"></TextBlock>
         </Border>
+        <Grid Grid.Row="0" Grid.Column="1" Margin="-1 0 0 0">
+            <StackPanel x:Name="panel1" Orientation="Horizontal"></StackPanel>
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="0" Margin="0 -1 0 0">
+            <StackPanel x:Name="panel2" Orientation="Vertical"></StackPanel>
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="1" Margin="-1 -1 0 0">
+            <StackPanel x:Name="panel3" Orientation="Vertical"></StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

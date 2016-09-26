@@ -248,10 +248,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CustomDrawing\CustomDrawing.csproj">
-      <Project>{77609ce3-81f3-4b14-85be-7e95b2bf1c0c}</Project>
-      <Name>CustomDrawing</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Entity\Entity.csproj">
       <Project>{74f6a4c2-e508-4aa2-8993-ca7cc57f0562}</Project>
       <Name>Entity</Name>

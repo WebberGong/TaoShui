@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using GalaSoft.MvvmLight;
+using System.Collections.ObjectModel;
 
 namespace TaoShui.Model
 {
@@ -11,6 +12,7 @@ namespace TaoShui.Model
         private int _loginTimeOut;
         private string _name;
         private string _url;
+        private ObservableCollection<WebSiteSetting> _relatedWebSiteSettings;
 
         [DisplayName(@"网址")]
         public string Url
@@ -90,6 +92,19 @@ namespace TaoShui.Model
                 if (_name != value)
                 {
                     _name = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public ObservableCollection<WebSiteSetting> RelatedWebSiteSettings
+        {
+            get { return _relatedWebSiteSettings; }
+            set
+            {
+                if (_relatedWebSiteSettings != value)
+                {
+                    _relatedWebSiteSettings = value;
                     RaisePropertyChanged();
                 }
             }

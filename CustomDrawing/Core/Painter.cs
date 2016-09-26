@@ -89,6 +89,17 @@ namespace CustomDrawing.Core
             return (Selected == null) && !pin.IsSelected && testResult;
         }
 
+        private bool HitTest(Line line, float hitX, float hitY)
+        {
+            return line.ExternalRectangle.
+        }
+
+        private bool HitTest(Line line, float x, float y)
+        {
+            var testResult = HitTest(pin, HitRadius, pin.X + x, pin.Y + y, HitX, HitY);
+            return (Selected == null) && !pin.IsSelected && testResult;
+        }
+
         #endregion
 
         #region Selected
@@ -195,8 +206,55 @@ namespace CustomDrawing.Core
                 Draw(pin, x, y, variables);
         }
 
+
+        private void HitTestForSelected(Line pin, float x, float y)
+        {
+            if (DoHitTest)
+            {
+                bool hit;
+                var parent = pin.Parent as Reference;
+                if (parent != null)
+                {
+                    var origin = parent.Origin;
+                    hit = HitTest(pin, origin.X + x, origin.Y + y);
+                }
+                else
+                {
+                    hit = HitTest(pin, x, y);
+                }
+
+                if (hit && ((SnapMode & pin.Type) == pin.Type))
+                {
+                    SetSelected(pin);
+                    AddSelected(pin, x, y, Renderer.GetAngle(), Renderer.GetCenterX(), Renderer.GetCenterY());
+                }
+                else if (CanDeselect(pin))
+                {
+                    pin.IsSelected = false;
+                }
+            }
+            else
+            {
+                var parent = pin.Parent as Reference;
+                if (parent != null)
+                {
+                    var origin = parent.Origin;
+                    HitTest(pin, origin.X + x, origin.Y + y);
+                }
+                else
+                {
+                    HitTest(pin, x, y);
+                }
+
+                if (pin.IsSelected)
+                    AddSelected(pin, x, y, Renderer.GetAngle(), Renderer.GetCenterX(), Renderer.GetCenterY());
+            }
+        }
+
         private void Draw(Line line, float x, float y, IDictionary<int, string> variables)
         {
+            HitTestForSelected(line, x, y);
+
             if (DoRender)
                 Renderer.Draw(line, x, y, variables);
 

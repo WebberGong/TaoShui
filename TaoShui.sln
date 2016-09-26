@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaptchaRecogniser", "CaptchaRecogniser\CaptchaRecogniser.csproj", "{A49647C1-A474-4368-80A7-A59C7E1E5750}"
 EndProject
@@ -20,8 +20,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{D8566BBE-2E67-40A9-B9F0-19AC81C1AD79}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FontAwesome", "FontAwesome\FontAwesome.csproj", "{784B0AE1-D15C-4FD7-A9AE-799081D41323}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomDrawing", "CustomDrawing\CustomDrawing.csproj", "{77609CE3-81F3-4B14-85BE-7E95B2BF1C0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,10 +63,6 @@ Global
 		{784B0AE1-D15C-4FD7-A9AE-799081D41323}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{784B0AE1-D15C-4FD7-A9AE-799081D41323}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{784B0AE1-D15C-4FD7-A9AE-799081D41323}.Release|Any CPU.Build.0 = Release|Any CPU
-		{77609CE3-81F3-4B14-85BE-7E95B2BF1C0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{77609CE3-81F3-4B14-85BE-7E95B2BF1C0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{77609CE3-81F3-4B14-85BE-7E95B2BF1C0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{77609CE3-81F3-4B14-85BE-7E95B2BF1C0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
