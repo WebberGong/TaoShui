@@ -74,9 +74,9 @@ namespace TaoShui.ViewModel
             WebSiteSettingAddCommand = new RelayCommand(ExecuteWebSiteSettingAddCommand);
             WebSiteSettingEditCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteSettingEditCommand);
             WebSiteSettingRemoveCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteSettingRemoveCommand);
-            WebSiteAddCommand = new RelayCommand(ExecuteWebSiteAddCommand);
-            WebSiteEditCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteEditCommand);
-            WebSiteRemoveCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteRemoveCommand);
+            WebSiteAccountAddCommand = new RelayCommand(ExecuteWebSiteAccountAddCommand);
+            WebSiteAccountEditCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteAccountEditCommand);
+            WebSiteAccountRemoveCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteAccountRemoveCommand);
             SaveWebSiteSettingsCommand = new RelayCommand(ExecuteSaveWebSiteSettingsCommand);
         }
 
@@ -106,11 +106,11 @@ namespace TaoShui.ViewModel
 
         public ICommand WebSiteSettingRemoveCommand { get; private set; }
 
-        public ICommand WebSiteAddCommand { get; private set; }
+        public ICommand WebSiteAccountAddCommand { get; private set; }
 
-        public ICommand WebSiteEditCommand { get; private set; }
+        public ICommand WebSiteAccountEditCommand { get; private set; }
 
-        public ICommand WebSiteRemoveCommand { get; private set; }
+        public ICommand WebSiteAccountRemoveCommand { get; private set; }
 
         public ICommand SaveWebSiteSettingsCommand { get; private set; }
 
@@ -160,7 +160,7 @@ namespace TaoShui.ViewModel
                 }
         }
 
-        private void ExecuteWebSiteAddCommand()
+        private void ExecuteWebSiteAccountAddCommand()
         {
             var site = new WebSiteAccount(WebSiteSettings);
             new NewModelWindow<WebSiteAccount, WebSiteAccountDto>(
@@ -174,7 +174,7 @@ namespace TaoShui.ViewModel
                 }).ShowDialog();
         }
 
-        private void ExecuteWebSiteEditCommand(ContentPresenter contentPresenter)
+        private void ExecuteWebSiteAccountEditCommand(ContentPresenter contentPresenter)
         {
             var site = contentPresenter.Content as WebSiteAccount;
             if (site != null)
@@ -185,7 +185,7 @@ namespace TaoShui.ViewModel
                     (result, model) => { }).ShowDialog();
         }
 
-        private void ExecuteWebSiteRemoveCommand(ContentPresenter contentPresenter)
+        private void ExecuteWebSiteAccountRemoveCommand(ContentPresenter contentPresenter)
         {
             var site = contentPresenter.Content as WebSiteAccount;
             if (site != null)

@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using GalaSoft.MvvmLight;
 
 namespace TaoShui.Model
@@ -75,6 +76,11 @@ namespace TaoShui.Model
                 if (_settingId != value)
                 {
                     _settingId = value;
+                    if (Settings != null)
+                    {
+                        var setting = Settings.FirstOrDefault(x => x.Id == _settingId);
+                        Setting = setting;
+                    }
                     RaisePropertyChanged();
                 }
             }

@@ -99,7 +99,7 @@
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseLeftButtonDown">
                                             <i:InvokeCommandAction
-                                                Command="{Binding DataContext.WebSiteAddCommand, 
+                                                Command="{Binding DataContext.WebSiteAccountAddCommand, 
                                                 RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
@@ -117,7 +117,7 @@
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction
-                                                    Command="{Binding DataContext.WebSiteEditCommand, 
+                                                    Command="{Binding DataContext.WebSiteAccountEditCommand, 
                                                     RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"
                                                     CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
                                             </i:EventTrigger>
@@ -128,7 +128,7 @@
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                                 <i:InvokeCommandAction
-                                                    Command="{Binding DataContext.WebSiteRemoveCommand, 
+                                                    Command="{Binding DataContext.WebSiteAccountRemoveCommand, 
                                                     RelativeSource={RelativeSource AncestorType=UserControl, Mode=FindAncestor}}"
                                                     CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
                                             </i:EventTrigger>
