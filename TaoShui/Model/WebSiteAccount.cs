@@ -5,7 +5,7 @@ using GalaSoft.MvvmLight;
 
 namespace TaoShui.Model
 {
-    public class WebSite : ObservableObject, IModelBase
+    public class WebSiteAccount : ObservableObject, IModelBase
     {
         private long _id;
         private string _loginName;
@@ -15,11 +15,11 @@ namespace TaoShui.Model
         private long _settingId;
         private ObservableCollection<WebSiteSetting> _settings;
 
-        public WebSite()
+        public WebSiteAccount()
         {
         }
 
-        public WebSite(ObservableCollection<WebSiteSetting> settings)
+        public WebSiteAccount(ObservableCollection<WebSiteSetting> settings)
         {
             _settings = settings;
         }

@@ -29,14 +29,14 @@ namespace TaoShui
 
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<SettingViewModel>();
-            SimpleIoc.Default.Register<WebSiteViewModel>();
+            SimpleIoc.Default.Register<WebSiteAccountViewModel>();
             SimpleIoc.Default.Register<MatchViewModel>();
             SimpleIoc.Default.Register<RelevanceViewModel>();
             SimpleIoc.Default.Register<WebSiteSettingViewModel>();
             SimpleIoc.Default.Register<SystemSettingViewModel>();
 
             SimpleIoc.Default.Register<IDataService<WebSiteSetting, WebSiteSettingDto>, WebSiteSettingDataService>();
-            SimpleIoc.Default.Register<IDataService<WebSite, WebSiteDto>, WebSiteDataService>();
+            SimpleIoc.Default.Register<IDataService<WebSiteAccount, WebSiteAccountDto>, WebSiteAccountDataService>();
         }
 
         public MainViewModel Main

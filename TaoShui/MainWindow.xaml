@@ -15,6 +15,11 @@
     DataContext="{Binding Main, Source={StaticResource Locator}}"
     Background="PowderBlue"
     Icon="{Binding Icon, Mode=OneWay}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding ClosedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Window.Resources>
         <ControlTemplate x:Key="MainMenuTemplate" TargetType="RadioButton">
             <Border>

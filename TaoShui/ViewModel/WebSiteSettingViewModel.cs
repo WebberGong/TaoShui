@@ -15,21 +15,57 @@ namespace TaoShui.ViewModel
 {
     public class WebSiteSettingViewModel : ViewModelBase
     {
-        private readonly IDataService<WebSite, WebSiteDto> _webSiteDs;
+        private readonly IDataService<WebSiteAccount, WebSiteAccountDto> _webSiteAccountDs;
         private readonly IDataService<WebSiteSetting, WebSiteSettingDto> _webSiteSettingDs;
         private ObservableCollection<WebSiteSetting> _webSiteSettings;
-        private ObservableCollection<WebSite> _webSites;
+        private ObservableCollection<WebSiteAccount> _webSiteAccounts;
 
         public WebSiteSettingViewModel(
             IDataService<WebSiteSetting, WebSiteSettingDto> webSiteSettingDs,
-            IDataService<WebSite, WebSiteDto> webSiteDs)
+            IDataService<WebSiteAccount, WebSiteAccountDto> webSiteAccountDs)
         {
             _webSiteSettingDs = webSiteSettingDs;
-            _webSiteDs = webSiteDs;
+            _webSiteAccountDs = webSiteAccountDs;
 
             WebSiteSettings = _webSiteSettingDs.SelectAllModel();
-            WebSites = _webSiteDs.SelectAllModel();
-            foreach (var site in WebSites)
+            WebSiteAccounts = _webSiteAccountDs.SelectAllModel();
+
+            foreach (var item1 in WebSiteSettings)
+            {
+                var relatedWebSiteSettings = new ObservableCollection<SelectableObject<WebSiteSetting>>();
+                foreach (var item2 in WebSiteSettings)
+                {
+                    relatedWebSiteSettings.Add(new SelectableObject<WebSiteSetting>() { IsSelected = false, Object = item2 });
+                }
+                item1.RelatedWebSiteSettings = relatedWebSiteSettings;
+            }
+
+            foreach (var item1 in WebSiteSettings)
+            {
+                foreach (var item2 in item1.RelatedWebSiteSettings)
+                {
+                    item2.IsSelected = item2.Object.RelatedWebSiteSettingsString != null && item2.Object.RelatedWebSiteSettingsString.Contains(item1.Id.ToString());
+                    var setting1 = item1;
+                    item2.PropertyChanged += (sender, e) =>
+                    {
+                        var s1 = sender as SelectableObject<WebSiteSetting>;
+                        if (e.PropertyName == "IsSelected" && s1 != null)
+                        {
+                            var setting2 = WebSiteSettings.FirstOrDefault(x => x.Id == s1.Object.Id);
+                            if (setting2 != null)
+                            {
+                                var s2 = setting2.RelatedWebSiteSettings.FirstOrDefault(x => x.Object.Id == setting1.Id);
+                                if (s2 != null)
+                                {
+                                    s2.IsSelected = s1.IsSelected;
+                                }
+                            }
+                        }
+                    };
+                }
+            }
+
+            foreach (var site in WebSiteAccounts)
             {
                 site.Setting = WebSiteSettings.FirstOrDefault(x => x.Id == site.SettingId);
                 site.Settings = WebSiteSettings;
@@ -41,6 +77,7 @@ namespace TaoShui.ViewModel
             WebSiteAddCommand = new RelayCommand(ExecuteWebSiteAddCommand);
             WebSiteEditCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteEditCommand);
             WebSiteRemoveCommand = new RelayCommand<ContentPresenter>(ExecuteWebSiteRemoveCommand);
+            SaveWebSiteSettingsCommand = new RelayCommand(ExecuteSaveWebSiteSettingsCommand);
         }
 
         public ObservableCollection<WebSiteSetting> WebSiteSettings
@@ -53,12 +90,12 @@ namespace TaoShui.ViewModel
             }
         }
 
-        public ObservableCollection<WebSite> WebSites
+        public ObservableCollection<WebSiteAccount> WebSiteAccounts
         {
-            get { return _webSites; }
+            get { return _webSiteAccounts; }
             private set
             {
-                _webSites = value;
+                _webSiteAccounts = value;
                 RaisePropertyChanged();
             }
         }
@@ -74,6 +111,8 @@ namespace TaoShui.ViewModel
         public ICommand WebSiteEditCommand { get; private set; }
 
         public ICommand WebSiteRemoveCommand { get; private set; }
+
+        public ICommand SaveWebSiteSettingsCommand { get; private set; }
 
         private void ExecuteWebSiteSettingAddCommand()
         {
@@ -110,8 +149,8 @@ namespace TaoShui.ViewModel
                     if (result.IsSuccess)
                     {
                         WebSiteSettings.Remove(setting);
-                        var removeList = WebSites.Where(x => x.SettingId == setting.Id).ToList();
-                        removeList.ForEach(x => WebSites.Remove(x));
+                        var removeList = WebSiteAccounts.Where(x => x.SettingId == setting.Id).ToList();
+                        removeList.ForEach(x => WebSiteAccounts.Remove(x));
                         MyMessageBox.ShowInformationDialog(result.CombinedMsg);
                     }
                     else
@@ -123,39 +162,39 @@ namespace TaoShui.ViewModel
 
         private void ExecuteWebSiteAddCommand()
         {
-            var site = new WebSite(WebSiteSettings);
-            new NewModelWindow<WebSite, WebSiteDto>(
+            var site = new WebSiteAccount(WebSiteSettings);
+            new NewModelWindow<WebSiteAccount, WebSiteAccountDto>(
                 true,
                 site,
-                _webSiteDs,
+                _webSiteAccountDs,
                 (result, model) =>
                 {
                     if (result.IsSuccess)
-                        WebSites.Add(model);
+                        WebSiteAccounts.Add(model);
                 }).ShowDialog();
         }
 
         private void ExecuteWebSiteEditCommand(ContentPresenter contentPresenter)
         {
-            var site = contentPresenter.Content as WebSite;
+            var site = contentPresenter.Content as WebSiteAccount;
             if (site != null)
-                new NewModelWindow<WebSite, WebSiteDto>(
+                new NewModelWindow<WebSiteAccount, WebSiteAccountDto>(
                     false,
                     site,
-                    _webSiteDs,
+                    _webSiteAccountDs,
                     (result, model) => { }).ShowDialog();
         }
 
         private void ExecuteWebSiteRemoveCommand(ContentPresenter contentPresenter)
         {
-            var site = contentPresenter.Content as WebSite;
+            var site = contentPresenter.Content as WebSiteAccount;
             if (site != null)
                 if (MyMessageBox.ShowQuestionDialog("确定要删除该条数据吗?") == DialogResult.OK)
                 {
-                    var result = _webSiteDs.Delete(site);
+                    var result = _webSiteAccountDs.Delete(site);
                     if (result.IsSuccess)
                     {
-                        WebSites.Remove(site);
+                        WebSiteAccounts.Remove(site);
                         MyMessageBox.ShowInformationDialog(result.CombinedMsg);
                     }
                     else
@@ -163,6 +202,12 @@ namespace TaoShui.ViewModel
                         MyMessageBox.ShowWarningDialog(result.CombinedMsg);
                     }
                 }
+        }
+
+        private void ExecuteSaveWebSiteSettingsCommand()
+        {
+            bool result = _webSiteSettingDs.SaveAllModel(WebSiteSettings);
+            MyMessageBox.ShowInformationDialog(result ? "保存成功！" : "保存失败！");
         }
     }
 }

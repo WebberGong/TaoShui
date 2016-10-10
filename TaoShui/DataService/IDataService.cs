@@ -18,6 +18,8 @@ namespace TaoShui.DataService
 
         TDto SelectDtoById(long id);
 
+        bool SaveAllModel(ObservableCollection<TModel> models);
+
         DbResult<TDto> Update(TModel model);
 
         DbResult<TDto> Delete(TModel model);

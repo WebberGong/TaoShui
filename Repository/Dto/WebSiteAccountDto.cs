@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Repository.Dto
 {
-    [Table("WebSite")]
-    public class WebSiteDto
+    [Table("WebSiteAccount")]
+    public class WebSiteAccountDto
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

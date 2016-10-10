@@ -123,11 +123,12 @@
     <Compile Include="DataService\DbResult.cs" />
     <Compile Include="DataService\EnumErrorMsg.cs" />
     <Compile Include="DataService\EnumOkMsg.cs" />
-    <Compile Include="DataService\WebSiteDataService.cs" />
+    <Compile Include="DataService\WebSiteAccountDataService.cs" />
     <Compile Include="DataService\WebSiteSettingDataService.cs" />
     <Compile Include="DataService\IDataService.cs" />
     <Compile Include="Model\IModelBase.cs" />
-    <Compile Include="Model\WebSite.cs" />
+    <Compile Include="Model\SelectableObject.cs" />
+    <Compile Include="Model\WebSiteAccount.cs" />
     <Compile Include="Model\WebSiteSetting.cs" />
     <Compile Include="Shared\ComboBoxItem.xaml.cs">
       <DependentUpon>ComboBoxItem.xaml</DependentUpon>
@@ -153,8 +154,8 @@
     <Compile Include="View\SystemSettingView.xaml.cs">
       <DependentUpon>SystemSettingView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\WebSiteRelation.xaml.cs">
-      <DependentUpon>WebSiteRelation.xaml</DependentUpon>
+    <Compile Include="View\WebSiteRelationView.xaml.cs">
+      <DependentUpon>WebSiteRelationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\WebSiteSettingView.xaml.cs">
       <DependentUpon>WebSiteSettingView.xaml</DependentUpon>
@@ -165,8 +166,8 @@
     <Compile Include="MainViewModel.cs" />
     <Compile Include="ViewModel\SettingViewModel.cs" />
     <Compile Include="ViewModelLocator.cs" />
-    <Compile Include="View\WebSiteView.xaml.cs">
-      <DependentUpon>WebSiteView.xaml</DependentUpon>
+    <Compile Include="View\WebSiteAccountView.xaml.cs">
+      <DependentUpon>WebSiteAccountView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -204,7 +205,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\WebSiteRelation.xaml">
+    <Page Include="View\WebSiteRelationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -216,7 +217,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\WebSiteView.xaml">
+    <Page Include="View\WebSiteAccountView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -275,6 +276,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converter\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="jquery-3.1.0.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.102.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.102.0\build\net45\System.Data.SQLite.Core.targets')" />

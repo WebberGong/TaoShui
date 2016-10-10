@@ -2,9 +2,9 @@
 
 namespace TaoShui.ViewModel
 {
-    public class WebSiteViewModel : ViewModelBase
+    public class WebSiteAccountViewModel : ViewModelBase
     {
-        private string _name = "WebSite";
+        private string _name = "WebSiteAccount";
 
         public string Name
         {

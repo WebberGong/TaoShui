@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using GalaSoft.MvvmLight;
 using System.Collections.ObjectModel;
+using System.Text;
 
 namespace TaoShui.Model
 {
@@ -12,7 +13,8 @@ namespace TaoShui.Model
         private int _loginTimeOut;
         private string _name;
         private string _url;
-        private ObservableCollection<WebSiteSetting> _relatedWebSiteSettings;
+        private ObservableCollection<SelectableObject<WebSiteSetting>> _relatedWebSiteSettings;
+        private string _relatedWebSiteSettingsString;
 
         [DisplayName(@"网址")]
         public string Url
@@ -97,7 +99,7 @@ namespace TaoShui.Model
             }
         }
 
-        public ObservableCollection<WebSiteSetting> RelatedWebSiteSettings
+        public ObservableCollection<SelectableObject<WebSiteSetting>> RelatedWebSiteSettings
         {
             get { return _relatedWebSiteSettings; }
             set
@@ -105,9 +107,53 @@ namespace TaoShui.Model
                 if (_relatedWebSiteSettings != value)
                 {
                     _relatedWebSiteSettings = value;
+                    foreach (var setting in _relatedWebSiteSettings)
+                    {
+                        setting.PropertyChanged += (sender, e) =>
+                        {
+                            if (e.PropertyName == "IsSelected")
+                            {
+                                RelatedWebSiteSettingsString = GetRelatedWebSiteSettingsString();
+                            }
+                        };
+                    }
                     RaisePropertyChanged();
                 }
             }
+        }
+
+        public string RelatedWebSiteSettingsString
+        {
+            get { return _relatedWebSiteSettingsString; }
+            set
+            {
+                if (_relatedWebSiteSettingsString != value)
+                {
+                    _relatedWebSiteSettingsString = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private string GetRelatedWebSiteSettingsString()
+        {
+            StringBuilder result = new StringBuilder();
+            if (RelatedWebSiteSettings != null)
+            {
+                foreach (var item in RelatedWebSiteSettings)
+                {
+                    if (item.IsSelected)
+                    {
+                        result.Append(item.Object.Id + ",");
+                    }
+                }
+            }
+            string settingString = result.ToString();
+            if (settingString.Length > 0)
+            {
+                settingString = settingString.Substring(0, settingString.Length - 1);
+            }
+            return settingString;
         }
     }
 }

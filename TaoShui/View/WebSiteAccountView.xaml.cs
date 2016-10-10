@@ -3,11 +3,11 @@
 namespace TaoShui.View
 {
     /// <summary>
-    ///     Interaction logic for WebSiteView.xaml
+    ///     Interaction logic for WebSiteAccountView.xaml
     /// </summary>
-    public partial class WebSiteView : UserControl
+    public partial class WebSiteAccountView : UserControl
     {
-        public WebSiteView()
+        public WebSiteAccountView()
         {
             InitializeComponent();
         }

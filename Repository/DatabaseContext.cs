@@ -15,6 +15,6 @@ namespace Repository
 
         public DbSet<WebSiteSettingDto> WebSiteSettings { get; set; }
 
-        public DbSet<WebSiteDto> WebSites { get; set; }
+        public DbSet<WebSiteAccountDto> WebSiteAccounts { get; set; }
     }
 }

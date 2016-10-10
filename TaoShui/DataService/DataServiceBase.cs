@@ -29,6 +29,8 @@ namespace TaoShui.DataService
 
         public abstract TDto SelectDtoById(long id);
 
+        public abstract bool SaveAllModel(ObservableCollection<TModel> models);
+
         public abstract DbResult<TDto> Update(TModel model);
 
         public abstract DbResult<TDto> Delete(TModel model);

@@ -92,7 +92,7 @@
                                 </Setter.Value>
                             </Setter>
                             <Setter Property="BorderThickness" Value="1" />
-                            <Setter Property="BorderBrush" Value="RoyalBlue" />
+                            <Setter Property="BorderBrush" Value="DodgerBlue" />
                             <Setter Property="Width" Value="80" />
                             <Setter Property="Height" Value="25" />
                             <Style.Triggers>
@@ -122,8 +122,8 @@
             <DataTemplate DataType="{x:Type vm:SettingViewModel}">
                 <v:SettingView />
             </DataTemplate>
-            <DataTemplate DataType="{x:Type vm:WebSiteViewModel}">
-                <v:WebSiteView />
+            <DataTemplate DataType="{x:Type vm:WebSiteAccountViewModel}">
+                <v:WebSiteAccountView />
             </DataTemplate>
             <DataTemplate DataType="{x:Type vm:MatchViewModel}">
                 <v:MatchView />

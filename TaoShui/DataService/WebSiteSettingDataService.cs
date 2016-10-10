@@ -42,6 +42,27 @@ namespace TaoShui.DataService
             }
         }
 
+        public override bool SaveAllModel(ObservableCollection<WebSiteSetting> models)
+        {
+            using (var context = new DatabaseContext())
+            {
+                foreach (var dto in context.WebSiteSettings)
+                {
+                    var model = models.FirstOrDefault(x => x.Id == dto.Id);
+                    _mapper.Map(model, dto);
+                }
+                int result = context.SaveChanges();
+                if (result > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
         public override DbResult<WebSiteSettingDto> Update(WebSiteSetting model)
         {
             if (model == null)
@@ -78,7 +99,7 @@ namespace TaoShui.DataService
                 if (dto != null)
                 {
                     context.WebSiteSettings.Remove(dto);
-                    context.WebSites.RemoveRange(context.WebSites.Where(x => x.SettingId == dto.Id));
+                    context.WebSiteAccounts.RemoveRange(context.WebSiteAccounts.Where(x => x.SettingId == dto.Id));
                     context.SaveChanges();
                     return new DbResult<WebSiteSettingDto>(true, null, EnumOkMsg.删除数据成功.ToString(), dto);
                 }

@@ -26,5 +26,7 @@ namespace Repository.Dto
 
         [Range(1, 60, ErrorMessage = "抓取数据时间间隔必须介于1至60秒之间")]
         public int GrabDataInterval { get; set; }
+
+        public string RelatedWebSiteSettingsString { get; set; }
     }
 }

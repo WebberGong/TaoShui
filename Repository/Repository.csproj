@@ -85,14 +85,15 @@
     <Compile Include="CreateTablesIfNotExists.cs" />
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DbEntitySaveResult.cs" />
-    <Compile Include="Dto\WebSiteDto.cs" />
+    <Compile Include="Dto\WebSiteAccountDto.cs" />
+    <Compile Include="Dto\WebSiteRuleDto.cs" />
     <Compile Include="Dto\WebSiteSettingDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="data.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
   </ItemGroup>

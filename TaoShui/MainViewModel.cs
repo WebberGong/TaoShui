@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -30,7 +31,7 @@ namespace TaoShui
             ServiceLocator.Current.GetInstance<RelevanceViewModel>();
 
         private readonly SettingViewModel _settingViewModel = ServiceLocator.Current.GetInstance<SettingViewModel>();
-        private readonly WebSiteViewModel _webSiteViewModel = ServiceLocator.Current.GetInstance<WebSiteViewModel>();
+        private readonly WebSiteAccountViewModel _webSiteViewModel = ServiceLocator.Current.GetInstance<WebSiteAccountViewModel>();
         private ViewModelBase _currentViewModel;
         private bool _isAutoBet;
         private bool _isAutoRun;

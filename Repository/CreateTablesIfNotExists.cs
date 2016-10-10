@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Linq;
 using System.Transactions;
 using Repository.Dto;
 
@@ -17,13 +18,16 @@ namespace Repository
             }
             if (isDbExists)
             {
+                bool isWebSiteSettingExists = IsTableExists(context, "WebSiteSetting");
+
                 var webSiteSettingSql = @"CREATE TABLE IF NOT EXISTS [WebSiteSetting] (
 	                    Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	                    Name varchar(50) NOT NULL,
 	                    Url varchar(100) NOT NULL, 
 	                    CaptchaLength INTEGER,
 	                    LoginTimeOut INTEGER,
-	                    GrabDataInterval INTEGER
+	                    GrabDataInterval INTEGER,
+                        RelatedWebSiteSettingsString varchar(50)
                     );";
                 context.Database.ExecuteSqlCommand(webSiteSettingSql);
 
@@ -59,17 +63,23 @@ namespace Repository
                     GrabDataInterval = 1,
                     LoginTimeOut = 10
                 };
-                var webSiteSettings = new List<WebSiteSettingDto>
-                {
-                    maxbetSetting,
-                    isn99Setting,
-                    pinnacleSetting,
-                    sbobetSetting
-                };
-                webSiteSettings.ForEach(x => context.WebSiteSettings.Add(x));
-                context.SaveChanges();
 
-                var webSiteSql = @"CREATE TABLE IF NOT EXISTS [WebSite] (
+                if (!isWebSiteSettingExists)
+                {
+                    var webSiteSettings = new List<WebSiteSettingDto>
+                    {
+                        maxbetSetting,
+                        isn99Setting,
+                        pinnacleSetting,
+                        sbobetSetting
+                    };
+                    webSiteSettings.ForEach(x => context.WebSiteSettings.Add(x));
+                    context.SaveChanges();
+                }
+
+                bool isWebSiteExists = IsTableExists(context, "WebSiteAccount");
+
+                var webSiteSql = @"CREATE TABLE IF NOT EXISTS [WebSiteAccount] (
 	                    Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	                    LoginName varchar(50) NOT NULL,
 	                    Password varchar(50) NOT NULL,
@@ -77,40 +87,60 @@ namespace Repository
                     );";
                 context.Database.ExecuteSqlCommand(webSiteSql);
 
-                var webSites = new List<WebSiteDto>
+                if (!isWebSiteExists)
                 {
-                    new WebSiteDto
+                    var webSites = new List<WebSiteAccountDto>
                     {
-                        LoginName = "sfb1337952",
-                        Password = "Aaaa2235",
-                        SettingId = maxbetSetting.Id
-                    },
-                    new WebSiteDto
-                    {
-                        LoginName = "zb999111",
-                        Password = "sss123456",
-                        SettingId = isn99Setting.Id
-                    },
-                    new WebSiteDto
-                    {
-                        LoginName = "hh7d1hi061",
-                        Password = "ss123456@",
-                        SettingId = pinnacleSetting.Id
-                    },
-                    new WebSiteDto
-                    {
-                        LoginName = "hbhcgc3061",
-                        Password = "sss123456",
-                        SettingId = sbobetSetting.Id
-                    }
-                };
-                webSites.ForEach(x => context.WebSites.Add(x));
-                context.SaveChanges();
+                        new WebSiteAccountDto
+                        {
+                            LoginName = "sfb1337952",
+                            Password = "Aaaa2235",
+                            SettingId = maxbetSetting.Id
+                        },
+                        new WebSiteAccountDto
+                        {
+                            LoginName = "zb999111",
+                            Password = "sss123456",
+                            SettingId = isn99Setting.Id
+                        },
+                        new WebSiteAccountDto
+                        {
+                            LoginName = "hh7d1hi061",
+                            Password = "ss123456@",
+                            SettingId = pinnacleSetting.Id
+                        },
+                        new WebSiteAccountDto
+                        {
+                            LoginName = "hbhcgc3061",
+                            Password = "sss123456",
+                            SettingId = sbobetSetting.Id
+                        }
+                    };
+                    webSites.ForEach(x => context.WebSiteAccounts.Add(x));
+                    context.SaveChanges();
+                }
             }
             else
             {
                 throw new ApplicationException("No database instance");
             }
+        }
+
+        private bool IsTableExists(TContext context, string tableName)
+        {
+            var existsSql = string.Format("SELECT COUNT(*) FROM sqlite_master where type='table' and name='{0}'", tableName);
+            var cursor = context.Database.SqlQuery(typeof(int), existsSql).GetEnumerator();
+            bool result = false;
+
+            if (cursor.MoveNext())
+            {
+                int count = (int)cursor.Current;
+                if (count > 0)
+                {
+                    result = true;
+                }
+            }
+            return result;
         }
     }
 }

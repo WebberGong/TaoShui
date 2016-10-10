@@ -70,14 +70,14 @@
                 <ColumnDefinition Width="3*" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
-            <v:WebSiteRelation Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="0 0 3 0" DataContext="{Binding WebSiteSettings, Mode=OneWay}"></v:WebSiteRelation>
+            <v:WebSiteRelationView Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Margin="0 0 3 0" DataContext="{Binding}"></v:WebSiteRelationView>
             <GridSplitter Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Width="3" HorizontalAlignment="Right"
                           VerticalAlignment="Stretch" />
             <DataGrid Grid.Row="0" Grid.Column="1" Margin="0 0 0 3" />
             <GridSplitter Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
                           Height="3" />
             <DataGrid Grid.Row="1" Grid.Column="1" />
-            <DataGrid Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" ItemsSource="{Binding WebSites}" Margin="3 0 0 0">
+            <DataGrid Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" ItemsSource="{Binding WebSiteAccounts}" Margin="3 0 0 0">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="编号" Binding="{Binding Id, Mode=TwoWay}" Width="0.5*" IsReadOnly="True"
                                         ElementStyle="{StaticResource ContentCenterStyle}" />
